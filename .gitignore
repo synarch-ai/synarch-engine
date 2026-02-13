@@ -35,9 +35,7 @@ yarn-error.log
 .npm-cache/
 **/.npm-cache/
 
-# System
-.DS_Store
-.vscode/
-.idea/
-.auth-profile/
-*.dir
+# Ignore all dot directories (agents, tools, etc)
+.*/
+!/.vscode/
+!/.idea/
