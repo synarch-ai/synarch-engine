@@ -9,49 +9,36 @@ Aligned with V3 Design System: **Cyber-Sovereign Industrialism**
 **For Midjourney v6 / DALL-E / Ideogram:**
 
 ```
-A minimalist geometric logo mark for "Synarch" — an enterprise-grade
-autonomous AI agent orchestration engine.
+A complex, architectural blueprint, technical drawing logo for "Synarch" (SAMAS).
 
-CONCEPT: "The Distributed Crown" — A crown silhouette constructed entirely
-from interconnected network nodes and data pathways. NOT a decorative crown.
-A structural crown. An architecture that happens to look like sovereignty.
+CONCEPT: "The Sovereign Schematic". A crown shape visualized as a high-fidelity
+distributed system architecture diagram. It is not just a shape; it is a BLUEPRINT.
 
-CONSTRUCTION:
-- 5 to 7 nodes (small circles or hexagons) arranged in an ascending
-  chevron/crown formation
-- Thin precision lines connecting each node (representing the NATS message bus)
-- The overall shape reads as a crown from 50 feet away
-- Up close, it is clearly a distributed systems topology diagram
-- The center node sits highest — this is "Synarch" (the CEO agent)
-- Flanking nodes descend symmetrically — these are the C-Suite gods
+VISUALS:
+- An isometric or orthographic projection of 7 interlocking agent nodes
+- The nodes form a sharp, aggressive crown silhouette
+- The connections between nodes are detailed data pipelines (thick and thin lines)
+- Tiny, precise technical readouts (lines, numbers, crosshairs) surround the main shape
+- The aesthetic is "Military-Industrial AI Control System"
 
-MATERIAL FEEL:
-- Machined metal. Laser-etched. Precision-engineered.
-- Think: the logo stamped onto military-grade hardware
-- Mono-weight lines (every stroke identical thickness, 1.5-2px equivalent)
-- Sharp vertices. No curves. Angular intersections only.
+STYLE:
+- CAD (Computer-Aided Design) Wireframe
+- Technical Blueprint
+- 80s Cyberpunk Industrial Design (Alien / Blade Runner interfaces)
+- Extremely high detail, fine lines, math-heavy look
 
 COLOR:
-- Primary version: Amber #FFB900 on Void Black #0A0A0B
-- Monochrome version: Pure white on black (for GitHub, docs, favicon)
-- NEVER use gradients. NEVER use glow effects. NEVER use 3D.
-- The amber should feel like a warning indicator on a control panel
+- Main Lines: Electric Amber (#FFB900)
+- Accent Lines: Dim Tungsten (#52525b)
+- Background: SOLID VOID BLACK (#0A0A0B) - NO TRANSPARENCY, NO CHECKERBOARD
 
-ANTI-REFERENCES (what this is NOT):
-- NOT a literal king's crown with jewels and velvet
-- NOT a brain, circuit board, or neural network
-- NOT a robot face or AI eye
-- NOT an "S" lettermark
-- NOT organic or flowing — everything is angular and structural
-- NOT colorful — single color only
+FEEL:
+- "This is the architecture of a superior intelligence."
+- Intimidatingly complex but organized.
+- Precision engineering.
+- Screams "Enterprise-Grade Autonomous System".
 
-SCALE TEST:
-- Must be recognizable as a 16x16px favicon
-- Must hold structure on a billboard
-- Must work embossed on a dark business card
-
-OUTPUT: Vector-ready, SVG-compatible geometric construction.
-Transparent background. Centered composition.
+OUTPUT: High-contrast technical illustration. Solid black background.
 ```
 
 ---

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
+     role="img" aria-labelledby="synarch-title synarch-desc">
+  <title id="synarch-title">Synarch Logo</title>
+  <desc id="synarch-desc">A distributed crown formed by seven interconnected nodes in an ascending hierarchy, representing orchestrated multi-agent governance.</desc>
+
+  <defs>
+    <style>
+      :root {
+        --brand-primary: #FFB900;
+        --brand-bg: #0A0A0B;
+        --brand-dim: #27272A;
+      }
+      .node { fill: var(--brand-bg); stroke: var(--brand-primary); stroke-width: 1.8; }
+      .node-core { fill: var(--brand-primary); }
+      .link { stroke: var(--brand-primary); stroke-width: 1.2; fill: none; }
+      .link-mesh { stroke: var(--brand-primary); stroke-width: 0.6; fill: none; opacity: 0.35; stroke-dasharray: 2 2; }
+    </style>
+  </defs>
+
+  <g id="symbol" transform="translate(50, 50)">
+    <!-- 
+      CROWN PROTOCOL: 7 nodes in ascending crown formation
+      Tier 1 (apex): Synarch at (0, -32)
+      Tier 2 (C-Suite): Zeus(-22, -14), Thoth(22, -14)
+      Tier 3 (Generals): L(-36, 6), R(36, 6)
+      Tier 4 (Base): BL(-24, 24), BR(24, 24)
+    -->
+
+    <!-- Structural Links (Primary Hierarchy) -->
+    <line class="link" x1="0" y1="-32" x2="-22" y2="-14"/>
+    <line class="link" x1="0" y1="-32" x2="22" y2="-14"/>
+    <line class="link" x1="-22" y1="-14" x2="-36" y2="6"/>
+    <line class="link" x1="22" y1="-14" x2="36" y2="6"/>
+    <line class="link" x1="-36" y1="6" x2="-24" y2="24"/>
+    <line class="link" x1="36" y1="6" x2="24" y2="24"/>
+    <line class="link" x1="-24" y1="24" x2="24" y2="24"/>
+
+    <!-- Mesh Links (Cross-Connections) -->
+    <line class="link-mesh" x1="-22" y1="-14" x2="22" y2="-14"/>
+    <line class="link-mesh" x1="-22" y1="-14" x2="-24" y2="24"/>
+    <line class="link-mesh" x1="22" y1="-14" x2="24" y2="24"/>
+    <line class="link-mesh" x1="-36" y1="6" x2="36" y2="6"/>
+
+    <!-- Tier 4: Base Nodes -->
+    <circle class="node" cx="-24" cy="24" r="3.5"/>
+    <circle class="node-core" cx="-24" cy="24" r="1.2"/>
+    <circle class="node" cx="24" cy="24" r="3.5"/>
+    <circle class="node-core" cx="24" cy="24" r="1.2"/>
+
+    <!-- Tier 3: General Nodes -->
+    <circle class="node" cx="-36" cy="6" r="3.5"/>
+    <circle class="node-core" cx="-36" cy="6" r="1.2"/>
+    <circle class="node" cx="36" cy="6" r="3.5"/>
+    <circle class="node-core" cx="36" cy="6" r="1.2"/>
+
+    <!-- Tier 2: C-Suite Nodes -->
+    <circle class="node" cx="-22" cy="-14" r="4"/>
+    <circle class="node-core" cx="-22" cy="-14" r="1.5"/>
+    <circle class="node" cx="22" cy="-14" r="4"/>
+    <circle class="node-core" cx="22" cy="-14" r="1.5"/>
+
+    <!-- Tier 1: Synarch (Apex) — largest node -->
+    <circle class="node" cx="0" cy="-32" r="5"/>
+    <circle class="node-core" cx="0" cy="-32" r="2"/>
+  </g>
+</svg>

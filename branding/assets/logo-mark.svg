@@ -1,0 +1,48 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background: Void Black -->
+  <rect width="512" height="512" fill="#0A0A0B"/>
+
+  <!-- Grid: Subconscious Texture -->
+  <defs>
+    <pattern id="grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#27272A" fill-opacity="0.4"/>
+    </pattern>
+  </defs>
+  <rect width="512" height="512" fill="url(#grid)" />
+
+  <g transform="translate(0, 20)">
+    <!-- Node Definitions: Central Sovereign -->
+    <circle cx="256" cy="100" r="8" fill="#0A0A0B" stroke="#FFB900" stroke-width="2"/>
+    <circle cx="256" cy="100" r="3" fill="#FFB900"/>
+
+    <!-- Mid Tier (The Executives) -->
+    <path d="M256 108 L160 200" stroke="#FFB900" stroke-width="2"/>
+    <path d="M256 108 L352 200" stroke="#FFB900" stroke-width="2"/>
+    <circle cx="160" cy="200" r="6" fill="#0A0A0B" stroke="#FFB900" stroke-width="2"/>
+    <circle cx="352" cy="200" r="6" fill="#0A0A0B" stroke="#FFB900" stroke-width="2"/>
+
+    <!-- Outer Tier (The Generals) -->
+    <path d="M160 206 L80 300" stroke="#FFB900" stroke-width="2"/>
+    <path d="M352 206 L432 300" stroke="#FFB900" stroke-width="2"/>
+    <circle cx="80" cy="300" r="6" fill="#0A0A0B" stroke="#FFB900" stroke-width="2"/>
+    <circle cx="432" cy="300" r="6" fill="#0A0A0B" stroke="#FFB900" stroke-width="2"/>
+
+    <!-- Foundation Tier (The Base) -->
+    <path d="M80 306 L180 400" stroke="#FFB900" stroke-width="2"/>
+    <path d="M432 306 L332 400" stroke="#FFB900" stroke-width="2"/>
+    <circle cx="180" cy="400" r="6" fill="#0A0A0B" stroke="#FFB900" stroke-width="2"/>
+    <circle cx="332" cy="400" r="6" fill="#0A0A0B" stroke="#FFB900" stroke-width="2"/>
+
+    <!-- The Base Connection -->
+    <line x1="186" y1="400" x2="326" y2="400" stroke="#FFB900" stroke-width="2"/>
+
+    <!-- Cross Connections (The Mesh) -->
+    <line x1="160" y1="200" x2="352" y2="200" stroke="#FFB900" stroke-width="1" stroke-opacity="0.5" stroke-dasharray="4 4"/>
+    <line x1="160" y1="200" x2="180" y2="400" stroke="#FFB900" stroke-width="1" stroke-opacity="0.5" stroke-dasharray="4 4"/>
+    <line x1="352" y1="200" x2="332" y2="400" stroke="#FFB900" stroke-width="1" stroke-opacity="0.5" stroke-dasharray="4 4"/>
+  </g>
+
+  <!-- Technical Markings -->
+  <text x="256" y="460" font-family="monospace" font-size="10" fill="#52525B" text-anchor="middle" letter-spacing="2">SYNARCH KERNEL V3.0 [SAMAS]</text>
+  <line x1="156" y1="470" x2="356" y2="470" stroke="#52525B" stroke-width="1"/>
+</svg>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
+     role="img" aria-labelledby="synarch-title3 synarch-desc3">
+  <title id="synarch-title3">Synarch Logo — Apex Network</title>
+  <desc id="synarch-desc3">Five interconnected points forming a minimal crown silhouette — a pentagonal network with elevated apex representing distributed sovereignty.</desc>
+
+  <defs>
+    <style>
+      :root {
+        --brand-primary: #FFB900;
+        --brand-bg: #0A0A0B;
+      }
+      .edge { stroke: var(--brand-primary); stroke-width: 1.5; fill: none; stroke-linejoin: miter; }
+      .edge-inner { stroke: var(--brand-primary); stroke-width: 0.8; fill: none; opacity: 0.3; }
+      .dot { fill: var(--brand-primary); }
+      .dot-ring { fill: none; stroke: var(--brand-primary); stroke-width: 1.2; }
+    </style>
+  </defs>
+
+  <g id="symbol" transform="translate(50, 50)">
+    <!--
+      APEX NETWORK: 5 nodes forming a crown/pentagon
+      Ultra-minimal. Maximum scalability.
+      
+      A = apex (0, -30) — Synarch
+      B = left shoulder (-32, -8) — Zeus
+      C = right shoulder (32, -8) — Thoth  
+      D = left base (-20, 24) — Specialist
+      E = right base (20, 24) — Specialist
+    -->
+
+    <!-- Outer edges: The Crown Silhouette -->
+    <polyline class="edge" points="-20,24 -32,-8 0,-30 32,-8 20,24"/>
+    <line class="edge" x1="-20" y1="24" x2="20" y2="24"/>
+
+    <!-- Inner cross-links: The Network -->
+    <line class="edge-inner" x1="-32" y1="-8" x2="20" y2="24"/>
+    <line class="edge-inner" x1="32" y1="-8" x2="-20" y2="24"/>
+    <line class="edge-inner" x1="-32" y1="-8" x2="32" y2="-8"/>
+    <line class="edge-inner" x1="0" y1="-30" x2="-20" y2="24"/>
+    <line class="edge-inner" x1="0" y1="-30" x2="20" y2="24"/>
+
+    <!-- Node E: Right Base -->
+    <circle class="dot" cx="20" cy="24" r="2.5"/>
+
+    <!-- Node D: Left Base -->
+    <circle class="dot" cx="-20" cy="24" r="2.5"/>
+
+    <!-- Node C: Right Shoulder -->
+    <circle class="dot" cx="32" cy="-8" r="3"/>
+
+    <!-- Node B: Left Shoulder -->
+    <circle class="dot" cx="-32" cy="-8" r="3"/>
+
+    <!-- Node A: Apex — Synarch (larger, ringed) -->
+    <circle class="dot-ring" cx="0" cy="-30" r="5"/>
+    <circle class="dot" cx="0" cy="-30" r="2.5"/>
+  </g>
+</svg>

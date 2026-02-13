@@ -1,0 +1,12 @@
+<svg width="800" height="200" viewBox="0 0 800 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background: Void Black -->
+  <rect width="800" height="200" fill="#0A0A0B"/>
+
+  <text x="400" y="110" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="80" fill="#FAFAFA" text-anchor="middle" letter-spacing="12">SYNARCH</text>
+
+  <!-- The Datum Line -->
+  <line x1="50" y1="125" x2="750" y2="125" stroke="#FFB900" stroke-width="1"/>
+
+  <!-- Technical Subtext -->
+  <text x="400" y="150" font-family="monospace" font-size="10" fill="#52525B" text-anchor="middle" letter-spacing="4">AUTONOMOUS MULTI-AGENT SYSTEM</text>
+</svg>

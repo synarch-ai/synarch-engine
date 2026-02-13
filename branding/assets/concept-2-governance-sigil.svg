@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
+     role="img" aria-labelledby="synarch-title2 synarch-desc2">
+  <title id="synarch-title2">Synarch Logo — Governance Sigil</title>
+  <desc id="synarch-desc2">An angular chevron crown composed of three interlocking V-shapes representing hierarchical agent tiers converging at a sovereign apex.</desc>
+
+  <defs>
+    <style>
+      :root {
+        --brand-primary: #FFB900;
+        --brand-bg: #0A0A0B;
+      }
+      .tier-1 { stroke: var(--brand-primary); stroke-width: 2.2; fill: none; stroke-linecap: square; }
+      .tier-2 { stroke: var(--brand-primary); stroke-width: 1.6; fill: none; stroke-linecap: square; opacity: 0.7; }
+      .tier-3 { stroke: var(--brand-primary); stroke-width: 1; fill: none; stroke-linecap: square; opacity: 0.4; }
+      .apex { fill: var(--brand-primary); }
+    </style>
+  </defs>
+
+  <g id="symbol" transform="translate(50, 52)">
+    <!--
+      GOVERNANCE SIGIL: Three nested chevrons + apex diamond
+      Each tier is a V-shape (chevron), progressively wider and lighter
+      The apex is a solid diamond — the Synarch node
+    -->
+
+    <!-- Tier 3: Outer Chevron (Specialists) -->
+    <polyline class="tier-3" points="-38,20 0,-28 38,20"/>
+
+    <!-- Tier 2: Middle Chevron (C-Suite) -->
+    <polyline class="tier-2" points="-28,16 0,-22 28,16"/>
+
+    <!-- Tier 1: Inner Chevron (CEO) -->
+    <polyline class="tier-1" points="-18,12 0,-16 18,12"/>
+
+    <!-- Apex Diamond: The Sovereign Node -->
+    <polygon class="apex" points="0,-34 4,-30 0,-26 -4,-30"/>
+
+    <!-- Base Line: The Foundation -->
+    <line class="tier-1" x1="-38" y1="22" x2="38" y2="22"/>
+
+    <!-- Vertical Datum: Sovereignty Axis -->
+    <line x1="0" y1="-34" x2="0" y2="22" stroke="#FFB900" stroke-width="0.5" opacity="0.2"/>
+
+    <!-- Tick marks at chevron intersections -->
+    <line x1="-2" y1="-16" x2="2" y2="-16" stroke="#FFB900" stroke-width="0.8" opacity="0.5"/>
+    <line x1="-2" y1="-22" x2="2" y2="-22" stroke="#FFB900" stroke-width="0.8" opacity="0.5"/>
+    <line x1="-2" y1="-28" x2="2" y2="-28" stroke="#FFB900" stroke-width="0.8" opacity="0.5"/>
+  </g>
+</svg>
