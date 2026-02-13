@@ -1,9 +1,42 @@
-.env
-node_modules/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
 dist/
-.auth-profile/
-# Large media files (keep local, don't push)
-*.mp3
-*.mp4
-*.wav
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
+# Virtual Environment
+venv/
+.venv/
+env/
+.env
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.npm-cache/
+**/.npm-cache/
+
+# System
+.DS_Store
+.vscode/
+.idea/
+.auth-profile/
