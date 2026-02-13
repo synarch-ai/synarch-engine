@@ -140,18 +140,37 @@ The Oracle (you) types into Mission Control:
   4. **Task Board** — Kanban: To Do → In Progress → Review → Done
   5. **Deliverables** — Final outputs from completed missions
 
-### 3.6 The Models — Cost-Optimized from Day 1
+### 3.6 The Models — AWS Bedrock + Ollama (Cost-Optimized from Day 1)
 
-| Agent | Model | Reasoning |
-|---|---|---|
-| **Pantheon** | Claude Sonnet 4 / GPT-4o | Strategic decomposition needs frontier reasoning |
-| **Zeus** | Claude Sonnet 4 / GPT-4o | Technical planning needs strong reasoning |
-| **Thoth** | Claude Sonnet 4 / GPT-4o | Research synthesis needs frontier quality |
-| **Hermes** | Ollama (Llama 3.1 8B) | Information retrieval is structured, not creative |
-| **Hephaestus** | Claude Sonnet 4 / GPT-4o | Code generation needs frontier quality |
-| **Janus** | Ollama (Llama 3.1 8B) | Review against checklist is structured |
+**Why Bedrock:** One API key, multiple models, pay-per-use, no rate limits. The user already has Bedrock access (used for this Cline session). This gives us the full Claude model family + Llama + Mistral under one roof.
 
-**Cost per mission (estimated):** ~$0.05–0.15 (2 frontier calls + 2 local)
+| Agent | Model (Bedrock) | Bedrock Model ID | Reasoning |
+|---|---|---|---|
+| **Pantheon** | Claude Opus 4 | `us.anthropic.claude-opus-4-20250514-v1:0` | Strategic decomposition — needs the strongest reasoning |
+| **Zeus** | Claude Sonnet 4 | `us.anthropic.claude-sonnet-4-20250514-v1:0` | Technical planning — strong reasoning, good cost balance |
+| **Thoth** | Claude Sonnet 4 | `us.anthropic.claude-sonnet-4-20250514-v1:0` | Research synthesis — needs quality, not maximum power |
+| **Hermes** | Llama 3.1 8B (Ollama) | Local — `ollama/llama3.1:8b` | Information retrieval is structured — save money here |
+| **Hephaestus** | Claude Sonnet 4 | `us.anthropic.claude-sonnet-4-20250514-v1:0` | Code generation — frontier quality for correct code |
+| **Janus** | Claude Haiku 3.5 | `us.anthropic.claude-3-5-haiku-20241022-v1:0` | Review is checklist-based — fast + cheap is ideal |
+
+**Model Routing Strategy:**
+```
+Complexity → Model Selection:
+  STRATEGIC (decomposition, arbitration)  → Opus 4    ($$$$)
+  CREATIVE  (code, research synthesis)    → Sonnet 4  ($$$)
+  STRUCTURED (review, formatting)         → Haiku 3.5 ($$)
+  RETRIEVAL  (search, simple queries)     → Ollama    (free)
+```
+
+**Cost per mission (estimated):** ~$0.03–0.10 (Bedrock pay-per-token + free local)
+
+**Bedrock Configuration (.env):**
+```env
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=<from-bedrock>
+AWS_SECRET_ACCESS_KEY=<from-bedrock>
+# No per-model API keys needed — Bedrock handles routing
+```
 
 ---
 
