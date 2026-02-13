@@ -61,6 +61,34 @@
 4. File trademark: Class 9 (Software) + Class 42 (IT Services) via IP India
 5. Codebase: rename when ready (not urgent — internal codename "pantheon" can persist during PoC)
 
+## The "Synarchy of Gods" Model (Antigravity Recommendation — ADOPTED)
+
+| Layer | Name | Rationale |
+|---|---|---|
+| **Company** | Synarch | Legal entity, trademark, domains |
+| **Product** | Synarch Engine | The multi-agent orchestration platform |
+| **CEO Agent** | Synarch (renamed from Pantheon) | The orchestrator node matches the brand |
+| **C-Suite Agents** | Zeus, Thoth, Athena, Odin, Midas, Apollo | Mythology stays — gods inside the machine |
+| **Specialist Agents** | Hermes, Hephaestus, Janus, etc. | Mythology stays |
+| **User** | God | Unchanged |
+
+**Key Insight (Antigravity):** *"Synarch is the System. The gods are its council."*
+
+### Operation Rename Scope (for next session)
+1. `PantheonAgent` class → `SynarchAgent`
+2. `src/agents/pantheon.py` → `src/agents/synarch.py`
+3. `docs/agents/pantheon/soul.md` → update name to "Synarch" (keep mythology vibe)
+4. NATS subjects: `pantheon.agent.>` → `synarch.agent.>`
+5. Docker service names: add `synarch-` prefix
+6. `package.json` name field
+7. Documentation sweep: Pantheon → Synarch where referring to company/product
+
+### What Does NOT Change
+- Zeus, Thoth, Hermes, Hephaestus, Janus — all keep their names
+- God — stays as God
+- The hierarchy — unchanged
+- All architecture decisions — unchanged
+
 ## MOA Object Clause (drafted for CA/CS review)
 See the detailed MOA language in the branding research notes — covers AI systems, multi-agent orchestration, SaaS/PaaS/IaaS delivery, and R&D consultancy.
 
