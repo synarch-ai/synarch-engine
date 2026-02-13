@@ -2,3 +2,7 @@
 node_modules/
 dist/
 .auth-profile/
+# Large media files (keep local, don't push)
+*.mp3
+*.mp4
+*.wav
