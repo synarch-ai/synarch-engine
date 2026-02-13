@@ -188,7 +188,8 @@ AWS_SECRET_ACCESS_KEY=<from-bedrock>
 | Frontend | Next.js | 14+ | App Router, Server Components, streaming |
 | UI Library | shadcn/ui | latest | Accessible, customizable, Tailwind-based |
 | Local LLM | Ollama | 0.5+ | Llama 3.1 8B for cost optimization |
-| Research | notebooklm-kit | 2.2.0 | Full NotebookLM SDK access |
+| Model Abstraction | **litellm** | latest | Provider-agnostic: Bedrock, Ollama, OpenAI, Groq, 100+ |
+| Research | notebooklm-kit | 2.2.0 | Full NotebookLM SDK (Phase 2 RAG) |
 | Language | Python 3.12+ | — | LangGraph ecosystem |
 | Language | TypeScript 5+ | — | Frontend + NotebookLM scripts |
 
