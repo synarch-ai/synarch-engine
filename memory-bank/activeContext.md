@@ -36,5 +36,13 @@
 - Future: agents vote on model selection for new agents — design needed
 - AgentNode base class design (from Antigravity's "Wrapper Strategy")
 
+## CRITICAL: Branding Pivot (Late Session 2026-02-13)
+**"Pantheon AI" → "Synarch"** — trademark conflicts with 6+ companies globally.
+- Synarch = syn (together) + arch (rule/govern) = "ruling together"
+- Zero trademark conflicts in Class 9/42
+- Domains to buy: synarch.ai, synarch.dev, synarch.in
+- The AGENT "Pantheon" keeps its name (internal codename). The COMPANY becomes Synarch.
+- See ADR-002 for full analysis
+
 ## Blockers
 None — all dependencies resolved, all decisions made, ready to build.
