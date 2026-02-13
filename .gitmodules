@@ -1,0 +1,21 @@
+[submodule "references/autogen"]
+	path = references/autogen
+	url = https://github.com/microsoft/autogen.git
+[submodule "references/crewAI"]
+	path = references/crewAI
+	url = https://github.com/crewAIInc/crewAI.git
+[submodule "references/langgraph"]
+	path = references/langgraph
+	url = https://github.com/langchain-ai/langgraph.git
+[submodule "references/letta"]
+	path = references/letta
+	url = https://github.com/letta-ai/letta.git
+[submodule "references/llm-council-plus"]
+	path = references/llm-council-plus
+	url = https://github.com/jacob-bd/llm-council-plus.git
+[submodule "references/openclaw"]
+	path = references/openclaw
+	url = https://github.com/openclaw/openclaw.git
+[submodule "references/swarms"]
+	path = references/swarms
+	url = https://github.com/kyegomez/swarms.git
