@@ -11,7 +11,7 @@
 | Relational DB | PostgreSQL 16 | LangGraph checkpointing, structured state |
 | Frontend | Next.js 14 + shadcn/ui | App Router, streaming, accessible components |
 | Local LLM | Ollama (Llama 3.1 8B) | Cost optimization for simple tasks |
-| Frontier LLM | AWS Bedrock | Multi-model: Opus 4, Sonnet 4, Haiku 3.5 |
+| Frontier LLM | **litellm** (wraps Bedrock, Ollama, OpenAI, 100+) | Provider-agnostic: Opus 4, Sonnet 4, Haiku 3.5 via any provider |
 | Research | notebooklm-kit 2.2.0 | Full NotebookLM SDK (notes, sources, artifacts) |
 | Embedding | nomic-embed-text via Ollama | Local, no API cost |
 
