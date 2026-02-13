@@ -1,0 +1,30 @@
+# Project Brief: Pantheon AI
+
+## Mission
+Build an open-source, production-grade **Autonomous Multi-Agent Operating System** — the "Linux of agent teams." Inspired by Bhanu Teja P's 14-agent SiteGPT marketing squad, but engineered to be self-evolving, secure, general-purpose, and event-driven.
+
+## Core Value Proposition
+*"God speaks a wish. The Pantheon makes it real."*
+
+## Acceptance Criteria (PoC)
+1. 6 agents (Pantheon, Zeus, Thoth, Hermes, Hephaestus, Janus) collaborate on a Dev+Research task
+2. Real-time Mission Control dashboard shows agent thoughts, task flow, deliverables
+3. Everything runs locally via `docker compose up` + one start script
+4. AWS Bedrock for frontier models + Ollama for local cost optimization
+5. Agent hierarchy enforced: God → Pantheon → C-Suite → Specialists
+
+## Scope
+- **In:** PoC with 6 agents, NATS event bus, LangGraph orchestration, Next.js dashboard, NotebookLM research integration
+- **Out:** Cloud deployment, self-evolution, consensus voting, WASM sandboxing (Phase 2+)
+
+## Success Metrics
+- Pantheon decomposes goals into multi-agent workflows
+- Hermes queries NotebookLM and returns source-cited research
+- Hephaestus writes tested code
+- Dashboard shows real-time agent activity
+- End-to-end mission completes in <3 minutes
+
+## Non-Functional Requirements
+- Startup < 2 minutes
+- Cost per mission < $0.10
+- Crash recovery via PostgreSQL checkpointing
