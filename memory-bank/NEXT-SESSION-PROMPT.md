@@ -1,13 +1,15 @@
-# Pantheon AI — Next Session Prompt
+# Synarch Engine — Next Session Prompt
 
 Copy everything below this line into a new Cline chat:
 
 ---
 
-#pantheon-ai
+#synarch-engine
 
 ## Context
-You are resuming work on **Pantheon AI** — an open-source autonomous multi-agent operating system. M0 (Research & Architecture) is complete. You are starting **M1: Foundation**.
+You are resuming work on **Synarch Engine** (formerly Pantheon AI) — an open-source autonomous multi-agent orchestration engine. M0 (Research & Architecture) is complete. You are starting **M1: Foundation**.
+
+**IMPORTANT:** The project was renamed from "Pantheon AI" to "Synarch" (syn=together + arch=govern). See ADR-002. The CEO agent is now "Synarch" (not "Pantheon"). All gods (Zeus, Thoth, etc.) keep their names. The V3 Design System ("Cyber-Sovereign Industrialism") is LOCKED in `branding/brand-identity.md`.
 
 ## Instructions
 

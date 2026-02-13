@@ -1,4 +1,4 @@
-# Project Brief: Pantheon AI
+# Project Brief: Synarch Engine
 
 ## Mission
 Build an open-source, production-grade **Autonomous Multi-Agent Operating System** — the "Linux of agent teams." Inspired by Bhanu Teja P's 14-agent SiteGPT marketing squad, but engineered to be self-evolving, secure, general-purpose, and event-driven.

@@ -1,4 +1,4 @@
-# Product Context: Pantheon AI
+# Product Context: Synarch Engine
 
 ## Problem Statement
 AI agent frameworks (CrewAI, AutoGen, LangGraph) are libraries, not products. Users must build everything: orchestration, UI, memory, security, monitoring. Bhanu Teja proved autonomous agent teams work at SiteGPT — but his system is closed-source, insecure, ad-hoc, and marketing-only.

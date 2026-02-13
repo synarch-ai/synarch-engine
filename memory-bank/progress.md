@@ -1,4 +1,4 @@
-# Progress: Pantheon AI
+# Progress: Synarch Engine
 
 ## Milestones
 

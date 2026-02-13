@@ -1,4 +1,4 @@
-# Tech Context: Pantheon AI
+# Tech Context: Synarch Engine
 
 ## Tech Stack (Decided)
 

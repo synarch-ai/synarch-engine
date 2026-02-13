@@ -1,4 +1,4 @@
-# System Patterns: Pantheon AI
+# System Patterns: Synarch Engine
 
 ## Agent Hierarchy (Tier System)
 ```

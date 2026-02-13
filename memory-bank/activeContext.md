@@ -1,48 +1,50 @@
-# Active Context: Pantheon AI
+# Active Context: Synarch Engine
 
 ## Current Focus
 **PoC Phase 1 — Foundation** (ready to start implementation)
 
+## Repository
+- **URL:** https://github.com/synarch-ai/synarch-engine (private)
+- **Local:** `/Users/praxlannister/Documents/workspace/synarch-engine`
+- **Org:** github.com/synarch-ai
+
 ## What Was Done (2026-02-13)
-1. NotebookLM SDK (`notebooklm-kit`) connected — 43 notebooks, full archive downloaded
-2. Downloaded: 50 notes (169KB), 12 source guides (65KB), quiz (39KB), flashcards (29KB), audio (81MB)
-3. 7 agent soul files created: God, Pantheon, Zeus, Thoth, Hermes, Hephaestus, Janus
-4. Comprehensive PoC PRD with AWS Bedrock model routing
-5. Agent naming convention (mythology-based, 3-tier hierarchy)
-6. OpenClaw studied: identity.ts, system-prompt.ts, identity-file.ts
-7. 5 reference repos cloned: OpenClaw, CrewAI, LangGraph, Letta, LLM-Council-Plus
-8. Dual vision analysis: Cline (Claude Opus 4) + Antigravity (Gemini 3 Pro)
+1. NotebookLM SDK connected — 43 notebooks, full archive (50 notes, 12 guides, quiz, flashcards)
+2. 7 agent soul files: God, Synarch (CEO), Zeus, Thoth, Hermes, Hephaestus, Janus
+3. PoC PRD with litellm model routing (provider-agnostic)
+4. Agent naming convention (mythology hierarchy, 20+ names)
+5. 7 reference repos: OpenClaw, CrewAI, LangGraph, Letta, LLM-Council-Plus, Swarms, AutoGen
+6. Dual vision analysis: Cline + Antigravity
+7. ADR-001: Swarms vs LangGraph — REFERENCE NOT FORK
+8. ADR-002: Branding pivot — Pantheon AI → Synarch
+9. V3 Design System LOCKED: "Cyber-Sovereign Industrialism" (branding/brand-identity.md)
+10. Logo generation prompts created (branding/logo-prompts.md)
+11. Repo renamed + transferred: PrakharMNNIT/pantheon-ai → synarch-ai/synarch-engine
+12. Local dir renamed: pantheon-ai → synarch-engine
 
-## Key Decisions Made
-- **Name:** Pantheon AI (God → Pantheon → C-Suite → Specialists)
-- **Models:** AWS Bedrock (Opus 4/Sonnet 4/Haiku 3.5) + Ollama (Llama 3.1 8B)
-- **Event Bus:** NATS (not Redis) — subject hierarchy, JetStream persistence
-- **Orchestration:** LangGraph (not CrewAI) — state machines, checkpointing
-- **User = God** — Rule of Two permission escalation from Meta Research
+## Key Decisions
+- **Company:** Synarch (syn=together + arch=govern)
+- **Product:** Synarch Engine
+- **CEO Agent:** Synarch (renamed from Pantheon)
+- **Gods:** Zeus, Thoth, Hermes, Hephaestus, Janus — unchanged
+- **User:** God — unchanged
+- **Models:** litellm (wraps Bedrock, Ollama, OpenAI, 100+)
+- **Event Bus:** NATS (not Redis)
+- **Orchestration:** LangGraph (not CrewAI, not Swarms)
+- **NotebookLM:** DROPPED from PoC (Phase 2 RAG)
+- **Design System:** V3 "Cyber-Sovereign Industrialism" — amber #FFB900 on void #0A0A0B
 
-## Immediate Next Steps
-1. `docker compose up` — spin up NATS, Qdrant, PostgreSQL, Ollama
-2. FastAPI skeleton with `/mission/start`, `/mission/{id}/stream` endpoints
-3. LangGraph StateGraph with Pantheon as entry node
-4. Soul.md → runtime system prompt compiler
-5. Next.js Mission Control skeleton with shadcn/ui
-
-## Key Decision (Late Session)
-**DROP NotebookLM from PoC.** Antigravity's "NotebookLM Latency Trap" analysis is correct. RAG should be a pluggable capability, not hardwired. Hermes uses web search + Qdrant for PoC. NotebookLM integration becomes Phase 2 optional RAG provider.
+## Immediate Next Steps (M1: Foundation)
+1. Operation Rename: pantheon → synarch in code (agent files, NATS subjects, classes)
+2. `docker compose up` — NATS, Qdrant, PostgreSQL, Ollama
+3. FastAPI skeleton with litellm integration
+4. LangGraph StateGraph with Synarch as entry node
+5. Next.js Mission Control with V3 design system
 
 ## Open Questions
-- Should soul.md format follow OpenClaw's identity-file.ts parsing (key:value) or stay as rich markdown?
-- How to handle Bedrock region failover?
-- Future: agents vote on model selection for new agents — design needed
 - AgentNode base class design (from Antigravity's "Wrapper Strategy")
-
-## CRITICAL: Branding Pivot (Late Session 2026-02-13)
-**"Pantheon AI" → "Synarch"** — trademark conflicts with 6+ companies globally.
-- Synarch = syn (together) + arch (rule/govern) = "ruling together"
-- Zero trademark conflicts in Class 9/42
-- Domains to buy: synarch.ai, synarch.dev, synarch.in
-- The AGENT "Pantheon" keeps its name (internal codename). The COMPANY becomes Synarch.
-- See ADR-002 for full analysis
+- soul.md parsing: rich markdown vs OpenClaw key:value
+- Logo generation (user action — Midjourney/DALL-E)
 
 ## Blockers
 None — all dependencies resolved, all decisions made, ready to build.
