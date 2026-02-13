@@ -14,12 +14,12 @@ Build an open-source, production-grade **Autonomous Multi-Agent Operating System
 5. Agent hierarchy enforced: God → Pantheon → C-Suite → Specialists
 
 ## Scope
-- **In:** PoC with 6 agents, NATS event bus, LangGraph orchestration, Next.js dashboard, NotebookLM research integration
+- **In:** PoC with 6 agents, NATS event bus, LangGraph orchestration, Next.js dashboard, Search/RAG integration
 - **Out:** Cloud deployment, self-evolution, consensus voting, WASM sandboxing (Phase 2+)
 
 ## Success Metrics
 - Pantheon decomposes goals into multi-agent workflows
-- Hermes queries NotebookLM and returns source-cited research
+- Hermes queries Search/RAG and returns source-cited research
 - Hephaestus writes tested code
 - Dashboard shows real-time agent activity
 - End-to-end mission completes in <3 minutes
