@@ -27,10 +27,14 @@
 4. Soul.md → runtime system prompt compiler
 5. Next.js Mission Control skeleton with shadcn/ui
 
+## Key Decision (Late Session)
+**DROP NotebookLM from PoC.** Antigravity's "NotebookLM Latency Trap" analysis is correct. RAG should be a pluggable capability, not hardwired. Hermes uses web search + Qdrant for PoC. NotebookLM integration becomes Phase 2 optional RAG provider.
+
 ## Open Questions
 - Should soul.md format follow OpenClaw's identity-file.ts parsing (key:value) or stay as rich markdown?
 - How to handle Bedrock region failover?
 - Future: agents vote on model selection for new agents — design needed
+- AgentNode base class design (from Antigravity's "Wrapper Strategy")
 
 ## Blockers
 None — all dependencies resolved, all decisions made, ready to build.
