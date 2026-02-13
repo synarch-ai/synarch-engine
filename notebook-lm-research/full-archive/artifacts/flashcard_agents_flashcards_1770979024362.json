@@ -1,0 +1,330 @@
+{
+  "artifactId": "6359b13e-8030-4b69-b992-106ea132759e",
+  "title": "Agents Flashcards",
+  "type": 6,
+  "state": 2,
+  "sourceIds": [
+    "949f1f29-0eeb-41d8-b06a-342157fa3b17",
+    "8eca3819-e550-428b-ab44-dbba7c11196a",
+    "e1ba607c-2778-4529-ad50-9e75e1bbbcc1",
+    "85e674b6-e322-403c-9bdc-92cfe57e31a2",
+    "2730e1eb-421d-44a9-bbea-a85863d59e63",
+    "edef6eba-ff62-4d32-a5ae-2ea94bd63952",
+    "4dd00848-73e2-4e71-bd30-73f83cbf762f",
+    "a5462284-c613-42f4-adf8-9e2aca80a6ca",
+    "3b0b9213-85c1-4e2b-ac44-4e2bf38d3cb6",
+    "a0617bcb-15f4-486e-8ad2-0a97bdf99c13"
+  ],
+  "flashcards": [
+    {
+      "question": "In the SAMAS architecture, which event-driven technology replaces the polling-based communication found in earlier multi-agent systems?",
+      "answer": "NATS JetStream."
+    },
+    {
+      "question": "Why is NATS JetStream considered superior to Apache Kafka for autonomous agent 'interest-based' retention?",
+      "answer": "It retains messages only as long as active consumers are interested, matching the cognitive lifecycle of a task."
+    },
+    {
+      "question": "Which specific memory technique prepends context strings to text chunks before indexing to improve retrieval precision?",
+      "answer": "Contextual Retrieval (Anthropic)."
+    },
+    {
+      "question": "The 'Rule of Two' for agent security allows a session to satisfy only two of which three properties simultaneously?",
+      "answer": "Access to private data, exposure to untrusted content, and external communication capability."
+    },
+    {
+      "question": "In SiteGPT's 'Mission Control', what is the actual operational mechanism behind the perceived real-time interaction of 14 agents?",
+      "answer": "Staggered cron jobs creating one-shot isolated sessions every 15 minutes."
+    },
+    {
+      "question": "Which consensus protocol technique requires agents to generate an initial solution independently before seeing others' work?",
+      "answer": "All-Agents Drafting (AAD)."
+    },
+    {
+      "question": "Why is WebAssembly (WASM) preferred over standard shell execution for agentic tool use in production?",
+      "answer": "It provides a sandboxed runtime to mitigate remote code execution risks from prompt injection."
+    },
+    {
+      "question": "In the SagaLLM framework, what is the purpose of a 'compensating action'?",
+      "answer": "To restore the system to a consistent state by rolling back previous successful steps if a subsequent step fails."
+    },
+    {
+      "question": "Which cost optimisation tool uses trained classifiers to route queries between 'strong' and 'weak' models?",
+      "answer": "RouteLLM."
+    },
+    {
+      "question": "How does GraphRAG enhance multi-hop reasoning compared to standard vector search?",
+      "answer": "It traverses edges between entity nodes to find non-obvious relationships that vector embeddings might miss."
+    },
+    {
+      "question": "What is the primary target of Phase 0 in the SAMAS implementation roadmap?",
+      "answer": "Deploying three hardcoded agents performing one impressive task to achieve time-to-first-value in under five minutes."
+    },
+    {
+      "question": "Which orchestration framework is selected for SAMAS due to its support for cyclic graphs and native persistence (checkpoints)?",
+      "answer": "LangGraph."
+    },
+    {
+      "question": "The 'Memory Curator' pattern is designed to solve which specific problem in multi-agent systems?",
+      "answer": "Conflicting agent knowledge by performing entity resolution and deduplication against a shared knowledge graph."
+    },
+    {
+      "question": "According to ACL 2025 research, why does multi-agent debate often yield lower accuracy than simple voting protocols?",
+      "answer": "Extended discussion causes premature answer convergence, destroying the cognitive diversity that powers effective voting."
+    },
+    {
+      "question": "In a confidence-weighted voting model, how is the final decision (final_answer) mathematically determined?",
+      "answer": "$argmax(\\sum(confidence_{i} \\times vote_{i}))$"
+    },
+    {
+      "question": "What is the specific risk associated with OpenClaw's 'local-first' execution model on a host machine?",
+      "answer": "Broad access to the host file system and shell creates a massive attack surface for prompt injection and malicious 'AgentSkills'."
+    },
+    {
+      "question": "Which framework is used in SAMAS to replace static prompt strings with parameters that are mathematically tuned by an optimizer agent?",
+      "answer": "DSPy."
+    },
+    {
+      "question": "What is the architectural role of a 'Guard Agent' in the Coordinator + Guard dual-agent security model?",
+      "answer": "Post-validating outputs to enforce format rules and block residual risks before delivery."
+    },
+    {
+      "question": "Which technology allows Qdrant to manage thousands of private memories for different agents within a single collection?",
+      "answer": "Payload-based Partitioning (Multi-tenancy)."
+    },
+    {
+      "question": "The GEPA optimizer improves prompts by using LLMs to mathematically propose mutations based on what data?",
+      "answer": "Reflective feedback from successful and failed task execution traces."
+    },
+    {
+      "question": "Why is the Model Context Protocol (MCP) used to connect agents to external tools in the SAMAS blueprint?",
+      "answer": "It decouples tool maintenance from agent logic, allowing standardised access control and easier API updates."
+    },
+    {
+      "question": "In SiteGPT's topology, which agent acts as the 'Squad Lead' or project manager?",
+      "answer": "Jarvis."
+    },
+    {
+      "question": "What is the primary disadvantage of OpenClaw's 'Lane Queue' system?",
+      "answer": "It defaults to serial execution, which blocks concurrent operations and severely limits system throughput."
+    },
+    {
+      "question": "Which caching tier in SAMAS provides 100% savings on API costs when identical queries are intercepted?",
+      "answer": "Semantic caching (e.g., GPTCache)."
+    },
+    {
+      "question": "What is the purpose of the 'A2A Protocol' (Agent-to-Agent)?",
+      "answer": "To enable capability discovery and standard communication between disparate agent systems using JSON-based 'Agent Cards'."
+    },
+    {
+      "question": "Which dashboard component is recommended for visualising live agent topology and message flows?",
+      "answer": "React Flow (or @xyflow/react)."
+    },
+    {
+      "question": "In the context of cost optimisation, why is prompt caching highly effective for 20+ agents?",
+      "answer": "Stable system prompts (SOPs) are shared across many agents, leading to high cache hit rates and 90% cost reductions on input."
+    },
+    {
+      "question": "What 'autonomy slider' configuration is implemented for SAMAS agents?",
+      "answer": "Discrete levels (e.g. Low/Medium/High) mapped to specific Human-in-the-loop (HITL) interrupt triggers."
+    },
+    {
+      "question": "The 'Collective Improvement' (CI) technique adds what specific step to the multi-agent consensus process?",
+      "answer": "Structured iterative refinement to prevent excessive or unguided communication."
+    },
+    {
+      "question": "Why is self-hosting LLMs considered a 'trap' for most agent deployments below 100M tokens per month?",
+      "answer": "Managed APIs are significantly cheaper (60–700$\\times$) than the hardware and operational costs of serving open-weight models."
+    },
+    {
+      "question": "Which real-time database is used by Bhanu Teja P for his Mission Control dashboard?",
+      "answer": "Convex."
+    },
+    {
+      "question": "In the SAMAS dashboard stack, which library is used for accessible, Tailwind-based UI primitives?",
+      "answer": "shadcn/ui."
+    },
+    {
+      "question": "What trigger should cause an agent system to automatically escalate a task to a human operator?",
+      "answer": "Average confidence across voting agents falls below a specific threshold (e.g. 40%)."
+    },
+    {
+      "question": "The 'SagaLLM' approach ensures reliability by decomposing complex goals into what kind of units?",
+      "answer": "Atomic steps with defined forward actions and reversible states."
+    },
+    {
+      "question": "Which OpenClaw file serves as the core instruction set for an agent's personality and 'soul'?",
+      "answer": "SOUL.md."
+    },
+    {
+      "question": "How does the 'Competitive Swarming' pattern work within NATS JetStream?",
+      "answer": "A request is broadcast (Fan-Out) to multiple agents, and a 'Judge' agent selects the best generated variation."
+    },
+    {
+      "question": "Which technology provides hardware-level isolation for agents while maintaining millisecond startup times?",
+      "answer": "Firecracker MicroVMs."
+    },
+    {
+      "question": "What is the function of the 'MIPROv2' optimizer in the DSPy framework?",
+      "answer": "It mathematically proposes multi-step instructions to maximise a success metric based on a training dataset."
+    },
+    {
+      "question": "Which specific risk did OpenClaw encounter shortly after reaching 100k stars on GitHub?",
+      "answer": "The proliferation of malicious skills (11.3% of the marketplace) due to an uncurated registry."
+    },
+    {
+      "question": "In the context of multi-agent memory, what are 'multi-resolution summaries'?",
+      "answer": "Global summaries paired with agent-specific fine-grained logs to prevent information overload."
+    },
+    {
+      "question": "Which consensus model routes factual verification tasks differently than strategic reasoning tasks?",
+      "answer": "Adaptive protocol selector."
+    },
+    {
+      "question": "How does LiteLLM facilitate cost management in enterprise agent swarms?",
+      "answer": "It acts as a self-hosted gateway with routing strategies, usage-based budgets, and automatic retries."
+    },
+    {
+      "question": "What is the primary benefit of the 'Agent-to-Agent' (A2A) JSON manifest?",
+      "answer": "It allows an orchestrator to dynamically 'hire' agents based on their advertised capabilities and inputs."
+    },
+    {
+      "question": "Which specific database is recommended for low-latency thread-level persistence in LangGraph?",
+      "answer": "Redis."
+    },
+    {
+      "question": "In the SAMAS security model, what is 'Provenance Ledger' tracking?",
+      "answer": "Data origin and trust levels across agents to detect indirect prompt injection."
+    },
+    {
+      "question": "What is the 'martingale' concern in NeurIPS 2025 research regarding multi-agent debate?",
+      "answer": "Debate induces belief trajectories that don't improve correctness without specific corrective update interventions."
+    },
+    {
+      "question": "Which OpenClaw tool enables a 'Live Canvas' visual workspace?",
+      "answer": "A2UI."
+    },
+    {
+      "question": "What distinguishes 'Agentic Plan Caching' from standard prompt caching?",
+      "answer": "It caches structured execution plans from completed runs to reduce latency and cost for recurring task types."
+    },
+    {
+      "question": "Why is 'Diversity' of model architectures considered essential for multi-agent voting?",
+      "answer": "Homogeneous agents (using the same model) tend to hallucinate in similar patterns, reducing the error-correction benefit of voting."
+    },
+    {
+      "question": "In the OpenClaw Gateway, what is the 'main' session's default security privilege?",
+      "answer": "Full access to the host machine (tools run on the host)."
+    },
+    {
+      "question": "Which specific protocol standardises 'RUN_STARTED' and 'RUN_FINISHED' events for agent-to-frontend communication?",
+      "answer": "AG-UI (from CopilotKit)."
+    },
+    {
+      "question": "What does the 'A-HMAD' framework use to reduce factual errors by 30%?",
+      "answer": "Dynamic routing that activates specific agent subsets based on the query type."
+    },
+    {
+      "question": "In SiteGPT's squad, what is the role of the agent named 'Friday'?",
+      "answer": "Development."
+    },
+    {
+      "question": "What is the primary advantage of the 'Recursive Hierarchical Supervisor' pattern for 20+ agents?",
+      "answer": "It prevents the top-level orchestrator from becoming a processing bottleneck by delegating to domain-specific sub-teams."
+    },
+    {
+      "question": "Which specific tool is used by SAMAS to process asynchronous text and extract entities for the knowledge graph?",
+      "answer": "Curator Agent."
+    },
+    {
+      "question": "What is the recommended layout algorithm for automatically positioning nodes in an agent dashboard topology?",
+      "answer": "Dagre or ELK."
+    },
+    {
+      "question": "Which agent type in the GaaS framework implements hard blocks on prohibited actions?",
+      "answer": "Coercive enforcement mode."
+    },
+    {
+      "question": "What defines the 'Active' state in the research-supported agent lifecycle?",
+      "answer": "An agent that is currently available and actively processing events or tasks."
+    },
+    {
+      "question": "Which specific benefit does Anthropic's 'Prompt Caching' offer for recurring input blocks?",
+      "answer": "A 90% reduction in input costs for cache hits."
+    },
+    {
+      "question": "What is the role of the 'Evolution Agent' in the SAMAS infrastructure?",
+      "answer": "To run weekly GEPA optimization against production traces and mathematically tune agent instructions."
+    },
+    {
+      "question": "Which OpenClaw command is used to troubleshoot risky or misconfigured DM policies?",
+      "answer": "openclaw doctor"
+    },
+    {
+      "question": "What does the 'AgentSpawn' paper propose to improve task completion rates during dynamic agent creation?",
+      "answer": "Automatic memory transfer and adaptive spawning policies."
+    },
+    {
+      "question": "Which specific React library is recommended for implementing a Kanban task board for agents?",
+      "answer": "dnd-kit."
+    },
+    {
+      "question": "In the context of the SAMAS nervous system, what is 'Queue Group' load balancing?",
+      "answer": "Distributing tasks across multiple identical specialist agents (e.g. three 'Friday' developers) to handle spikes."
+    },
+    {
+      "question": "Which language is used for defining agent SOPs (roles, goals, backstories) in the SAMAS repository?",
+      "answer": "YAML."
+    },
+    {
+      "question": "What is 'Semantic Search' fusion in OpenClaw's memory architecture?",
+      "answer": "Combining semantic similarity (sqlite-vec) with keyword matching (FTS5/BM25)."
+    },
+    {
+      "question": "In the SAMAS dashboard, which tool provides deep distributed tracing for agent reasoning loops?",
+      "answer": "LangFuse (or Arize Phoenix)."
+    },
+    {
+      "question": "How does 'Staggered Cron' help maintain low operational costs in SiteGPT's multi-agent system?",
+      "answer": "It ensures that most agents consume zero VPS resources between their specific 15-minute heartbeats."
+    },
+    {
+      "question": "Which OpenClaw feature allows a user to control the agent via WhatsApp or Telegram?",
+      "answer": "The Gateway Pattern (Multi-channel inbox)."
+    },
+    {
+      "question": "What is the 'All-Agents Drafting' (AAD) impact on reasoning tasks?",
+      "answer": "A 3.3% improvement in accuracy by ensuring independent initial thought."
+    },
+    {
+      "question": "Which security tier in the SAMAS authority model requires manual approval for most actions?",
+      "answer": "Intern tier."
+    },
+    {
+      "question": "What distinguishes the SAMAS 'Push-Based Swarm Topology' from SiteGPT's 'Mission Control'?",
+      "answer": "Agents react instantly to NATS events rather than waiting for the next 15-minute polling tick."
+    },
+    {
+      "question": "Which specific model is recommended by Peter Steinberger for long-context strength in OpenClaw?",
+      "answer": "Anthropic Claude Pro/Max (Opus 4.6)."
+    },
+    {
+      "question": "In LangGraph, what is the 'interrupt()' mechanism used for?",
+      "answer": "Enforcing Human-in-the-loop (HITL) approval by pausing execution during high-risk tool calls."
+    },
+    {
+      "question": "What is the significance of the 'Wait for round 3' findings in ReConcile research?",
+      "answer": "Consensus protocols generally converge within three rounds, making further debate rounds computationally inefficient."
+    },
+    {
+      "question": "Which component in OpenRAG handles the intelligent identification and extraction of PDF tables?",
+      "answer": "Docling."
+    },
+    {
+      "question": "How does 'Confidence-weighted voting' handle a disagreement between a highly accurate agent and a low-accuracy agent?",
+      "answer": "The historical accuracy weight of the agents is multiplied by their current confidence to recalibrate the final vote."
+    }
+  ],
+  "totalCards": 77,
+  "csv": "\"In the SAMAS architecture, which event-driven technology replaces the polling-based communication found in earlier multi-agent systems?\",NATS JetStream.\nWhy is NATS JetStream considered superior to Apache Kafka for autonomous agent 'interest-based' retention?,\"It retains messages only as long as active consumers are interested, matching the cognitive lifecycle of a task.\"\nWhich specific memory technique prepends context strings to text chunks before indexing to improve retrieval precision?,Contextual Retrieval (Anthropic).\nThe 'Rule of Two' for agent security allows a session to satisfy only two of which three properties simultaneously?,\"Access to private data, exposure to untrusted content, and external communication capability.\"\n\"In SiteGPT's 'Mission Control', what is the actual operational mechanism behind the perceived real-time interaction of 14 agents?\",Staggered cron jobs creating one-shot isolated sessions every 15 minutes.\nWhich consensus protocol technique requires agents to generate an initial solution independently before seeing others' work?,All-Agents Drafting (AAD).\nWhy is WebAssembly (WASM) preferred over standard shell execution for agentic tool use in production?,It provides a sandboxed runtime to mitigate remote code execution risks from prompt injection.\n\"In the SagaLLM framework, what is the purpose of a 'compensating action'?\",To restore the system to a consistent state by rolling back previous successful steps if a subsequent step fails.\nWhich cost optimisation tool uses trained classifiers to route queries between 'strong' and 'weak' models?,RouteLLM.\nHow does GraphRAG enhance multi-hop reasoning compared to standard vector search?,It traverses edges between entity nodes to find non-obvious relationships that vector embeddings might miss.\nWhat is the primary target of Phase 0 in the SAMAS implementation roadmap?,Deploying three hardcoded agents performing one impressive task to achieve time-to-first-value in under five minutes.\nWhich orchestration framework is selected for SAMAS due to its support for cyclic graphs and native persistence (checkpoints)?,LangGraph.\nThe 'Memory Curator' pattern is designed to solve which specific problem in multi-agent systems?,Conflicting agent knowledge by performing entity resolution and deduplication against a shared knowledge graph.\n\"According to ACL 2025 research, why does multi-agent debate often yield lower accuracy than simple voting protocols?\",\"Extended discussion causes premature answer convergence, destroying the cognitive diversity that powers effective voting.\"\n\"In a confidence-weighted voting model, how is the final decision (final_answer) mathematically determined?\",$argmax(\\sum(confidence_{i} \\times vote_{i}))$\nWhat is the specific risk associated with OpenClaw's 'local-first' execution model on a host machine?,Broad access to the host file system and shell creates a massive attack surface for prompt injection and malicious 'AgentSkills'.\nWhich framework is used in SAMAS to replace static prompt strings with parameters that are mathematically tuned by an optimizer agent?,DSPy.\nWhat is the architectural role of a 'Guard Agent' in the Coordinator + Guard dual-agent security model?,Post-validating outputs to enforce format rules and block residual risks before delivery.\nWhich technology allows Qdrant to manage thousands of private memories for different agents within a single collection?,Payload-based Partitioning (Multi-tenancy).\nThe GEPA optimizer improves prompts by using LLMs to mathematically propose mutations based on what data?,Reflective feedback from successful and failed task execution traces.\nWhy is the Model Context Protocol (MCP) used to connect agents to external tools in the SAMAS blueprint?,\"It decouples tool maintenance from agent logic, allowing standardised access control and easier API updates.\"\n\"In SiteGPT's topology, which agent acts as the 'Squad Lead' or project manager?\",Jarvis.\nWhat is the primary disadvantage of OpenClaw's 'Lane Queue' system?,\"It defaults to serial execution, which blocks concurrent operations and severely limits system throughput.\"\nWhich caching tier in SAMAS provides 100% savings on API costs when identical queries are intercepted?,\"Semantic caching (e.g., GPTCache).\"\nWhat is the purpose of the 'A2A Protocol' (Agent-to-Agent)?,To enable capability discovery and standard communication between disparate agent systems using JSON-based 'Agent Cards'.\nWhich dashboard component is recommended for visualising live agent topology and message flows?,React Flow (or @xyflow/react).\n\"In the context of cost optimisation, why is prompt caching highly effective for 20+ agents?\",\"Stable system prompts (SOPs) are shared across many agents, leading to high cache hit rates and 90% cost reductions on input.\"\nWhat 'autonomy slider' configuration is implemented for SAMAS agents?,Discrete levels (e.g. Low/Medium/High) mapped to specific Human-in-the-loop (HITL) interrupt triggers.\nThe 'Collective Improvement' (CI) technique adds what specific step to the multi-agent consensus process?,Structured iterative refinement to prevent excessive or unguided communication.\nWhy is self-hosting LLMs considered a 'trap' for most agent deployments below 100M tokens per month?,Managed APIs are significantly cheaper (60–700$\\times$) than the hardware and operational costs of serving open-weight models.\nWhich real-time database is used by Bhanu Teja P for his Mission Control dashboard?,Convex.\n\"In the SAMAS dashboard stack, which library is used for accessible, Tailwind-based UI primitives?\",shadcn/ui.\nWhat trigger should cause an agent system to automatically escalate a task to a human operator?,Average confidence across voting agents falls below a specific threshold (e.g. 40%).\nThe 'SagaLLM' approach ensures reliability by decomposing complex goals into what kind of units?,Atomic steps with defined forward actions and reversible states.\nWhich OpenClaw file serves as the core instruction set for an agent's personality and 'soul'?,SOUL.md.\nHow does the 'Competitive Swarming' pattern work within NATS JetStream?,\"A request is broadcast (Fan-Out) to multiple agents, and a 'Judge' agent selects the best generated variation.\"\nWhich technology provides hardware-level isolation for agents while maintaining millisecond startup times?,Firecracker MicroVMs.\nWhat is the function of the 'MIPROv2' optimizer in the DSPy framework?,It mathematically proposes multi-step instructions to maximise a success metric based on a training dataset.\nWhich specific risk did OpenClaw encounter shortly after reaching 100k stars on GitHub?,The proliferation of malicious skills (11.3% of the marketplace) due to an uncurated registry.\n\"In the context of multi-agent memory, what are 'multi-resolution summaries'?\",Global summaries paired with agent-specific fine-grained logs to prevent information overload.\nWhich consensus model routes factual verification tasks differently than strategic reasoning tasks?,Adaptive protocol selector.\nHow does LiteLLM facilitate cost management in enterprise agent swarms?,\"It acts as a self-hosted gateway with routing strategies, usage-based budgets, and automatic retries.\"\nWhat is the primary benefit of the 'Agent-to-Agent' (A2A) JSON manifest?,It allows an orchestrator to dynamically 'hire' agents based on their advertised capabilities and inputs.\nWhich specific database is recommended for low-latency thread-level persistence in LangGraph?,Redis.\n\"In the SAMAS security model, what is 'Provenance Ledger' tracking?\",Data origin and trust levels across agents to detect indirect prompt injection.\nWhat is the 'martingale' concern in NeurIPS 2025 research regarding multi-agent debate?,Debate induces belief trajectories that don't improve correctness without specific corrective update interventions.\nWhich OpenClaw tool enables a 'Live Canvas' visual workspace?,A2UI.\nWhat distinguishes 'Agentic Plan Caching' from standard prompt caching?,It caches structured execution plans from completed runs to reduce latency and cost for recurring task types.\nWhy is 'Diversity' of model architectures considered essential for multi-agent voting?,\"Homogeneous agents (using the same model) tend to hallucinate in similar patterns, reducing the error-correction benefit of voting.\"\n\"In the OpenClaw Gateway, what is the 'main' session's default security privilege?\",Full access to the host machine (tools run on the host).\nWhich specific protocol standardises 'RUN_STARTED' and 'RUN_FINISHED' events for agent-to-frontend communication?,AG-UI (from CopilotKit).\nWhat does the 'A-HMAD' framework use to reduce factual errors by 30%?,Dynamic routing that activates specific agent subsets based on the query type.\n\"In SiteGPT's squad, what is the role of the agent named 'Friday'?\",Development.\nWhat is the primary advantage of the 'Recursive Hierarchical Supervisor' pattern for 20+ agents?,It prevents the top-level orchestrator from becoming a processing bottleneck by delegating to domain-specific sub-teams.\nWhich specific tool is used by SAMAS to process asynchronous text and extract entities for the knowledge graph?,Curator Agent.\nWhat is the recommended layout algorithm for automatically positioning nodes in an agent dashboard topology?,Dagre or ELK.\nWhich agent type in the GaaS framework implements hard blocks on prohibited actions?,Coercive enforcement mode.\nWhat defines the 'Active' state in the research-supported agent lifecycle?,An agent that is currently available and actively processing events or tasks.\nWhich specific benefit does Anthropic's 'Prompt Caching' offer for recurring input blocks?,A 90% reduction in input costs for cache hits.\nWhat is the role of the 'Evolution Agent' in the SAMAS infrastructure?,To run weekly GEPA optimization against production traces and mathematically tune agent instructions.\nWhich OpenClaw command is used to troubleshoot risky or misconfigured DM policies?,openclaw doctor\nWhat does the 'AgentSpawn' paper propose to improve task completion rates during dynamic agent creation?,Automatic memory transfer and adaptive spawning policies.\nWhich specific React library is recommended for implementing a Kanban task board for agents?,dnd-kit.\n\"In the context of the SAMAS nervous system, what is 'Queue Group' load balancing?\",Distributing tasks across multiple identical specialist agents (e.g. three 'Friday' developers) to handle spikes.\n\"Which language is used for defining agent SOPs (roles, goals, backstories) in the SAMAS repository?\",YAML.\nWhat is 'Semantic Search' fusion in OpenClaw's memory architecture?,Combining semantic similarity (sqlite-vec) with keyword matching (FTS5/BM25).\n\"In the SAMAS dashboard, which tool provides deep distributed tracing for agent reasoning loops?\",LangFuse (or Arize Phoenix).\nHow does 'Staggered Cron' help maintain low operational costs in SiteGPT's multi-agent system?,It ensures that most agents consume zero VPS resources between their specific 15-minute heartbeats.\nWhich OpenClaw feature allows a user to control the agent via WhatsApp or Telegram?,The Gateway Pattern (Multi-channel inbox).\nWhat is the 'All-Agents Drafting' (AAD) impact on reasoning tasks?,A 3.3% improvement in accuracy by ensuring independent initial thought.\nWhich security tier in the SAMAS authority model requires manual approval for most actions?,Intern tier.\nWhat distinguishes the SAMAS 'Push-Based Swarm Topology' from SiteGPT's 'Mission Control'?,Agents react instantly to NATS events rather than waiting for the next 15-minute polling tick.\nWhich specific model is recommended by Peter Steinberger for long-context strength in OpenClaw?,Anthropic Claude Pro/Max (Opus 4.6).\n\"In LangGraph, what is the 'interrupt()' mechanism used for?\",Enforcing Human-in-the-loop (HITL) approval by pausing execution during high-risk tool calls.\nWhat is the significance of the 'Wait for round 3' findings in ReConcile research?,\"Consensus protocols generally converge within three rounds, making further debate rounds computationally inefficient.\"\nWhich component in OpenRAG handles the intelligent identification and extraction of PDF tables?,Docling.\nHow does 'Confidence-weighted voting' handle a disagreement between a highly accurate agent and a low-accuracy agent?,The historical accuracy weight of the agents is multiplied by their current confidence to recalibrate the final vote."
+}

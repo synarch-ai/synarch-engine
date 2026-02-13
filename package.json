@@ -1,0 +1,20 @@
+{
+  "name": "pantheon-ai",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Prax Lannister <prakhar.2019ca66@gmail.com>",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "17.3.1",
+    "notebooklm-kit": "2.2.0",
+    "playwright": "1.58.2",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3"
+  }
+}

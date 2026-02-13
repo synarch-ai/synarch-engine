@@ -1,0 +1,147 @@
+[
+  {
+    "artifactId": "664cf931-af9f-4c0c-b1b0-be18cd6816bb",
+    "title": "SAMAS: From Magic to Production",
+    "type": 11,
+    "state": 2,
+    "sourceIds": [
+      "949f1f29-0eeb-41d8-b06a-342157fa3b17",
+      "8eca3819-e550-428b-ab44-dbba7c11196a",
+      "e1ba607c-2778-4529-ad50-9e75e1bbbcc1",
+      "85e674b6-e322-403c-9bdc-92cfe57e31a2",
+      "2730e1eb-421d-44a9-bbea-a85863d59e63",
+      "edef6eba-ff62-4d32-a5ae-2ea94bd63952",
+      "4dd00848-73e2-4e71-bd30-73f83cbf762f",
+      "a5462284-c613-42f4-adf8-9e2aca80a6ca",
+      "3b0b9213-85c1-4e2b-ac44-4e2bf38d3cb6",
+      "a0617bcb-15f4-486e-8ad2-0a97bdf99c13"
+    ],
+    "videoData": "https://lh3.googleusercontent.com/notebooklm/ANHLwAw4WcYElCbCbbuzFstZ9urpDVqD4aBnUyfLUsLG5gBsVgwEh6gjTHHmq9kV8eFMkngPUIZFQBHbvX881oCTyJMXzSPL_GkbgDgIPcP1fFY6l5OXCShngW0POKmInMRkP_6RiQk8lBH7mYaExzhhDZpzNtXq1Q=m22"
+  },
+  {
+    "artifactId": "748ad0a1-0851-44b1-8a0e-44cb068721e9",
+    "title": "The Blueprint For Enterprise Agent Swarms",
+    "type": 10,
+    "state": 2,
+    "sourceIds": [
+      "949f1f29-0eeb-41d8-b06a-342157fa3b17",
+      "8eca3819-e550-428b-ab44-dbba7c11196a",
+      "e1ba607c-2778-4529-ad50-9e75e1bbbcc1",
+      "85e674b6-e322-403c-9bdc-92cfe57e31a2",
+      "2730e1eb-421d-44a9-bbea-a85863d59e63",
+      "edef6eba-ff62-4d32-a5ae-2ea94bd63952",
+      "4dd00848-73e2-4e71-bd30-73f83cbf762f",
+      "a5462284-c613-42f4-adf8-9e2aca80a6ca",
+      "3b0b9213-85c1-4e2b-ac44-4e2bf38d3cb6",
+      "a0617bcb-15f4-486e-8ad2-0a97bdf99c13"
+    ]
+  },
+  {
+    "artifactId": "a2a8c736-126b-44d4-ae6f-f0b2ed517b64",
+    "title": "SAMAS Architecture Deep Dive",
+    "type": 9,
+    "state": 2,
+    "sourceIds": [
+      "949f1f29-0eeb-41d8-b06a-342157fa3b17",
+      "8eca3819-e550-428b-ab44-dbba7c11196a",
+      "e1ba607c-2778-4529-ad50-9e75e1bbbcc1",
+      "85e674b6-e322-403c-9bdc-92cfe57e31a2",
+      "2730e1eb-421d-44a9-bbea-a85863d59e63",
+      "edef6eba-ff62-4d32-a5ae-2ea94bd63952",
+      "4dd00848-73e2-4e71-bd30-73f83cbf762f",
+      "a5462284-c613-42f4-adf8-9e2aca80a6ca",
+      "3b0b9213-85c1-4e2b-ac44-4e2bf38d3cb6",
+      "a0617bcb-15f4-486e-8ad2-0a97bdf99c13"
+    ]
+  },
+  {
+    "artifactId": "12ef54c5-83c4-4a1a-96a5-dda81cf06892",
+    "title": "SAMAS Enterprise Multi-Agent Systems Blueprint",
+    "type": 8,
+    "state": 2,
+    "sourceIds": [
+      "949f1f29-0eeb-41d8-b06a-342157fa3b17",
+      "8eca3819-e550-428b-ab44-dbba7c11196a",
+      "e1ba607c-2778-4529-ad50-9e75e1bbbcc1",
+      "85e674b6-e322-403c-9bdc-92cfe57e31a2",
+      "2730e1eb-421d-44a9-bbea-a85863d59e63",
+      "edef6eba-ff62-4d32-a5ae-2ea94bd63952",
+      "4dd00848-73e2-4e71-bd30-73f83cbf762f",
+      "a5462284-c613-42f4-adf8-9e2aca80a6ca",
+      "3b0b9213-85c1-4e2b-ac44-4e2bf38d3cb6",
+      "a0617bcb-15f4-486e-8ad2-0a97bdf99c13"
+    ]
+  },
+  {
+    "artifactId": "572cff53-86be-42af-a56c-6e1c02bc0c94",
+    "title": "The SAMAS Blueprint: Engineering Enterprise-Grade Autonomous Agent Swarms",
+    "type": 1,
+    "state": 2,
+    "sourceIds": [
+      "949f1f29-0eeb-41d8-b06a-342157fa3b17",
+      "8eca3819-e550-428b-ab44-dbba7c11196a",
+      "e1ba607c-2778-4529-ad50-9e75e1bbbcc1",
+      "85e674b6-e322-403c-9bdc-92cfe57e31a2",
+      "2730e1eb-421d-44a9-bbea-a85863d59e63",
+      "edef6eba-ff62-4d32-a5ae-2ea94bd63952",
+      "4dd00848-73e2-4e71-bd30-73f83cbf762f",
+      "a5462284-c613-42f4-adf8-9e2aca80a6ca",
+      "3b0b9213-85c1-4e2b-ac44-4e2bf38d3cb6",
+      "a0617bcb-15f4-486e-8ad2-0a97bdf99c13"
+    ]
+  },
+  {
+    "artifactId": "2c510914-2d3e-44b4-a653-264b05c82444",
+    "title": "Agent Quiz",
+    "type": 5,
+    "state": 2,
+    "sourceIds": [
+      "949f1f29-0eeb-41d8-b06a-342157fa3b17",
+      "8eca3819-e550-428b-ab44-dbba7c11196a",
+      "e1ba607c-2778-4529-ad50-9e75e1bbbcc1",
+      "85e674b6-e322-403c-9bdc-92cfe57e31a2",
+      "2730e1eb-421d-44a9-bbea-a85863d59e63",
+      "edef6eba-ff62-4d32-a5ae-2ea94bd63952",
+      "4dd00848-73e2-4e71-bd30-73f83cbf762f",
+      "a5462284-c613-42f4-adf8-9e2aca80a6ca",
+      "3b0b9213-85c1-4e2b-ac44-4e2bf38d3cb6",
+      "a0617bcb-15f4-486e-8ad2-0a97bdf99c13"
+    ]
+  },
+  {
+    "artifactId": "6359b13e-8030-4b69-b992-106ea132759e",
+    "title": "Agents Flashcards",
+    "type": 6,
+    "state": 2,
+    "sourceIds": [
+      "949f1f29-0eeb-41d8-b06a-342157fa3b17",
+      "8eca3819-e550-428b-ab44-dbba7c11196a",
+      "e1ba607c-2778-4529-ad50-9e75e1bbbcc1",
+      "85e674b6-e322-403c-9bdc-92cfe57e31a2",
+      "2730e1eb-421d-44a9-bbea-a85863d59e63",
+      "edef6eba-ff62-4d32-a5ae-2ea94bd63952",
+      "4dd00848-73e2-4e71-bd30-73f83cbf762f",
+      "a5462284-c613-42f4-adf8-9e2aca80a6ca",
+      "3b0b9213-85c1-4e2b-ac44-4e2bf38d3cb6",
+      "a0617bcb-15f4-486e-8ad2-0a97bdf99c13"
+    ]
+  },
+  {
+    "artifactId": "e4df6c94-b451-4a2e-9a9d-402e48a848ab",
+    "title": "SAMAS Architecture vs. Legacy Agent Systems Comparison",
+    "type": 9,
+    "state": 2,
+    "sourceIds": [
+      "949f1f29-0eeb-41d8-b06a-342157fa3b17",
+      "8eca3819-e550-428b-ab44-dbba7c11196a",
+      "e1ba607c-2778-4529-ad50-9e75e1bbbcc1",
+      "85e674b6-e322-403c-9bdc-92cfe57e31a2",
+      "2730e1eb-421d-44a9-bbea-a85863d59e63",
+      "edef6eba-ff62-4d32-a5ae-2ea94bd63952",
+      "4dd00848-73e2-4e71-bd30-73f83cbf762f",
+      "a5462284-c613-42f4-adf8-9e2aca80a6ca",
+      "3b0b9213-85c1-4e2b-ac44-4e2bf38d3cb6",
+      "a0617bcb-15f4-486e-8ad2-0a97bdf99c13"
+    ]
+  }
+]

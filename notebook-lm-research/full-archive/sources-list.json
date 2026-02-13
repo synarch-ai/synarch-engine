@@ -1,0 +1,134 @@
+[
+  {
+    "sourceId": "e115296c-39e2-4474-9f8a-ba4990a00ede",
+    "title": "All notes 2/13/2026",
+    "type": 15,
+    "createdAt": "2026-02-12T20:47:45.074Z",
+    "updatedAt": "2026-02-12T20:47:44.304Z",
+    "status": 2,
+    "metadata": {
+      "fileSize": 21076
+    }
+  },
+  {
+    "sourceId": "949f1f29-0eeb-41d8-b06a-342157fa3b17",
+    "title": "Building Superior Autonomous Multi-Agent System.docx",
+    "type": 0,
+    "createdAt": "2026-02-12T16:57:20.479Z",
+    "updatedAt": "2026-02-12T16:57:23.057Z",
+    "status": 2,
+    "metadata": {
+      "fileSize": 3720
+    }
+  },
+  {
+    "sourceId": "4320237b-babc-4a65-982c-9bfd83338a70",
+    "title": "GitHub - gsd-build/get-shit-done: A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code and OpenCode.",
+    "type": 1,
+    "createdAt": "2026-02-12T21:17:26.020Z",
+    "updatedAt": "2026-02-12T21:17:25.259Z",
+    "status": 2,
+    "metadata": {
+      "fileSize": 2732
+    }
+  },
+  {
+    "sourceId": "8eca3819-e550-428b-ab44-dbba7c11196a",
+    "title": "GitHub - openclaw/openclaw: Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞",
+    "type": 1,
+    "createdAt": "2026-02-11T22:39:49.876Z",
+    "updatedAt": "2026-02-11T22:39:49.239Z",
+    "status": 2,
+    "metadata": {
+      "fileSize": 2799
+    }
+  },
+  {
+    "sourceId": "e1ba607c-2778-4529-ad50-9e75e1bbbcc1",
+    "title": "How to run multiple Clawdbots (aka Openclaw agents)",
+    "type": 4,
+    "createdAt": "2026-02-11T22:36:14.209Z",
+    "updatedAt": "2026-02-11T22:36:13.693Z",
+    "status": 2,
+    "metadata": {
+      "fileSize": 3243
+    }
+  },
+  {
+    "sourceId": "85e674b6-e322-403c-9bdc-92cfe57e31a2",
+    "title": "OpenClaw - OpenClaw",
+    "type": 1,
+    "createdAt": "2026-02-11T22:38:41.943Z",
+    "updatedAt": "2026-02-11T22:38:41.333Z",
+    "status": 2,
+    "metadata": {
+      "fileSize": 512
+    }
+  },
+  {
+    "sourceId": "2730e1eb-421d-44a9-bbea-a85863d59e63",
+    "title": "OpenClaw — Personal AI Assistant",
+    "type": 1,
+    "createdAt": "2026-02-11T22:38:05.744Z",
+    "updatedAt": "2026-02-11T22:38:05.167Z",
+    "status": 2,
+    "metadata": {
+      "fileSize": 5758
+    }
+  },
+  {
+    "sourceId": "edef6eba-ff62-4d32-a5ae-2ea94bd63952",
+    "title": "OpenClaw: The Viral AI Agent that Broke the Internet - Peter Steinberger | Lex Fridman Podcast #491",
+    "type": 4,
+    "createdAt": "2026-02-12T13:56:50.423Z",
+    "updatedAt": "2026-02-12T13:56:49.851Z",
+    "status": 2,
+    "metadata": {
+      "fileSize": 28608
+    }
+  },
+  {
+    "sourceId": "4dd00848-73e2-4e71-bd30-73f83cbf762f",
+    "title": "Personal Assistant Setup - OpenClaw",
+    "type": 1,
+    "createdAt": "2026-02-11T22:38:52.846Z",
+    "updatedAt": "2026-02-11T22:38:52.253Z",
+    "status": 2,
+    "metadata": {
+      "fileSize": 848
+    }
+  },
+  {
+    "sourceId": "a5462284-c613-42f4-adf8-9e2aca80a6ca",
+    "title": "SAMAS Gap Analysis_ Six Critical Unknowns Resolved for Production Multi-Agent Systems.pdf",
+    "type": 7,
+    "createdAt": "2026-02-12T16:57:20.479Z",
+    "updatedAt": "2026-02-12T16:57:23.046Z",
+    "status": 2,
+    "metadata": {
+      "fileSize": 3539
+    }
+  },
+  {
+    "sourceId": "3b0b9213-85c1-4e2b-ac44-4e2bf38d3cb6",
+    "title": "What is OpenRAG? Unlocking the Future of RAG in Generative AI",
+    "type": 4,
+    "createdAt": "2026-02-12T14:00:06.714Z",
+    "updatedAt": "2026-02-12T14:00:06.117Z",
+    "status": 2,
+    "metadata": {
+      "fileSize": 1135
+    }
+  },
+  {
+    "sourceId": "a0617bcb-15f4-486e-8ad2-0a97bdf99c13",
+    "title": "compass_artifact_wf-f30e995b-b833-4a36-bdff-8d8d9908bc98_text_markdown.md",
+    "type": 15,
+    "createdAt": "2026-02-12T16:57:20.479Z",
+    "updatedAt": "2026-02-12T16:57:23.100Z",
+    "status": 2,
+    "metadata": {
+      "fileSize": 3301
+    }
+  }
+]

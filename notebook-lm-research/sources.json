@@ -1,0 +1,297 @@
+{
+  "success": true,
+  "data": {
+    "sources": [
+      {
+        "id": "source-0",
+        "title": "more_vertmarkdown",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-1",
+        "title": "more_vertmarkdown",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-2",
+        "title": "more_vert",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-3",
+        "title": "markdown",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-4",
+        "title": "more_vertarticle",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-5",
+        "title": "more_vertarticle",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-6",
+        "title": "more_vert",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-7",
+        "title": "article",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-8",
+        "title": "more_vertweb",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-9",
+        "title": "more_vertweb",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-10",
+        "title": "more_vert",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-11",
+        "title": "web",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-12",
+        "title": "more_vertweb",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-13",
+        "title": "more_vertweb",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-14",
+        "title": "more_vert",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-15",
+        "title": "web",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-16",
+        "title": "more_vertvideo_youtube",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-17",
+        "title": "more_vertvideo_youtube",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-18",
+        "title": "more_vert",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-19",
+        "title": "video_youtube",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-20",
+        "title": "more_vertweb",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-21",
+        "title": "more_vertweb",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-22",
+        "title": "more_vert",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-23",
+        "title": "web",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-24",
+        "title": "more_vertweb",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-25",
+        "title": "more_vertweb",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-26",
+        "title": "more_vert",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-27",
+        "title": "web",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-28",
+        "title": "more_vertvideo_youtube",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-29",
+        "title": "more_vertvideo_youtube",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-30",
+        "title": "more_vert",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-31",
+        "title": "video_youtube",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-32",
+        "title": "more_vertweb",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-33",
+        "title": "more_vertweb",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-34",
+        "title": "more_vert",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-35",
+        "title": "web",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-36",
+        "title": "more_vertdrive_pdf",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-37",
+        "title": "more_vertdrive_pdf",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-38",
+        "title": "more_vert",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-39",
+        "title": "drive_pdf",
+        "type": "file",
+        "status": "ready"
+      },
+      {
+        "id": "source-40",
+        "title": "more_vertvideo_youtube",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-41",
+        "title": "more_vertvideo_youtube",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-42",
+        "title": "more_vert",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-43",
+        "title": "video_youtube",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-44",
+        "title": "more_vertmarkdown",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-45",
+        "title": "more_vertmarkdown",
+        "type": "text",
+        "status": "ready"
+      },
+      {
+        "id": "source-46",
+        "title": "more_vert",
+        "type": "drive",
+        "status": "ready"
+      },
+      {
+        "id": "source-47",
+        "title": "markdown",
+        "type": "drive",
+        "status": "ready"
+      }
+    ],
+    "count": 48,
+    "notebookUrl": "https://notebooklm.google.com/notebook/1ddb4475-1a08-4eba-9615-ad64fbc73365?authuser=1"
+  }
+}

@@ -1,0 +1,553 @@
+{
+  "artifactId": "2c510914-2d3e-44b4-a653-264b05c82444",
+  "title": "Agent Quiz",
+  "type": 5,
+  "state": 2,
+  "sourceIds": [
+    "949f1f29-0eeb-41d8-b06a-342157fa3b17",
+    "8eca3819-e550-428b-ab44-dbba7c11196a",
+    "e1ba607c-2778-4529-ad50-9e75e1bbbcc1",
+    "85e674b6-e322-403c-9bdc-92cfe57e31a2",
+    "2730e1eb-421d-44a9-bbea-a85863d59e63",
+    "edef6eba-ff62-4d32-a5ae-2ea94bd63952",
+    "4dd00848-73e2-4e71-bd30-73f83cbf762f",
+    "a5462284-c613-42f4-adf8-9e2aca80a6ca",
+    "3b0b9213-85c1-4e2b-ac44-4e2bf38d3cb6",
+    "a0617bcb-15f4-486e-8ad2-0a97bdf99c13"
+  ],
+  "questions": [
+    {
+      "question": "In the SAMAS architecture, what fundamental shift is proposed to replace the polling-based communication observed in systems like SiteGPT?",
+      "options": [
+        "An event-driven nervous system utilising NATS JetStream",
+        "A monolithic Gateway process bridging messaging channels",
+        "A custom-coded Mission Control dashboard acting as a passive blackboard",
+        "A serial execution 'Lane Queue' to prevent race conditions"
+      ],
+      "correctAnswer": 0,
+      "explanation": "SAMAS advocates for a real-time reactive architecture to eliminate the arbitrary latency and compute waste associated with periodic dashboard checks.",
+      "reasoning": "SAMAS advocates for a real-time reactive architecture to eliminate the arbitrary latency and compute waste associated with periodic dashboard checks.",
+      "hint": "Consider the technology selected to handle high-priority system events in real-time.",
+      "optionReasons": [
+        "SAMAS advocates for a real-time reactive architecture to eliminate the arbitrary latency and compute waste associated with periodic dashboard checks.",
+        "This describes the OpenClaw architecture, which SAMAS aims to move away from due to single-point-of-failure risks.",
+        "Passive dashboards are characteristic of the reference architectures that SAMAS seeks to improve upon by using active brokers.",
+        "Serial execution is a limitation of OpenClaw that restricts throughput, whereas SAMAS focuses on asynchronous swarming."
+      ]
+    },
+    {
+      "question": "According to the Gap Analysis, how does Bhanu Teja P's 'Mission Control' actually manage multiple agents on a single VPS?",
+      "options": [
+        "Staggered cron cycles creating isolated one-shot sessions",
+        "Parallel containerised processes for each MCU-themed agent",
+        "A persistent WebSocket stream connecting all 14 agents simultaneously",
+        "Browser automation agents interacting with a shared Notion workspace"
+      ],
+      "correctAnswer": 0,
+      "explanation": "The system uses OpenClaw's built-in cron to wake agents on schedules, query a database for tasks, and then terminate to save resources.",
+      "reasoning": "The system uses OpenClaw's built-in cron to wake agents on schedules, query a database for tasks, and then terminate to save resources.",
+      "hint": "Focus on the mechanism that allows many agents to run on limited hardware without burning constant compute.",
+      "optionReasons": [
+        "The system uses OpenClaw's built-in cron to wake agents on schedules, query a database for tasks, and then terminate to save resources.",
+        "The agents are not separate processes but separate sessions within a single gateway daemon.",
+        "Only the lead agent, Jarvis, typically maintains a persistent interactive session, while others wake on schedules.",
+        "The dashboard is a custom React app backed by Convex, not a standard productivity tool controlled by automation."
+      ]
+    },
+    {
+      "question": "The 'Rule of Two' established by Meta's 2025 research suggests that an agent session should satisfy no more than two of which three properties?",
+      "options": [
+        "Private data access, untrusted content exposure, and external communication",
+        "Vector storage, knowledge graph integration, and thread-level persistence",
+        "Semantic search, keyword matching, and hybrid re-ranking",
+        "Role-based backstory, goal-oriented tasks, and tool constraints"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Satisfying all three creates a significant security risk, necessitating mandatory human-in-the-loop intervention.",
+      "reasoning": "Satisfying all three creates a significant security risk, necessitating mandatory human-in-the-loop intervention.",
+      "hint": "Think about the combination of permissions that would allow an agent to leak sensitive information autonomously.",
+      "optionReasons": [
+        "Satisfying all three creates a significant security risk, necessitating mandatory human-in-the-loop intervention.",
+        "These are memory architecture tiers, not the security properties defined in the Meta research.",
+        "These components relate to RAG retrieval logic rather than the session properties of autonomous agents.",
+        "These are the standard components of agent SOPs in frameworks like CrewAI."
+      ]
+    },
+    {
+      "question": "Which cost optimisation strategy allows a multi-agent system to achieve up to a $95\\%$ reduction in LLM spend?",
+      "options": [
+        "Routing $80\\%$ to $90\\%$ of queries to 'cheap' models like GPT-4o Mini",
+        "Self-hosting Llama 3.3 70B models on dedicated A100 instances",
+        "Increasing the number of discussion rounds in multi-agent debates",
+        "Replacing prompt caching with semantic caching in the multi-tier architecture"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Task-to-model mapping ensures that expensive frontier models are only used for high-stakes reasoning, while bulk tasks use low-cost alternatives.",
+      "reasoning": "Task-to-model mapping ensures that expensive frontier models are only used for high-stakes reasoning, while bulk tasks use low-cost alternatives.",
+      "hint": "Consider the economic impact of choosing different tiers of model intelligence for varying task complexities.",
+      "optionReasons": [
+        "Task-to-model mapping ensures that expensive frontier models are only used for high-stakes reasoning, while bulk tasks use low-cost alternatives.",
+        "The source material indicates that self-hosting is often 60–700$\\times$ more expensive than using APIs for the same model.",
+        "Extra debate rounds increase token consumption and can actually degrade the quality of decision-making.",
+        "SAMAS recommends a multi-tier approach where semantic caching and prompt caching work together rather than replacing one another."
+      ]
+    },
+    {
+      "question": "What does ACL 2025 research conclude regarding the efficacy of 'Voting' versus 'Debate' in multi-agent systems?",
+      "options": [
+        "Voting improves reasoning tasks by $13.2\\%$ while debate often causes answer convergence",
+        "Debate is superior for knowledge tasks as it resolves factual hallucinations",
+        "Homogeneous agent squads perform $11.4\\%$ better in structured debates",
+        "Discussion rounds should continue until a $100\\%$ confidence score is achieved"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Simple majority voting captures most gains, whereas excessive discussion destroys the diversity required for accurate voting.",
+      "reasoning": "Simple majority voting captures most gains, whereas excessive discussion destroys the diversity required for accurate voting.",
+      "hint": "Think about whether more communication amongst agents always leads to better results.",
+      "optionReasons": [
+        "Simple majority voting captures most gains, whereas excessive discussion destroys the diversity required for accurate voting.",
+        "The research suggests consensus protocols (a form of voting) improve knowledge tasks, but debate induces a martingale trajectory.",
+        "Diversity from different model architectures is considered essential, as homogeneous agents perform significantly worse.",
+        "Performance often reduces with more discussion rounds; ReConcile typically converges by round 3."
+      ]
+    },
+    {
+      "question": "Why is WebAssembly (WASM) or Firecracker sandboxing considered 'non-negotiable' for production-grade agent systems?",
+      "options": [
+        "To mitigate remote code execution risks from malicious tool use or prompt injection",
+        "To enable the agent to modify its own source code in a persistent environment",
+        "To reduce the latency of NATS JetStream message delivery between pods",
+        "To store episodic memory in a format compatible with GraphRAG"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Agents with shell access create a massive attack surface; hardware-level isolation ensures compromised tools cannot escape to the host kernel.",
+      "reasoning": "Agents with shell access create a massive attack surface; hardware-level isolation ensures compromised tools cannot escape to the host kernel.",
+      "hint": "Recall the security vulnerabilities found in OpenClaw's unrestricted local access model.",
+      "optionReasons": [
+        "Agents with shell access create a massive attack surface; hardware-level isolation ensures compromised tools cannot escape to the host kernel.",
+        "While self-modification is mentioned in OpenClaw, sandboxing is specifically used to restrict and isolate dangerous actions.",
+        "Sandboxing is a security measure for tool execution, while NATS handles the communication layer.",
+        "Memory storage is handled by databases like Qdrant or Neo4j, not the tool execution sandbox."
+      ]
+    },
+    {
+      "question": "In the 'Phase 0' roadmap for SAMAS, what is the primary objective for developers?",
+      "options": [
+        "Shipping 3 agents performing one impressive task with minimal configuration",
+        "Implementing a full Knowledge Graph with Neo4j and entity resolution",
+        "Designing an enterprise-grade Mission Control dashboard with React Flow",
+        "Conducting weekly GEPA optimisation loops on production execution traces"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Successful MVPs like AgentGPT and CrewAI prove that shipping a small, tangible demo is better than building a massive swarm upfront.",
+      "reasoning": "Successful MVPs like AgentGPT and CrewAI prove that shipping a small, tangible demo is better than building a massive swarm upfront.",
+      "hint": "Reflect on the common patterns of successful viral AI projects mentioned in the Gap Analysis.",
+      "optionReasons": [
+        "Successful MVPs like AgentGPT and CrewAI prove that shipping a small, tangible demo is better than building a massive swarm upfront.",
+        "Building the memory fabric is assigned to Phase 3 of the implementation roadmap.",
+        "Dashboard development and topology visualisation are reserved for later phases after the core nervous system is built.",
+        "Prompt optimisation and self-evolution are advanced features planned for the final stages of development."
+      ]
+    },
+    {
+      "question": "Which protocol is utilised in SAMAS to standardise the connection between agents and external tools, such as Slack or Google Drive?",
+      "options": [
+        "Model Context Protocol (MCP)",
+        "Agent-to-Agent (A2A) Protocol",
+        "SagaLLM Framework",
+        "NATS JetStream Subject Mapping"
+      ],
+      "correctAnswer": 0,
+      "explanation": "MCP decouples tool maintenance from agent logic by using a client-server model for tool connections.",
+      "reasoning": "MCP decouples tool maintenance from agent logic by using a client-server model for tool connections.",
+      "hint": "Consider the Anthropic-led protocol designed to solve the tool-integration bottleneck.",
+      "optionReasons": [
+        "MCP decouples tool maintenance from agent logic by using a client-server model for tool connections.",
+        "A2A is used for communication between disparate agent systems, not for standardising tool connections.",
+        "SagaLLM is used for managing state and transaction guarantees in long-running planning workflows.",
+        "NATS handles message routing but does not provide the standardised schema for tool interaction."
+      ]
+    },
+    {
+      "question": "What is the purpose of the 'All-Agents Drafting' (AAD) technique in the context of multi-agent decision making?",
+      "options": [
+        "To prevent 'conformity bias' by ensuring independent initial solutions",
+        "To automatically generate few-shot examples for prompt optimisation",
+        "To assign specific roles (e.g., Writer, Critic) to agents within a squad",
+        "To compress long conversation histories into episodic memory chunks"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Agents draft solutions before seeing others' work, preserving the diversity that makes voting protocols effective.",
+      "reasoning": "Agents draft solutions before seeing others' work, preserving the diversity that makes voting protocols effective.",
+      "hint": "Think about how seeing another agent's answer might influence an LLM's own reasoning.",
+      "optionReasons": [
+        "Agents draft solutions before seeing others' work, preserving the diversity that makes voting protocols effective.",
+        "Prompt optimisation is the role of DSPy and GEPA, not the drafting phase of a consensus protocol.",
+        "Role assignment is part of the orchestration and SOP definition, not the decision-making protocol itself.",
+        "AAD is a reasoning technique, while memory compression is handled by RAG or compaction commands."
+      ]
+    },
+    {
+      "question": "Which orchestration framework is selected for SAMAS due to its support for cyclic workflows and native state persistence?",
+      "options": [
+        "LangGraph",
+        "CrewAI",
+        "AutoGen",
+        "MetaGPT"
+      ],
+      "correctAnswer": 0,
+      "explanation": "LangGraph's graph-based state machine and checkpointer mechanism are ideal for complex, looping production workflows.",
+      "reasoning": "LangGraph's graph-based state machine and checkpointer mechanism are ideal for complex, looping production workflows.",
+      "hint": "This framework is described as being 'built for control' and 'checkpoints'.",
+      "optionReasons": [
+        "LangGraph's graph-based state machine and checkpointer mechanism are ideal for complex, looping production workflows.",
+        "While good for linear collaboration, it offers less control over complex states and cycles.",
+        "AutoGen is excellent for multi-agent dialogue but is harder to control in structured execution flows.",
+        "MetaGPT is highly structured for software development but can be too rigid for general autonomous tasks."
+      ]
+    },
+    {
+      "question": "How does the 'Saga Pattern' improve the reliability of SAMAS's long-horizon workflows?",
+      "options": [
+        "By defining atomic steps with associated compensating (rollback) actions",
+        "By using vector search to find the most relevant past failure cases",
+        "By encrypting all inter-agent communication via the NATS message bus",
+        "By automatically upgrading weak models to frontier models during timeouts"
+      ],
+      "correctAnswer": 0,
+      "explanation": "If a step like 'Upload via CMS' fails, the system triggers compensations for previous steps to ensure a consistent state.",
+      "reasoning": "If a step like 'Upload via CMS' fails, the system triggers compensations for previous steps to ensure a consistent state.",
+      "hint": "Consider how a complex system might handle an error halfway through a three-step process.",
+      "optionReasons": [
+        "If a step like 'Upload via CMS' fails, the system triggers compensations for previous steps to ensure a consistent state.",
+        "Finding past cases is a RAG function, whereas Sagas manage active transaction execution and recovery.",
+        "NATS provides transport, but Sagas provide the logical structure for error handling in distributed steps.",
+        "Model routing is a cost/performance strategy, not a distributed transaction recovery pattern."
+      ]
+    },
+    {
+      "question": "In SAMAS's memory fabric, what role does 'GraphRAG' play that traditional vector search might fail to address?",
+      "options": [
+        "Enabling multi-hop reasoning by traversing non-obvious entity relationships",
+        "Providing sub-millisecond keyword matching using SQLite's FTS5",
+        "Generating self-contained chunks by prepending context strings via Claude Haiku",
+        "Partitioning private memories for thousands of virtual agents in a single collection"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Knowledge graphs connect disparate facts (e.g., SEO nodes to Revenue nodes) that dense vector search might miss.",
+      "reasoning": "Knowledge graphs connect disparate facts (e.g., SEO nodes to Revenue nodes) that dense vector search might miss.",
+      "hint": "Think about how a system connects 'A to B' and 'B to C' to conclude 'A to C'.",
+      "optionReasons": [
+        "Knowledge graphs connect disparate facts (e.g., SEO nodes to Revenue nodes) that dense vector search might miss.",
+        "Keyword matching is part of sparse retrieval, while GraphRAG focuses on structural and relational reasoning.",
+        "This describes Anthropic's 'Contextual Retrieval' technique, which is separate from graph-based memory.",
+        "Memory partitioning is a feature of Qdrant's payload-based multi-tenancy, not a function of GraphRAG."
+      ]
+    },
+    {
+      "question": "What is 'GEPA' (Genetic-Pareto Reflective Prompt Evolution) used for in the SAMAS Evolution Agent?",
+      "options": [
+        "Mathematically tuning instructions and few-shot examples based on performance data",
+        "Determining the optimal routing between NATS JetStream and Apache Kafka",
+        "Generating unique agent identities and MCU-themed backstories",
+        "Detecting prompt injection attacks by scanning for malicious patterns"
+      ],
+      "correctAnswer": 0,
+      "explanation": "GEPA uses LLM reflection to propose mutations to prompts, improving agent SOPs without manual human intervention.",
+      "reasoning": "GEPA uses LLM reflection to propose mutations to prompts, improving agent SOPs without manual human intervention.",
+      "hint": "Consider how an agent might 'learn' to give better answers by changing its own instructions.",
+      "optionReasons": [
+        "GEPA uses LLM reflection to propose mutations to prompts, improving agent SOPs without manual human intervention.",
+        "NATS is the established backbone; GEPA focuses on the cognitive runtime (prompts) rather than the transport layer.",
+        "Identity creation is part of initial setup, while GEPA is a continuous optimisation loop for performance.",
+        "Security scanning is handled by the 'Guardrail Agent' or WASM isolation, not the evolution engine."
+      ]
+    },
+    {
+      "question": "According to the SAMAS architectural blueprint, why is NATS JetStream preferred over Apache Kafka for agent swarms?",
+      "options": [
+        "NATS JetStream is lightweight, decentralized, and supports interest-based retention",
+        "Apache Kafka lacks the ability to handle high-throughput log aggregation",
+        "NATS JetStream is primarily an in-memory datastore similar to Redis",
+        "Kafka does not support hierarchical subject naming or wildcard filtering"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Kafka's operational overhead is considered too high for most agent swarms, whereas NATS matches the agent cognitive lifecycle.",
+      "reasoning": "Kafka's operational overhead is considered too high for most agent swarms, whereas NATS matches the agent cognitive lifecycle.",
+      "hint": "Focus on the operational suitability and the matching of task 'interest' to message retention.",
+      "optionReasons": [
+        "Kafka's operational overhead is considered too high for most agent swarms, whereas NATS matches the agent cognitive lifecycle.",
+        "Kafka is actually built for high-throughput log aggregation; the issue is its heavyweight nature for this specific use case.",
+        "While it can run in memory, NATS JetStream provides persistence and queuing, whereas standard Redis is less robust for complex replay.",
+        "While naming conventions differ, the primary reason for choosing NATS is its cloud-native messaging paradigm and efficiency."
+      ]
+    },
+    {
+      "question": "What does the 'Confidence-weighted voting' protocol involve to improve decision accuracy?",
+      "options": [
+        "Multiplying an agent's vote by its self-reported confidence and historical accuracy",
+        "Only allowing agents with $100\\%$ confidence scores to participate in the final vote",
+        "A human operator assigning weights to each agent based on their MCU-themed persona",
+        "A linear increase in voting power based on the temperature setting of the LLM"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Calibration prompts allow agents to score their own confidence, which is then weighted by their track record in that domain.",
+      "reasoning": "Calibration prompts allow agents to score their own confidence, which is then weighted by their track record in that domain.",
+      "hint": "Recall the ReConcile framework mentioned in the research regarding voting weights.",
+      "optionReasons": [
+        "Calibration prompts allow agents to score their own confidence, which is then weighted by their track record in that domain.",
+        "This would likely discard too much information; weighting allows all relevant inputs to be considered proportionally.",
+        "SAMAS aims for an automated self-calibrating system based on historical performance data.",
+        "Temperature affects randomness but does not serve as a reliable weighting factor for decision correctness."
+      ]
+    },
+    {
+      "question": "In the context of the SAMAS dashboard, what is the 'Autonomy Slider' used for?",
+      "options": [
+        "Setting discrete human-in-the-loop (HITL) trigger configurations per agent",
+        "Adjusting the token limit and spend budget for specific marketing campaigns",
+        "Scaling the number of Kubernetes pods automatically based on queue depth",
+        "Controlling the semantic similarity threshold for vector memory retrieval"
+      ],
+      "correctAnswer": 0,
+      "explanation": "It allows operators to control whether an agent acts autonomously, semi-autonomously, or requires approval for all tasks.",
+      "reasoning": "It allows operators to control whether an agent acts autonomously, semi-autonomously, or requires approval for all tasks.",
+      "hint": "Andrej Karpathy is cited as the source for this production UI pattern.",
+      "optionReasons": [
+        "It allows operators to control whether an agent acts autonomously, semi-autonomously, or requires approval for all tasks.",
+        "While cost attribution is tracked, the 'slider' specifically refers to the level of independent agency granted to the AI.",
+        "Scaling is handled by the Horizontal Pod Autoscaler (HPA), not a manual UI slider for agent autonomy.",
+        "Search thresholds are technical parameters in the retrieval logic, not a measure of agent autonomy."
+      ]
+    },
+    {
+      "question": "What is a 'Memory Curator' agent in a 20+ agent SAMAS implementation?",
+      "options": [
+        "An agent that resolves knowledge conflicts and deduplicates entries across graph and vector stores",
+        "A process that automatically deletes old conversation logs to save disk space",
+        "An agent responsible for converting text into embeddings via OpenAI's ADA models",
+        "The primary agent that retrieves documents for the end-user via WhatsApp"
+      ],
+      "correctAnswer": 0,
+      "explanation": "The curator prevents information overload and ensures consistency by applying priority rules like recency and authority.",
+      "reasoning": "The curator prevents information overload and ensures consistency by applying priority rules like recency and authority.",
+      "hint": "Think about who manages the 'Shared Brain' to ensure there aren't two conflicting facts stored.",
+      "optionReasons": [
+        "The curator prevents information overload and ensures consistency by applying priority rules like recency and authority.",
+        "Memory compaction is a technical pruning step, whereas a 'Curator' performs intelligent semantic resolution.",
+        "Embedding generation is a standard pipeline function, not the specific role of the Memory Curator.",
+        "User interaction is handled by agents like 'Jarvis', whereas the Curator works on the system's internal knowledge base."
+      ]
+    },
+    {
+      "question": "SiteGPT's marketing squad used a dashboard as a 'blackboard'. Why is this considered a 'critical weakness' by SAMAS designers?",
+      "options": [
+        "It acts as a passive database rather than an active broker, causing high latency",
+        "It uses Convex, which is prone to real-time change propagation errors",
+        "The board does not allow agents to communicate via direct message passing",
+        "A shared blackboard makes it impossible for agents to have specialised SOPs"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Agents must poll the board (e.g., every 15 mins), meaning events can sit unprocessed for a significant time.",
+      "reasoning": "Agents must poll the board (e.g., every 15 mins), meaning events can sit unprocessed for a significant time.",
+      "hint": "Consider the difference between someone calling you versus you checking your mailbox every hour.",
+      "optionReasons": [
+        "Agents must poll the board (e.g., every 15 mins), meaning events can sit unprocessed for a significant time.",
+        "Convex is actually praised for its real-time capabilities; the weakness is the polling *pattern* used in the original SiteGPT logic.",
+        "Decoupling is actually a strength; the weakness lies in the *passive* nature of the retrieval loop.",
+        "Specialisation is the core strength of the squad model; the dashboard itself is merely the communication medium."
+      ]
+    },
+    {
+      "question": "What technique does SAMAS use to prevent the 'conformity bias' often seen when multiple LLMs collaborate in a debate?",
+      "options": [
+        "All-Agents Drafting (AAD)",
+        "Prompt Caching",
+        "Zero-Trust Security",
+        "Horizontal Pod Autoscaling"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Requiring agents to generate initial solutions before interaction ensures a diverse pool of ideas for voting.",
+      "reasoning": "Requiring agents to generate initial solutions before interaction ensures a diverse pool of ideas for voting.",
+      "hint": "This acronym represents a phase where every agent must write their own 'first draft'.",
+      "optionReasons": [
+        "Requiring agents to generate initial solutions before interaction ensures a diverse pool of ideas for voting.",
+        "Caching is a cost optimisation technique, not a bias-mitigation strategy.",
+        "Zero-trust refers to permissions and isolation, not the cognitive bias in decision making.",
+        "Autoscaling relates to infrastructure resource management, not AI reasoning."
+      ]
+    },
+    {
+      "question": "Which specific React library is recommended for visualising the live topology of active agents and NATS message flows?",
+      "options": [
+        "React Flow (or xyflow/react)",
+        "Tailwind CSS",
+        "Convex",
+        "Tremor"
+      ],
+      "correctAnswer": 0,
+      "explanation": "React Flow is the standard for rendering node-link diagrams and workflow canvases in agentic dashboards.",
+      "reasoning": "React Flow is the standard for rendering node-link diagrams and workflow canvases in agentic dashboards.",
+      "hint": "It provides a 'node-link diagram' where active agents are nodes and message flows are edges.",
+      "optionReasons": [
+        "React Flow is the standard for rendering node-link diagrams and workflow canvases in agentic dashboards.",
+        "Tailwind is used for styling components, not for rendering complex node-link topologies.",
+        "Convex is the real-time backend database, not a frontend visualisation library.",
+        "Tremor is used for charts and KPI cards, while React Flow handles the agent connections."
+      ]
+    },
+    {
+      "question": "In the model routing logic, which type of task is typically assigned to 'Frontier' models like Claude Opus 4 or GPT-5?",
+      "options": [
+        "Critical multi-hop reasoning or novel problem-solving with high stakes",
+        "Standard text classification and log parsing",
+        "Generating daily marketing reports from template files",
+        "Maintaining the episodic memory index within Qdrant"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Expensive frontier models are reserved for tasks where accuracy is paramount and logic is too complex for smaller models.",
+      "reasoning": "Expensive frontier models are reserved for tasks where accuracy is paramount and logic is too complex for smaller models.",
+      "hint": "Consider the cost of a token on a model that is $100\\times$ more expensive than a mini model.",
+      "optionReasons": [
+        "Expensive frontier models are reserved for tasks where accuracy is paramount and logic is too complex for smaller models.",
+        "These are bulk, low-complexity tasks better suited for 'cheap' models like GPT-4o Mini.",
+        "Templates are predictable and can be handled by mid-tier or even cheap models efficiently.",
+        "Memory maintenance is a procedural task that does not require the reasoning power of a frontier model."
+      ]
+    },
+    {
+      "question": "The 'Martian' router uses which technique to predict model performance per-query without running full inference?",
+      "options": [
+        "Mechanistic interpretability",
+        "Genetic-Pareto Evolution",
+        "Batch API Discounting",
+        "Weighted Re-ranking"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Martian predicts quality by interpreting query features, allowing per-step quality compounding without wasting compute.",
+      "reasoning": "Martian predicts quality by interpreting query features, allowing per-step quality compounding without wasting compute.",
+      "hint": "This term refers to understanding the inner workings of an LLM's weights and activations.",
+      "optionReasons": [
+        "Martian predicts quality by interpreting query features, allowing per-step quality compounding without wasting compute.",
+        "This is GEPA's method for prompt mutation, not Martian's query-prediction method.",
+        "Batching is a commercial optimisation offered by providers, not an interpretability technique.",
+        "Re-ranking occurs in RAG pipelines to prioritise search results, not to select models for routing."
+      ]
+    },
+    {
+      "question": "What is the primary benefit of 'Semantic Caching' via tools like GPTCache in an agent swarm?",
+      "options": [
+        "Intercepting identical or near-identical queries before they reach the LLM",
+        "Reducing the cost of system prompts by $90\\%$ on cache hits",
+        "Ensuring that the agent always uses the most recent information from the Knowledge Graph",
+        "Creating self-contained chunks of memory for multi-tenant partitions"
+      ],
+      "correctAnswer": 0,
+      "explanation": "It can achieve over $60\\%$ hit rates, saving $100\\%$ of the cost for cached responses.",
+      "reasoning": "It can achieve over $60\\%$ hit rates, saving $100\\%$ of the cost for cached responses.",
+      "hint": "Think about what happens if two agents ask the exact same question.",
+      "optionReasons": [
+        "It can achieve over $60\\%$ hit rates, saving $100\\%$ of the cost for cached responses.",
+        "This describes 'Prompt Caching' (a feature of providers like Anthropic), which is distinct from semantic caching.",
+        "Caching actually risks using 'stale' information; its benefit is cost and speed, not real-time graph updates.",
+        "Contextual retrieval and partitioning handle data structure, not query result caching."
+      ]
+    },
+    {
+      "question": "OpenClaw uses a 'Lane Queue' to manage tool execution. Why does SAMAS move away from this pattern?",
+      "options": [
+        "It blocks concurrent operations, severely limiting system throughput",
+        "It requires the use of WebAssembly, which increases latency",
+        "It is incompatible with Anthropic's Model Context Protocol (MCP)",
+        "It forces the use of Markdown files for session memory"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Serial execution prevents race conditions but stops the system from 'swarming' and processing many tasks in parallel.",
+      "reasoning": "Serial execution prevents race conditions but stops the system from 'swarming' and processing many tasks in parallel.",
+      "hint": "Consider the impact of 'serial execution' on a digital workforce trying to do 50 things at once.",
+      "optionReasons": [
+        "Serial execution prevents race conditions but stops the system from 'swarming' and processing many tasks in parallel.",
+        "OpenClaw actually lacks WASM sandboxing (a weakness); SAMAS adds it for security, not because lanes required it.",
+        "Lanes relate to execution order on the host; MCP relates to the interface for tools.",
+        "Memory format (Markdown) is a separate architectural choice from the execution queue logic."
+      ]
+    },
+    {
+      "question": "How does 'Contextual Retrieval' improve the precision of agent memory in the SAMAS memory fabric?",
+      "options": [
+        "A lightweight model prepends context strings to ensure chunks are self-contained",
+        "It uses Neo4j to build a hierarchical structure of all episodic memories",
+        "It automatically retires agents who have not been active for 30 days",
+        "It uses NATS JetStream to broadcast memory updates to all 'interested' agents"
+      ],
+      "correctAnswer": 0,
+      "explanation": "A chunk like 'It increased by 5%' is expanded to 'In the Q3 2025 report, revenue increased by 5%', making it more searchable.",
+      "reasoning": "A chunk like 'It increased by 5%' is expanded to 'In the Q3 2025 report, revenue increased by 5%', making it more searchable.",
+      "hint": "This technique is credited to Anthropic and involves a 'lightweight model' prepending strings.",
+      "optionReasons": [
+        "A chunk like 'It increased by 5%' is expanded to 'In the Q3 2025 report, revenue increased by 5%', making it more searchable.",
+        "This describes GraphRAG; Contextual Retrieval works at the individual chunk level before indexing.",
+        "Agent lifecycle management is a state machine function, not a RAG retrieval technique.",
+        "Messaging handles updates, but Contextual Retrieval specifically refines the data being retrieved."
+      ]
+    },
+    {
+      "question": "What is the recommended approach for storing and versioning Agent SOPs in a production SAMAS environment?",
+      "options": [
+        "YAML files stored in Git with semantic versioning",
+        "Plain Markdown files (MEMORY.md) stored locally on the Gateway host",
+        "Binary blobs stored in a Qdrant payload partition",
+        "Encrypted JSON strings passed as NATS global broadcasts"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Git provides a source of truth and audit trail, while YAML is a human-readable standard for role-based configurations.",
+      "reasoning": "Git provides a source of truth and audit trail, while YAML is a human-readable standard for role-based configurations.",
+      "hint": "Think about the standard tools developers use to manage code changes and configuration.",
+      "optionReasons": [
+        "Git provides a source of truth and audit trail, while YAML is a human-readable standard for role-based configurations.",
+        "This is the OpenClaw approach, which SAMAS considers insufficient for enterprise scale and collaborative versioning.",
+        "Vector stores are for retrieval-augmented facts, not for the primary source of truth for agent instructions (SOPs).",
+        "NATS is for events; SOPs should be persistently stored and version-controlled outside the message bus."
+      ]
+    },
+    {
+      "question": "According to the NeurIPS 2025 paper 'Debate or Vote', why does majority voting alone account for most performance gains?",
+      "options": [
+        "Debate induces a martingale over agent beliefs rather than improving expected correctness",
+        "Voting requires fewer API calls, which mathematically ensures a higher success rate",
+        "Debate is limited by the $128\\text{k}$ context window of most modern agents",
+        "LLMs are inherently unable to follow formal debate rules like the CI protocol"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Discussion doesn't inherently fix errors unless bias is specifically introduced toward correction; voting better leverages diverse initial answers.",
+      "reasoning": "Discussion doesn't inherently fix errors unless bias is specifically introduced toward correction; voting better leverages diverse initial answers.",
+      "hint": "This term from probability describes a sequence of random variables where future value expectation is current value.",
+      "optionReasons": [
+        "Discussion doesn't inherently fix errors unless bias is specifically introduced toward correction; voting better leverages diverse initial answers.",
+        "Efficiency (fewer calls) relates to cost, but the gain in *correctness* comes from the statistical properties of independent diversity.",
+        "Context size isn't the primary theoretical reason for voting's superiority over debate in reasoning tasks.",
+        "LLMs *can* follow protocols, but the protocol itself (debate) is less efficient at error correction than independent voting."
+      ]
+    },
+    {
+      "question": "In the implementation roadmap, what technology is paired with Qdrant and Neo4j to complete the 'Memory Fabric' (Phase 3)?",
+      "options": [
+        "SQLite-vec",
+        "Apache Kafka",
+        "WebAssembly",
+        "Next.js"
+      ],
+      "correctAnswer": 0,
+      "explanation": "SQLite-vec provides a lightweight, local vector/keyword hybrid for certain tasks alongside the enterprise databases.",
+      "reasoning": "SQLite-vec provides a lightweight, local vector/keyword hybrid for certain tasks alongside the enterprise databases.",
+      "hint": "It is mentioned as part of the 'Tier 2' memory logic, often used for local-first storage.",
+      "optionReasons": [
+        "SQLite-vec provides a lightweight, local vector/keyword hybrid for certain tasks alongside the enterprise databases.",
+        "Kafka is a messaging system, not a database for memory storage.",
+        "WASM is the security runtime for tools, not a memory storage engine.",
+        "Next.js is the frontend framework for the dashboard, not part of the backend memory fabric."
+      ]
+    }
+  ],
+  "totalQuestions": 28
+}
