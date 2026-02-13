@@ -48,6 +48,7 @@
 - NotebookLM source guides only available via chat workaround
 
 ## Repository
-- **URL:** https://github.com/PrakharMNNIT/pantheon-ai (private)
-- **Commits:** 9 (as of 2026-02-13 17:56 IST)
+- **URL:** https://github.com/synarch-ai/synarch-engine (private)
+- **Org:** synarch-ai
+- **Previously:** PrakharMNNIT/pantheon-ai → renamed + transferred
 - **Branch:** main
