@@ -69,12 +69,23 @@
 - **Three planes:** Control (LangGraph state), Observation (NATS), Persistence (PostgreSQL)
 - **NOT microservices** — LangGraph requires in-process execution
 
-## Immediate Next Steps (M1: Foundation)
-1. Restructure backend to match hexagonal architecture (domain/ports/adapters/api)
-2. `docker compose up` — verify NATS, Qdrant, PostgreSQL, Ollama
-3. Implement Milestone A: PostgreSQL schema, repositories, checkpointer
-4. Implement Milestone B: Conditional routing, HITL, idempotency
-5. Implement Milestone C: Mission Control cockpit with V3 design system
+## What Was Done (2026-02-20)
+1. PRD v1.0-final: 30 sections, FR-1 to FR-44 (merged Claude + Codex)
+2. ADR-005: Modular Monolith + Hexagonal Architecture (ACCEPTED)
+3. Full hexagonal restructure: 61 files, 1,794 lines (commit 3cf1f55)
+   - domain/: 17 files (models, events, agents, orchestrator)
+   - ports/: 5 ABCs (persistence, event_bus, model_provider, checkpointer, vector_store)
+   - adapters/: 5 implementations (litellm, NATS, LangGraph, PostgreSQL migration)
+   - api/: 8 files (routes, middleware, schemas, app factory)
+   - bootstrap: config.py, container.py, main.py, .env.example
+
+## Immediate Next Steps (Milestone A)
+1. `docker compose up` — verify NATS, Qdrant, PostgreSQL, Ollama
+2. `pip install -r backend/requirements.txt` — install dependencies
+3. `cd backend && python main.py` — verify FastAPI starts
+4. Implement PostgreSQL repositories (replace in-memory _MISSIONS)
+5. Wire LangGraph graph execution in background tasks
+6. Verify crash recovery: kill → restart → resume from checkpoint
 
 ## Open Questions
 - AgentNode base class design (from Antigravity's "Wrapper Strategy")
