@@ -1,25 +1,56 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-import asyncio
+"""Synarch Engine — Application bootstrap."""
+import logging
+import sys
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="Synarch AI Backend", version="1.0.0")
+import uvicorn
 
-# CORS (Allow Frontend)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+# Add backend/ to Python path for clean imports
+sys.path.insert(0, ".")
+
+from config import get_settings
+from container import create_container, shutdown_container
+from api.app import create_app
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='{"timestamp":"%(asctime)s","level":"%(levelname)s","component":"%(name)s","message":"%(message)s"}',
 )
+logger = logging.getLogger("synarch")
 
-from src.api.server import router
-app.include_router(router)
+# Global container reference
+_container = None
 
-@app.get("/health")
-async def health_check():
-    return {"status": "ok", "service": "synarch-backend"}
+
+@asynccontextmanager
+async def lifespan(app):
+    """Application lifespan — bootstrap and shutdown."""
+    global _container
+    settings = get_settings()
+    logger.info("Starting Synarch Engine v%s", settings.app_version)
+
+    # Bootstrap DI container
+    _container = await create_container(settings)
+    logger.info("All adapters initialized. Synarch Engine ready.")
+
+    yield
+
+    # Shutdown
+    if _container:
+        await shutdown_container(_container)
+    logger.info("Synarch Engine shutdown complete.")
+
+
+# Create app with lifespan
+settings = get_settings()
+app = create_app(cors_origins=settings.cors_origins)
+app.router.lifespan_context = lifespan
+
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+    )
