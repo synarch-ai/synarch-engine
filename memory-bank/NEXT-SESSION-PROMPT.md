@@ -1,93 +1,146 @@
-# Synarch Engine — Next Session Prompt
-
-Copy everything below this line into a new Cline chat:
+# Synarch Engine — Full Context Handoff Prompt
+*Updated: 2026-02-19 | Copy everything below the line into a new Cline chat*
 
 ---
 
 #synarch-engine
 
-## Context
-You are resuming work on **Synarch Engine** (formerly Synarch AI) — an open-source autonomous multi-agent orchestration engine. M0 (Research & Architecture) is complete. You are starting **M1: Foundation**.
+## 🧠 YOU ARE RESUMING WORK ON SYNARCH ENGINE
 
-**IMPORTANT:** The project was renamed from "Synarch AI" to "Synarch" (syn=together + arch=govern). See ADR-002. The CEO agent is now "Synarch" (not "Synarch"). All gods (Zeus, Thoth, etc.) keep their names. The V3 Design System ("Cyber-Sovereign Industrialism") is LOCKED in `branding/brand-identity.md`.
+**Synarch** (syn=together + arch=govern) is an open-source, production-grade **Autonomous Multi-Agent Orchestration Engine**. Think: the "Linux of autonomous agent teams." Specialized AI agents with mythology-based identities collaborate in a hierarchical council to execute complex missions.
 
-## Instructions
+**Repo:** https://github.com/synarch-ai/synarch-engine (private)
+**Local:** `/Users/praxlannister/Documents/workspace/synarch-ai/synarch-engine`
 
-1. **Read the memory bank first:**
-   - `memory-bank/projectbrief.md` — mission, scope, acceptance criteria
-   - `memory-bank/techContext.md` — full tech stack (LangGraph, NATS, litellm, Qdrant, PostgreSQL, Next.js)
-   - `memory-bank/systemPatterns.md` — hierarchy, nervous system, soul system, Rule of Two
-   - `memory-bank/activeContext.md` — latest decisions, next steps
-   - `memory-bank/progress.md` — milestone tracker
+---
 
-2. **Read the PRD:**
-   - `docs/01-requirements/poc-prd.md` — comprehensive PoC requirements
+## STEP 1: Read Memory Bank (MANDATORY — do this first, in order)
 
-3. **Read the ADR:**
-   - `docs/02-architecture/adr-001-swarms-vs-langgraph.md` — why LangGraph, what to steal from Swarms
+1. `memory-bank/projectbrief.md` — mission, scope, acceptance criteria
+2. `memory-bank/productContext.md` — problem statement, target users, differentiation
+3. `memory-bank/techContext.md` — full tech stack: LangGraph, NATS, litellm, Qdrant, PostgreSQL, Next.js
+4. `memory-bank/systemPatterns.md` — hierarchy, nervous system, soul system, Rule of Two security
+5. `memory-bank/activeContext.md` — latest decisions, what was done, next steps
+6. `memory-bank/progress.md` — milestone tracker (M0 done, M1 in progress)
 
-4. **Read the agent souls (know who you're building):**
-   - `docs/agents/synarch/soul.md` through `docs/agents/janus/soul.md`
+## STEP 2: Read Architecture Docs
 
-5. **Study reference patterns (don't copy code, learn patterns):**
-   - `references/langgraph/` — study multi-agent supervisor examples
-   - `references/swarms/swarms/structs/hiearchical_swarm.py` — Director→Worker planning prompts
-   - `references/swarms/swarms/structs/model_router.py` — complexity-based model routing
-   - `references/openclaw/src/agents/system-prompt.ts` — system prompt compilation
+7. `docs/01-requirements/poc-prd.md` — comprehensive PoC PRD (tech stack, API, Docker, phases)
+8. `docs/02-architecture/adr-001-swarms-vs-langgraph.md` — why LangGraph (not Swarms)
+9. `docs/02-architecture/adr-002-branding-synarch-ai-to-synarch.md` — naming decision
+10. `docs/02-architecture/adr-003-reference-repo-strategy.md` — how we use reference repos
+11. `docs/02-architecture/adr-004-gap-closure-and-reference-adoption-contract.md` — what to adopt from each
+12. `docs/02-architecture/reference-adoption-matrix.md` — pattern-by-pattern adoption map
+13. `docs/02-architecture/agent-naming-convention.md` — mythology hierarchy (20+ names)
+14. `docs/plans/2026-02-19-gap-closure-and-reference-adoption.md` — latest implementation plan
 
-## Build M1: Foundation
+## STEP 3: Read Agent Souls (know who you're building)
 
-Execute these in order:
+15. `docs/agents/god/soul.md` — Tier 0: The Human (Rule of Two permissions)
+16. `docs/agents/synarch/soul.md` — Tier 1: CEO Agent (supreme orchestrator)
+17. `docs/agents/zeus/soul.md` — Tier 2: CTO (engineering commander)
+18. `docs/agents/thoth/soul.md` — Tier 2: CRO (knowledge keeper)
+19. `docs/agents/hermes/soul.md` — Tier 3: Researcher (information gatherer)
+20. `docs/agents/hephaestus/soul.md` — Tier 3: Engineer (code builder)
+21. `docs/agents/janus/soul.md` — Tier 3: Reviewer (quality gate)
 
-### Step 1: Docker Compose
-Create `docker-compose.yml` with: NATS (JetStream), Qdrant, PostgreSQL 16, Ollama. Test with `docker compose up`.
+## STEP 4: Read Current Code
 
-### Step 2: Python Backend
-Create `backend/` with:
-- `requirements.txt` — langgraph, litellm, fastapi, uvicorn, nats-py, qdrant-client, psycopg
-- `main.py` — FastAPI app with health check, `/mission/start`, `/mission/{id}/stream` (SSE)
-- `orchestrator/state.py` — TypedDict for mission state
-- `orchestrator/graph.py` — LangGraph StateGraph with Synarch as entry node
+22. `backend/main.py` — FastAPI entry point
+23. `backend/src/orchestrator/state.py` — mission state schema
+24. `backend/src/orchestrator/graph.py` — LangGraph StateGraph definition
+25. `backend/src/agents/agent_node.py` — base AgentNode class
+26. `backend/src/agents/synarch.py` — Synarch CEO agent implementation
+27. `backend/src/agents/zeus.py` — Zeus CTO implementation
+28. `backend/src/agents/thoth.py` — Thoth CRO implementation
+29. `backend/src/api/server.py` — API routes
+30. `apps/web/app/page.tsx` — Next.js Mission Control
+31. `infra/docker-compose.yml` — NATS + Qdrant + PostgreSQL + Ollama
 
-### Step 3: AgentNode Base Class
-Create the standardized agent wrapper (from Antigravity's analysis):
-```python
-class AgentNode:
-    def __init__(self, soul_path: str, model: str, tools: list):
-        self.soul = load_soul(soul_path)  # Parse soul.md
-        self.model = model  # litellm model string
-        self.tools = tools
-    async def run(self, state: MissionState) -> dict:
-        # Build system prompt from soul.md
-        # Call litellm.completion()
-        # Publish event to NATS
-        # Return updated state
+## STEP 5: Read Branding
+
+32. `branding/brand-identity.md` — V3 Design System (LOCKED): Cyber-Sovereign Industrialism
+33. `README.md` — project README with logos and architecture
+
+## STEP 6: Study Reference Repos (patterns, not code)
+
+12 reference repos in `references/` (all gitmodules):
+
+| Repo | Study For | Key Files |
+|---|---|---|
+| `openclaw/` | Agent identity, soul system, memory (MEMORY.md) | `src/agents/identity.ts`, `src/agents/system-prompt.ts` |
+| `swarms/` | Hierarchical orchestration, model routing, prompts | `swarms/structs/hiearchical_swarm.py`, `swarms/structs/model_router.py` |
+| `langgraph/` | Multi-agent supervisor, checkpointing | `examples/multi_agent/` |
+| `crewAI/` | Role/crew/task model | `lib/crewai/` |
+| `letta/` | Long-term memory management | `letta/memory/`, `letta/agent/` |
+| `autogen/` | GroupChat manager pattern | `python/packages/autogen-agentchat/` |
+| `composio/` | Tool integration platform, MCP patterns | `python/`, `ts/` |
+| `smolagents/` | Lightweight agent framework | Root source |
+| `mcp-use/` | MCP client from Python | Root source |
+| `magentic-ui/` | Agent UI patterns | Root source |
+| `playwright-mcp/` | Browser automation MCP | Root source |
+| `llm-council-plus/` | Multi-agent voting/debate UI | `backend/`, `frontend/` |
+
+---
+
+## THE HIERARCHY
+
+```
+Tier 0: 🌟 GOD (Human User) — source of all authority
+         │
+Tier 1: 🏛️ SYNARCH (CEO Agent) — supreme orchestrator
+         │
+Tier 2: ⚡Zeus(CTO)  📜Thoth(CRO)  [+Athena, Odin, Midas, Apollo future]
+         │              │
+Tier 3: 🔨Hephaestus  🪶Hermes  🎭Janus
+         (Engineer)     (Research) (Review)
 ```
 
-### Step 4: Synarch Node
-Implement Synarch (CEO) — receives goal, decomposes into tasks, delegates to Zeus + Thoth.
+## KEY DECISIONS (NON-NEGOTIABLE)
 
-### Step 5: Next.js Skeleton
-Create `frontend/` with Next.js 14 + shadcn/ui. Minimal: chat input + thought stream (SSE consumer).
-
-## Critical Rules
-- **Use litellm** for ALL model calls (not raw Bedrock/OpenAI SDK)
-- **Use NATS** for all agent events (not in-memory)
-- **Use PostgreSQL** for checkpointing (not JSON files)
+- **litellm** for ALL model calls (not raw Bedrock/OpenAI SDK)
+- **NATS** for all agent events (not in-memory, not Redis)
+- **PostgreSQL** for checkpointing (not JSON files)
 - **NotebookLM is NOT in PoC** — RAG is Phase 2
-- **Backend runs on host**, infra in Docker
+- **Backend runs on host**, infra (NATS/Qdrant/PG/Ollama) in Docker
 - **Every agent reads its soul.md** as system prompt foundation
 - **All agent events publish to NATS** subjects: `synarch.agent.{name}.{event}`
-- **God = Human user**, Synarch = CEO, hierarchy is non-negotiable
+- **God = Human user**, Synarch = CEO, hierarchy is enforced
+- **V3 Design System** is LOCKED — amber #FFB900, void #0A0A0B, Space Grotesk, no pills, 0px radius
 
-## Model Routing (litellm)
+## MODEL ROUTING (litellm)
+
 ```
-Synarch: bedrock/anthropic.claude-opus-4-20250514-v1:0
-Zeus:     bedrock/anthropic.claude-sonnet-4-20250514-v1:0
-Thoth:    bedrock/anthropic.claude-sonnet-4-20250514-v1:0
-Hermes:   ollama/llama3.1:8b
-Hephaestus: bedrock/anthropic.claude-sonnet-4-20250514-v1:0
-Janus:    bedrock/anthropic.claude-3-5-haiku-20241022-v1:0
+Synarch:     bedrock/anthropic.claude-opus-4-20250514-v1:0     (strategic)
+Zeus:        bedrock/anthropic.claude-sonnet-4-20250514-v1:0    (technical)
+Thoth:       bedrock/anthropic.claude-sonnet-4-20250514-v1:0    (research)
+Hermes:      ollama/llama3.1:8b                                  (retrieval, free)
+Hephaestus:  bedrock/anthropic.claude-sonnet-4-20250514-v1:0    (code gen)
+Janus:       bedrock/anthropic.claude-3-5-haiku-20241022-v1:0   (review, cheap)
 ```
 
-## Start building. Show me gods that think.
+## WHAT TO BUILD NEXT
+
+**M1: Foundation** is in progress. Backend skeleton exists. Continue by:
+
+1. Verify `docker compose -f infra/docker-compose.yml up -d` works
+2. Verify `python backend/main.py` starts FastAPI
+3. Verify `cd apps/web && npm run dev` starts Next.js
+4. Then implement: Synarch→Zeus/Thoth delegation flow in LangGraph
+5. Then implement: NATS event publishing from agent nodes
+6. Then implement: SSE streaming from FastAPI to Next.js dashboard
+
+## RULES OF ENGAGEMENT
+
+- **Read everything before writing code.** Context = quality.
+- **Use ULTRATHINK** for architectural decisions.
+- **Ask God (the user) before committing** major design changes.
+- **Study reference repos** for patterns before building from scratch.
+- **Update memory-bank/** after every significant change.
+- **Commit with conventional messages** (🎉 feat, 🐛 fix, 📝 docs, 🔧 chore).
+
+## START
+
+After reading all of the above, present a brief status summary of what you understand and what you plan to do first. Then await God's orders.
+
+*"Synarch: Where agents rule together."*
