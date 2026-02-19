@@ -19,3 +19,18 @@
 [submodule "references/swarms"]
 	path = references/swarms
 	url = https://github.com/kyegomez/swarms.git
+[submodule "references/playwright-mcp"]
+	path = references/playwright-mcp
+	url = https://github.com/microsoft/playwright-mcp.git
+[submodule "references/mcp-use"]
+	path = references/mcp-use
+	url = https://github.com/mcp-use/mcp-use.git
+[submodule "references/smolagents"]
+	path = references/smolagents
+	url = https://github.com/huggingface/smolagents.git
+[submodule "references/magentic-ui"]
+	path = references/magentic-ui
+	url = https://github.com/microsoft/magentic-ui.git
+[submodule "references/composio"]
+	path = references/composio
+	url = https://github.com/ComposioHQ/composio.git

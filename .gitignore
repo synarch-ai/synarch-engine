@@ -39,5 +39,7 @@ yarn-error.log
 .*/
 !/.gitignore
 !/.gitmodules
+!/.github/
+!/.github/pull_request_template.md
 !/.vscode/
 !/.idea/

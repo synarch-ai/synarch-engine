@@ -15,6 +15,20 @@
 - [x] OpenClaw soul system studied (identity.ts, system-prompt.ts)
 - [x] Memory bank initialized
 
+### 🔲 M0.5: Gap Closure Program (2026-02-19) — IN PROGRESS
+- [x] ADR-004 created: gap closure + reference adoption contract
+- [x] Reference adoption matrix created (living tracker)
+- [x] Execution plan created under `docs/plans/`
+- [x] Adoption enforcement playbook created (`docs/02-architecture/adoption-enforcement-playbook.md`)
+- [x] Mission Control UI/UX strategy created (`docs/03-product/mission-control-ui-ux-and-functionality-strategy.md`)
+- [x] PR template created with mandatory governance checks (`.github/pull_request_template.md`)
+- [ ] Replace in-memory mission state with durable persistence
+- [ ] Introduce non-linear graph routing + HITL approval path
+- [ ] Replace placeholder agent runtime with `litellm` + structured NATS events
+- [ ] Replace static Mission Control starter page with operational cockpit
+- [ ] Enforce V3 brand system tokens/components in Mission Control UI
+- [ ] Mark first reference pattern as `adopted` with implementation evidence
+
 ### 🔲 M1: Foundation (Next — Days 1-2)
 - [ ] Docker Compose (NATS + Qdrant + PostgreSQL + Ollama)
 - [ ] FastAPI gateway skeleton

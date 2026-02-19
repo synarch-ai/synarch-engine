@@ -146,7 +146,13 @@ Open **http://localhost:3000** — Mission Control awaits your orders.
 |---|---|
 | [**PoC PRD**](docs/01-requirements/poc-prd.md) | Full product requirements — success criteria, API design, implementation phases |
 | [**ADR-001: Swarms vs LangGraph**](docs/02-architecture/adr-001-swarms-vs-langgraph.md) | Why we chose LangGraph over Swarms (both agents agreed) |
-| [**ADR-002: Branding Pivot**](docs/02-architecture/adr-002-branding-synarch-to-synarch.md) | Synarch AI → Synarch — trademark analysis + naming decision |
+| [**ADR-002: Branding Consolidation**](docs/02-architecture/adr-002-branding-synarch-ai-to-synarch.md) | Synarch AI → Synarch — canonical naming model for brand, product, and agent layers |
+| [**ADR-003: Reference Repo Strategy**](docs/02-architecture/adr-003-reference-repo-strategy.md) | What we keep as reference, when we fork, and how we update `references/*` |
+| [**ADR-004: Gap Closure + Adoption Contract**](docs/02-architecture/adr-004-gap-closure-and-reference-adoption-contract.md) | Binding plan to close architecture/runtime/UI gaps and govern reference adoption |
+| [**Adoption Enforcement Playbook**](docs/02-architecture/adoption-enforcement-playbook.md) | PR-level governance gates, evidence requirements, and merge criteria for architecture/UI/runtime work |
+| [**Reference Adoption Matrix**](docs/02-architecture/reference-adoption-matrix.md) | Living tracker for which patterns from `references/*` are planned/in-progress/adopted |
+| [**Gap Closure Implementation Plan (2026-02-19)**](docs/plans/2026-02-19-gap-closure-and-reference-adoption.md) | Sequenced execution plan to move from PoC stubs to production-grade baseline |
+| [**Mission Control UI/UX Strategy**](docs/03-product/mission-control-ui-ux-and-functionality-strategy.md) | Reference-backed product plan for cockpit UX, HITL controls, and operator trust surfaces |
 | [**Agent Naming Convention**](docs/02-architecture/agent-naming-convention.md) | 20+ mythology-based agent names across 6 domains |
 | [**Brand Identity (V3)**](branding/brand-identity.md) | Design system: Cyber-Sovereign Industrialism |
 | [**Vision Analysis**](docs/02-architecture/synarch-vision-analysis-cline.md) | Competition landscape, architectural innovations |
