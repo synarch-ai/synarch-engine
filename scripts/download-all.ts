@@ -69,7 +69,7 @@ async function main() {
     if (!notebookId) {
       // If ID matching fails, use the title match
       for (const nb of notebooks) {
-        if ((nb as any).title?.includes('Pantheon')) {
+        if ((nb as any).title?.includes('Synarch')) {
           notebookId = (nb as any).notebookId || (nb as any).id || (nb as any).projectId;
           console.log(`\n  🎯 Found by title: ${(nb as any).title}`);
           console.log(`     ID: ${notebookId}`);

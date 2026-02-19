@@ -16,16 +16,16 @@
 5. 7 reference repos: OpenClaw, CrewAI, LangGraph, Letta, LLM-Council-Plus, Swarms, AutoGen
 6. Dual vision analysis: Cline + Antigravity
 7. ADR-001: Swarms vs LangGraph — REFERENCE NOT FORK
-8. ADR-002: Branding pivot — Pantheon AI → Synarch
+8. ADR-002: Branding pivot — Synarch AI → Synarch
 9. V3 Design System LOCKED: "Cyber-Sovereign Industrialism" (branding/brand-identity.md)
 10. Logo generation prompts created (branding/logo-prompts.md)
-11. Repo renamed + transferred: PrakharMNNIT/pantheon-ai → synarch-ai/synarch-engine
-12. Local dir renamed: pantheon-ai → synarch-engine
+11. Repo renamed + transferred: PrakharMNNIT/synarch-ai → synarch-ai/synarch-engine
+12. Local dir renamed: synarch-ai → synarch-engine
 
 ## Key Decisions
 - **Company:** Synarch (syn=together + arch=govern)
 - **Product:** Synarch Engine
-- **CEO Agent:** Synarch (renamed from Pantheon)
+- **CEO Agent:** Synarch (renamed from Synarch)
 - **Gods:** Zeus, Thoth, Hermes, Hephaestus, Janus — unchanged
 - **User:** God — unchanged
 - **Models:** litellm (wraps Bedrock, Ollama, OpenAI, 100+)
@@ -35,7 +35,7 @@
 - **Design System:** V3 "Cyber-Sovereign Industrialism" — amber #FFB900 on void #0A0A0B
 
 ## Immediate Next Steps (M1: Foundation)
-1. Operation Rename: pantheon → synarch in code (agent files, NATS subjects, classes)
+1. Operation Rename: synarch → synarch in code (agent files, NATS subjects, classes)
 2. `docker compose up` — NATS, Qdrant, PostgreSQL, Ollama
 3. FastAPI skeleton with litellm integration
 4. LangGraph StateGraph with Synarch as entry node

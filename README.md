@@ -146,17 +146,17 @@ Open **http://localhost:3000** — Mission Control awaits your orders.
 |---|---|
 | [**PoC PRD**](docs/01-requirements/poc-prd.md) | Full product requirements — success criteria, API design, implementation phases |
 | [**ADR-001: Swarms vs LangGraph**](docs/02-architecture/adr-001-swarms-vs-langgraph.md) | Why we chose LangGraph over Swarms (both agents agreed) |
-| [**ADR-002: Branding Pivot**](docs/02-architecture/adr-002-branding-pantheon-to-synarch.md) | Pantheon AI → Synarch — trademark analysis + naming decision |
+| [**ADR-002: Branding Pivot**](docs/02-architecture/adr-002-branding-synarch-to-synarch.md) | Synarch AI → Synarch — trademark analysis + naming decision |
 | [**Agent Naming Convention**](docs/02-architecture/agent-naming-convention.md) | 20+ mythology-based agent names across 6 domains |
 | [**Brand Identity (V3)**](branding/brand-identity.md) | Design system: Cyber-Sovereign Industrialism |
-| [**Vision Analysis**](docs/02-architecture/pantheon-vision-analysis-cline.md) | Competition landscape, architectural innovations |
+| [**Vision Analysis**](docs/02-architecture/synarch-vision-analysis-cline.md) | Competition landscape, architectural innovations |
 
 ### Agent Souls
 
 | Soul | Identity |
 |---|---|
 | [🌟 God](docs/agents/god/soul.md) | The Human Creator — source of all authority |
-| [🏛️ Synarch](docs/agents/pantheon/soul.md) | Supreme Orchestrator — CEO of the agent council |
+| [🏛️ Synarch](docs/agents/synarch/soul.md) | Supreme Orchestrator — CEO of the agent council |
 | [⚡ Zeus](docs/agents/zeus/soul.md) | CTO — Commander of Engineering |
 | [📜 Thoth](docs/agents/thoth/soul.md) | CRO — Keeper of All Knowledge |
 | [🪶 Hermes](docs/agents/hermes/soul.md) | Senior Researcher — The Fastest God |

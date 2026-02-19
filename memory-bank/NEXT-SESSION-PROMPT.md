@@ -7,9 +7,9 @@ Copy everything below this line into a new Cline chat:
 #synarch-engine
 
 ## Context
-You are resuming work on **Synarch Engine** (formerly Pantheon AI) — an open-source autonomous multi-agent orchestration engine. M0 (Research & Architecture) is complete. You are starting **M1: Foundation**.
+You are resuming work on **Synarch Engine** (formerly Synarch AI) — an open-source autonomous multi-agent orchestration engine. M0 (Research & Architecture) is complete. You are starting **M1: Foundation**.
 
-**IMPORTANT:** The project was renamed from "Pantheon AI" to "Synarch" (syn=together + arch=govern). See ADR-002. The CEO agent is now "Synarch" (not "Pantheon"). All gods (Zeus, Thoth, etc.) keep their names. The V3 Design System ("Cyber-Sovereign Industrialism") is LOCKED in `branding/brand-identity.md`.
+**IMPORTANT:** The project was renamed from "Synarch AI" to "Synarch" (syn=together + arch=govern). See ADR-002. The CEO agent is now "Synarch" (not "Synarch"). All gods (Zeus, Thoth, etc.) keep their names. The V3 Design System ("Cyber-Sovereign Industrialism") is LOCKED in `branding/brand-identity.md`.
 
 ## Instructions
 
@@ -27,7 +27,7 @@ You are resuming work on **Synarch Engine** (formerly Pantheon AI) — an open-s
    - `docs/02-architecture/adr-001-swarms-vs-langgraph.md` — why LangGraph, what to steal from Swarms
 
 4. **Read the agent souls (know who you're building):**
-   - `docs/agents/pantheon/soul.md` through `docs/agents/janus/soul.md`
+   - `docs/agents/synarch/soul.md` through `docs/agents/janus/soul.md`
 
 5. **Study reference patterns (don't copy code, learn patterns):**
    - `references/langgraph/` — study multi-agent supervisor examples
@@ -47,7 +47,7 @@ Create `backend/` with:
 - `requirements.txt` — langgraph, litellm, fastapi, uvicorn, nats-py, qdrant-client, psycopg
 - `main.py` — FastAPI app with health check, `/mission/start`, `/mission/{id}/stream` (SSE)
 - `orchestrator/state.py` — TypedDict for mission state
-- `orchestrator/graph.py` — LangGraph StateGraph with Pantheon as entry node
+- `orchestrator/graph.py` — LangGraph StateGraph with Synarch as entry node
 
 ### Step 3: AgentNode Base Class
 Create the standardized agent wrapper (from Antigravity's analysis):
@@ -64,8 +64,8 @@ class AgentNode:
         # Return updated state
 ```
 
-### Step 4: Pantheon Node
-Implement Pantheon (CEO) — receives goal, decomposes into tasks, delegates to Zeus + Thoth.
+### Step 4: Synarch Node
+Implement Synarch (CEO) — receives goal, decomposes into tasks, delegates to Zeus + Thoth.
 
 ### Step 5: Next.js Skeleton
 Create `frontend/` with Next.js 14 + shadcn/ui. Minimal: chat input + thought stream (SSE consumer).
@@ -77,12 +77,12 @@ Create `frontend/` with Next.js 14 + shadcn/ui. Minimal: chat input + thought st
 - **NotebookLM is NOT in PoC** — RAG is Phase 2
 - **Backend runs on host**, infra in Docker
 - **Every agent reads its soul.md** as system prompt foundation
-- **All agent events publish to NATS** subjects: `pantheon.agent.{name}.{event}`
-- **God = Human user**, Pantheon = CEO, hierarchy is non-negotiable
+- **All agent events publish to NATS** subjects: `synarch.agent.{name}.{event}`
+- **God = Human user**, Synarch = CEO, hierarchy is non-negotiable
 
 ## Model Routing (litellm)
 ```
-Pantheon: bedrock/anthropic.claude-opus-4-20250514-v1:0
+Synarch: bedrock/anthropic.claude-opus-4-20250514-v1:0
 Zeus:     bedrock/anthropic.claude-sonnet-4-20250514-v1:0
 Thoth:    bedrock/anthropic.claude-sonnet-4-20250514-v1:0
 Hermes:   ollama/llama3.1:8b

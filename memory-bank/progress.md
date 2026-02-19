@@ -9,7 +9,7 @@
 - [x] Vision analysis from Cline + Antigravity
 - [x] Competition landscape mapped (9 competitors, none match scope)
 - [x] Agent naming convention (mythology hierarchy, 20+ names)
-- [x] 7 soul.md files (God, Pantheon, Zeus, Thoth, Hermes, Hephaestus, Janus)
+- [x] 7 soul.md files (God, Synarch, Zeus, Thoth, Hermes, Hephaestus, Janus)
 - [x] PoC PRD (comprehensive, Bedrock routing, Docker, 12-day roadmap)
 - [x] 5 reference repos cloned (OpenClaw, CrewAI, LangGraph, Letta, LLM-Council-Plus)
 - [x] OpenClaw soul system studied (identity.ts, system-prompt.ts)
@@ -23,7 +23,7 @@
 
 ### 🔲 M2: The Brain (Days 3-4)
 - [ ] LangGraph StateGraph
-- [ ] Pantheon → Zeus/Thoth delegation
+- [ ] Synarch → Zeus/Thoth delegation
 - [ ] Soul.md → system prompt compiler
 
 ### 🔲 M3: Specialists (Days 5-6)
@@ -50,5 +50,5 @@
 ## Repository
 - **URL:** https://github.com/synarch-ai/synarch-engine (private)
 - **Org:** synarch-ai
-- **Previously:** PrakharMNNIT/pantheon-ai → renamed + transferred
+- **Previously:** PrakharMNNIT/synarch-ai → renamed + transferred
 - **Branch:** main

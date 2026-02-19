@@ -1,8 +1,8 @@
-# Pantheon AI: Phase 1 Completion
+# Synarch AI: Phase 1 Completion
 
 ## Status
 The codebase foundation has been generated, including:
-1.  **Backend Structure**: `backend/` with FastAPI, LangGraph, and Agent Classes (`Pantheon`, `Zeus`, `Thoth`).
+1.  **Backend Structure**: `backend/` with FastAPI, LangGraph, and Agent Classes (`Synarch`, `Zeus`, `Thoth`).
 2.  **Infrastructure**: `infra/docker-compose.yml` for NATS, Postgres, Qdrant.
 3.  **Frontend Skeleton**: `apps/web/` with a mock dashboard page.
 

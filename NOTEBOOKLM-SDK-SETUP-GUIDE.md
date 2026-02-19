@@ -248,7 +248,7 @@ npx playwright install chromium
 ## Project Structure
 
 ```
-pantheon-ai/
+synarch-ai/
 ├── .env                           # Auth credentials (gitignored)
 ├── .gitignore                     # Protects .env + .auth-profile + node_modules
 ├── .auth-profile/                 # Playwright persistent browser session

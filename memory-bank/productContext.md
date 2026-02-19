@@ -9,7 +9,7 @@ AI agent frameworks (CrewAI, AutoGen, LangGraph) are libraries, not products. Us
 3. **Open-source community** wanting a self-hostable alternative to SaaS agent platforms
 
 ## Value Proposition
-| What Exists | What Pantheon Adds |
+| What Exists | What Synarch Adds |
 |---|---|
 | Single agents (ChatGPT, Claude) | Autonomous agent TEAMS with hierarchy |
 | Agent frameworks (CrewAI, AutoGen) | Production-grade PRODUCT with dashboard |

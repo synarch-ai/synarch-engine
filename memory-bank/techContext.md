@@ -19,7 +19,7 @@
 
 | Complexity | Model | Agent |
 |---|---|---|
-| STRATEGIC | Claude Opus 4 | Pantheon |
+| STRATEGIC | Claude Opus 4 | Synarch |
 | CREATIVE | Claude Sonnet 4 | Zeus, Thoth, Hephaestus |
 | STRUCTURED | Claude Haiku 3.5 | Janus |
 | RETRIEVAL | Ollama Llama 3.1 8B | Hermes |

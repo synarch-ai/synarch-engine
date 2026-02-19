@@ -1,4 +1,6 @@
-# Product Requirements Document: Pantheon PoC
+# Product Requirements Document: Synarch PoC
+
+**Developer:** PraxLannister
 **Version:** 1.0 | **Status:** Final Draft | **Date:** 2026-02-13  
 **Authors:** Cline (Claude Opus 4) + Antigravity (Gemini 3 Pro) — synthesized
 
@@ -6,9 +8,9 @@
 
 ## 1. Executive Summary
 
-**Pantheon** is a local, open-source, production-grade **Autonomous Multi-Agent Operating System**. This Proof of Concept demonstrates 5–6 mythologically-named agents collaborating in real-time on a Dev + Research task, orchestrated through an event-driven nervous system, with full observability via a Mission Control dashboard.
+**Synarch** is a local, open-source, production-grade **Autonomous Multi-Agent Operating System**. This Proof of Concept demonstrates 5–6 mythologically-named agents collaborating in real-time on a Dev + Research task, orchestrated through an event-driven nervous system, with full observability via a Mission Control dashboard.
 
-**Core Value Prop:** *"The Oracle speaks a wish. The Pantheon makes it real."*
+**Core Value Prop:** *"The Oracle speaks a wish. The Synarch makes it real."*
 
 **What Makes This Different From Every Other Agent Framework:**
 - Agents have **hierarchy** (CEO → C-Suite → Specialists), not flat peer-to-peer
@@ -24,17 +26,17 @@
 
 The Oracle (you) types into Mission Control:
 
-> *"Research the best event bus for Pantheon's nervous system and implement a working NATS integration prototype with tests."*
+> *"Research the best event bus for Synarch's nervous system and implement a working NATS integration prototype with tests."*
 
 ### Success Looks Like
 
 | Criteria | What Happens | Verification |
 |---|---|---|
-| **Pantheon decomposes** | Splits goal into research (→ Thoth) and engineering (→ Zeus) objectives | Dashboard shows task tree |
+| **Synarch decomposes** | Splits goal into research (→ Thoth) and engineering (→ Zeus) objectives | Dashboard shows task tree |
 | **Thoth delegates to Hermes** | Hermes queries NotebookLM + web for event bus comparisons | Source-cited research report generated |
 | **Zeus delegates to Hephaestus** | Hephaestus writes NATS client code with tests | Working code in `/output/` directory |
 | **Janus reviews** | Reviews both research and code deliverables | Structured review with verdict |
-| **Pantheon synthesizes** | Combines deliverables into final report to The Oracle | Dashboard shows MISSION COMPLETE |
+| **Synarch synthesizes** | Combines deliverables into final report to The Oracle | Dashboard shows MISSION COMPLETE |
 | **Real-time visibility** | Dashboard shows agent messages, task flow, status in real-time | WebSocket-driven live updates |
 | **Local deployment** | Everything runs via `docker compose up` + one start script | No cloud dependencies |
 
@@ -64,7 +66,7 @@ The Oracle (you) types into Mission Control:
 │                    LANGGRAPH ORCHESTRATOR                          │
 │                                                                    │
 │  ┌──────────┐    ┌────────┐    ┌────────┐                        │
-│  │ PANTHEON  │───▶│  ZEUS  │───▶│HEPHAEST│                        │
+│  │ SYNARCH  │───▶│  ZEUS  │───▶│HEPHAEST│                        │
 │  │  (CEO)    │    │  (CTO) │    │  US    │                        │
 │  └─────┬────┘    └────────┘    └────────┘                        │
 │        │                                                          │
@@ -81,10 +83,10 @@ The Oracle (you) types into Mission Control:
 │                    NERVOUS SYSTEM (NATS)                           │
 │                                                                    │
 │  Subjects:                                                        │
-│    pantheon.mission.>     — mission lifecycle events               │
-│    pantheon.agent.>       — agent status/message events            │
-│    pantheon.task.>        — task assignment/completion events       │
-│    pantheon.deliverable.> — deliverable creation events             │
+│    synarch.mission.>     — mission lifecycle events               │
+│    synarch.agent.>       — agent status/message events            │
+│    synarch.task.>        — task assignment/completion events       │
+│    synarch.deliverable.> — deliverable creation events             │
 └──────────────────────────────────────────────────────────────────┘
                        │
             ┌──────────┼──────────┐
@@ -106,7 +108,7 @@ The Oracle (you) types into Mission Control:
 
 ### 3.3 The Nervous System — NATS
 
-- **Why NATS over Redis Pub/Sub:** NATS has built-in subjects hierarchy (`pantheon.agent.zeus.task`), JetStream for persistence, and 60ns latency. Aligns with SAMAS research notes.
+- **Why NATS over Redis Pub/Sub:** NATS has built-in subjects hierarchy (`synarch.agent.zeus.task`), JetStream for persistence, and 60ns latency. Aligns with SAMAS research notes.
 - **Docker:** `nats:latest` container
 - **Event Schema:**
 ```json
@@ -146,7 +148,7 @@ The Oracle (you) types into Mission Control:
 
 | Agent | Model (Bedrock) | Bedrock Model ID | Reasoning |
 |---|---|---|---|
-| **Pantheon** | Claude Opus 4 | `us.anthropic.claude-opus-4-20250514-v1:0` | Strategic decomposition — needs the strongest reasoning |
+| **Synarch** | Claude Opus 4 | `us.anthropic.claude-opus-4-20250514-v1:0` | Strategic decomposition — needs the strongest reasoning |
 | **Zeus** | Claude Sonnet 4 | `us.anthropic.claude-sonnet-4-20250514-v1:0` | Technical planning — strong reasoning, good cost balance |
 | **Thoth** | Claude Sonnet 4 | `us.anthropic.claude-sonnet-4-20250514-v1:0` | Research synthesis — needs quality, not maximum power |
 | **Hermes** | Llama 3.1 8B (Ollama) | Local — `ollama/llama3.1:8b` | Information retrieval is structured — save money here |
@@ -196,14 +198,14 @@ AWS_SECRET_ACCESS_KEY=<from-bedrock>
 ### 4.2 Project Structure
 
 ```
-pantheon-ai/
+synarch-ai/
 ├── backend/                    # Python
 │   ├── main.py                # FastAPI gateway
 │   ├── orchestrator/          # LangGraph state machine
 │   │   ├── graph.py           # Main StateGraph definition
 │   │   ├── state.py           # State schema (TypedDict)
 │   │   └── nodes/             # Agent node implementations
-│   │       ├── pantheon.py
+│   │       ├── synarch.py
 │   │       ├── zeus.py
 │   │       ├── thoth.py
 │   │       ├── hermes.py
@@ -232,10 +234,10 @@ pantheon-ai/
 │   │   └── poc-prd.md         # This file
 │   ├── 02-architecture/
 │   │   ├── agent-naming-convention.md
-│   │   ├── pantheon-vision-analysis-cline.md
-│   │   └── pantheon-vision-analysis-antigravity.md
+│   │   ├── synarch-vision-analysis-cline.md
+│   │   └── synarch-vision-analysis-antigravity.md
 │   └── agents/
-│       ├── pantheon/soul.md
+│       ├── synarch/soul.md
 │       ├── zeus/soul.md
 │       ├── thoth/soul.md
 │       ├── hermes/soul.md
@@ -273,9 +275,9 @@ services:
     image: postgres:16-alpine
     ports: ["5432:5432"]
     environment:
-      POSTGRES_DB: pantheon
-      POSTGRES_USER: pantheon
-      POSTGRES_PASSWORD: pantheon_local
+      POSTGRES_DB: synarch
+      POSTGRES_USER: synarch
+      POSTGRES_PASSWORD: synarch_local
     volumes: ["pg_data:/var/lib/postgresql/data"]
   
   ollama:
@@ -301,9 +303,9 @@ volumes:
 - [ ] Next.js skeleton with shadcn/ui
 
 ### Phase 2: The Brain (Day 3-4)
-- [ ] LangGraph StateGraph with Pantheon as entry node
+- [ ] LangGraph StateGraph with Synarch as entry node
 - [ ] State schema: mission, tasks, deliverables, agent_messages
-- [ ] Pantheon node: decompose goal → delegate to Zeus + Thoth
+- [ ] Synarch node: decompose goal → delegate to Zeus + Thoth
 - [ ] Zeus node: create engineering tasks → delegate to Hephaestus
 - [ ] Thoth node: create research tasks → delegate to Hermes
 
@@ -381,11 +383,11 @@ These are Phase 2+ features documented in the vision analysis.
 | PostgreSQL now or later? | **Now.** LangGraph checkpointing requires it. No shortcuts. |
 | Backend in Docker? | **No.** Run on host for PoC. Simpler MCP/NotebookLM access. |
 | Which frontier model? | **Claude Sonnet 4** primary, GPT-4o fallback. User provides API key in `.env`. |
-| How many agents in PoC? | **6:** Pantheon, Zeus, Thoth, Hermes, Hephaestus, Janus |
+| How many agents in PoC? | **6:** Synarch, Zeus, Thoth, Hermes, Hephaestus, Janus |
 
 ---
 
 **Approved by:** The Oracle  
 **Date:** 2026-02-13  
 
-*"In the Pantheon, every god has a throne. Every throne has a purpose. No god acts alone."*
+*"In the Synarch, every god has a throne. Every throne has a purpose. No god acts alone."*

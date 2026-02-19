@@ -1,7 +1,7 @@
 from .agent_node import AgentNode
 from ..orchestrator.state import MissionState
 
-class PantheonAgent(AgentNode):
+class SynarchAgent(AgentNode):
     """
     The CEO Agent. Responsible for:
     1. Understanding the user's high-level goal.
@@ -10,7 +10,7 @@ class PantheonAgent(AgentNode):
     """
     def __init__(self):
         super().__init__(
-            soul_path="docs/agents/pantheon/soul.md", # Path to be verified
+            soul_path="docs/agents/synarch/soul.md", # Path to be verified
             model="bedrock/anthropic.claude-opus-4-20250514-v1:0", # As per M1 instructions
             tools=[]
         )
@@ -19,7 +19,7 @@ class PantheonAgent(AgentNode):
         """
         Override run to implement specific planning logic.
         """
-        print(f"[Pantheon] Analyzing goal: {state['goal']}")
+        print(f"[Synarch] Analyzing goal: {state['goal']}")
 
         # 1. Input: State['goal']
         # 2. Process: LLM Decomposition
@@ -34,5 +34,5 @@ class PantheonAgent(AgentNode):
 
         return {
             "plan": plan,
-            "logs": [{"agent": "Pantheon", "message": f"Created plan with {len(plan)} steps.", "timestamp": "now"}]
+            "logs": [{"agent": "Synarch", "message": f"Created plan with {len(plan)} steps.", "timestamp": "now"}]
         }

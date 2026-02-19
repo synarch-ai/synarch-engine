@@ -1,4 +1,6 @@
 # ULTRATHINK: Deep Research & Vision Analysis for "Antigravity"
+
+**Developer:** PraxLannister
 *Analysis by Antigravity (Gemini 3 Pro) — 2026-02-13*
 
 ---

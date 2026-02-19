@@ -3,13 +3,13 @@
 ## Agent Hierarchy (Tier System)
 ```
 Tier 0: God (Human) — source of all authority
-Tier 1: Pantheon (CEO) — supreme orchestrator
+Tier 1: Synarch (CEO) — supreme orchestrator
 Tier 2: C-Suite — Zeus(CTO), Thoth(CRO), Athena(CPO), Odin(CISO), Midas(CFO), Apollo(CMO)
 Tier 3: Specialists — Hephaestus, Hermes, Vishwakarma, Janus, etc.
 ```
 
 ## Communication: Event-Driven Nervous System
-- NATS subjects: `pantheon.mission.>`, `pantheon.agent.>`, `pantheon.task.>`, `pantheon.deliverable.>`
+- NATS subjects: `synarch.mission.>`, `synarch.agent.>`, `synarch.task.>`, `synarch.deliverable.>`
 - All agent actions emit events → SSE stream → Mission Control dashboard
 - Replaces SiteGPT's 15-minute polling with real-time pub/sub
 
@@ -26,7 +26,7 @@ Tier 3: Specialists — Hephaestus, Hermes, Vishwakarma, Janus, etc.
 
 ## Security: Rule of Two (Meta Research 2025)
 - Agent cannot hold 2+ of: private data, untrusted content, external communication
-- Violation → mandatory escalation through Pantheon to God
+- Violation → mandatory escalation through Synarch to God
 - Per-agent tool allowlists (future: WASM sandboxing)
 
 ## Soul System (Identity Enforcement)

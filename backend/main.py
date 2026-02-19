@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 
-app = FastAPI(title="Pantheon AI Backend", version="1.0.0")
+app = FastAPI(title="Synarch AI Backend", version="1.0.0")
 
 # CORS (Allow Frontend)
 app.add_middleware(
@@ -18,7 +18,7 @@ app.include_router(router)
 
 @app.get("/health")
 async def health_check():
-    return {"status": "ok", "service": "pantheon-backend"}
+    return {"status": "ok", "service": "synarch-backend"}
 
 if __name__ == "__main__":
     import uvicorn

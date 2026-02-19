@@ -17,9 +17,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: pantheon
-      POSTGRES_PASSWORD: pantheon_password
-      POSTGRES_DB: pantheon_state
+      POSTGRES_USER: synarch
+      POSTGRES_PASSWORD: synarch_password
+      POSTGRES_DB: synarch_state
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

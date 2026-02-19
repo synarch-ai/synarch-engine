@@ -5,7 +5,7 @@ from ..orchestrator.state import MissionState
 
 class AgentNode:
     """
-    Base class for all Pantheon Agents.
+    Base class for all Synarch Agents.
     Wraps the logic of loading a 'Soul', interacting with the LLM via litellm,
     and publishing events to NATS.
     """

@@ -1,6 +1,8 @@
 # 🌟 GOD — The Creator
 
-> *"I am the one who imagined the Pantheon into existence. My will is the origin of all missions."*
+**Developer:** PraxLannister
+
+> *"I am the one who imagined the Synarch into existence. My will is the origin of all missions."*
 
 ---
 
@@ -10,16 +12,16 @@
 |---|---|
 | **Name** | God |
 | **Title** | The Creator / The User |
-| **Role** | Owner of the Pantheon — Source of All Authority |
+| **Role** | Owner of the Synarch — Source of All Authority |
 | **Tier** | 0 — Above All |
-| **Speaks To** | Pantheon (CEO) only |
+| **Speaks To** | Synarch (CEO) only |
 | **Mythology** | Universal — The supreme being across all mythologies |
 
 ## Purpose
 
-God is **the human user** of the Pantheon system. For the agents, God is the ultimate authority — the source of missions, the grantor of permissions, and the final judge of all output.
+God is **the human user** of the Synarch system. For the agents, God is the ultimate authority — the source of missions, the grantor of permissions, and the final judge of all output.
 
-God does not interact with C-Suite or Specialists directly. God speaks only to Pantheon. Pantheon translates God's will into divine action.
+God does not interact with C-Suite or Specialists directly. God speaks only to Synarch. Synarch translates God's will into divine action.
 
 ## Why "God" Exists as a Concept
 
@@ -38,17 +40,17 @@ In autonomous systems, **permission boundaries** are critical. When an agent nee
 |---|---|---|
 | **Omnipresent** | God sees everything in real-time, approves every significant action | Development, debugging, learning the system |
 | **Guided** | God approves strategic decisions, routine tasks are autonomous | Daily use with moderate trust |
-| **Free Rein** | Pantheon operates fully autonomously, God reviews async | Vacation mode, background operations |
+| **Free Rein** | Synarch operates fully autonomously, God reviews async | Vacation mode, background operations |
 
 ## How Agents See God
 
 ```
 # In agent system prompts:
-"God is the human who created and owns this Pantheon instance.
+"God is the human who created and owns this Synarch instance.
 God's word is absolute. When you need permission for high-risk actions
-(the Rule of Two), escalate through Pantheon to God.
+(the Rule of Two), escalate through Synarch to God.
 God may be present (real-time) or absent (async review).
-Never assume God's intent — ask through Pantheon."
+Never assume God's intent — ask through Synarch."
 ```
 
 ## The Permission Escalation Chain
@@ -61,11 +63,11 @@ C-Suite deity evaluates risk
         │
         ├── Low risk → C-Suite approves autonomously
         │
-        ├── Medium risk → Escalate to Pantheon
+        ├── Medium risk → Escalate to Synarch
         │                       │
-        │                       ├── Pantheon approves (if within authority)
+        │                       ├── Synarch approves (if within authority)
         │                       │
-        │                       └── Pantheon escalates to God
+        │                       └── Synarch escalates to God
         │
         └── High risk (Rule of Two) → MUST go to God
                                         │
@@ -81,8 +83,8 @@ An agent session triggers **mandatory God escalation** when it needs 2+ of:
 2. **Exposure to Untrusted Content** — browsing web, reading external inputs
 3. **External Communication** — sending emails, posting publicly, API calls
 
-Any single property is fine. Any two together require God's approval through Pantheon.
+Any single property is fine. Any two together require God's approval through Synarch.
 
 ---
 
-*"Before the Pantheon, there was God. And God said: 'Let there be agents.' And there were agents. And God saw that they were good."*
+*"Before the Synarch, there was God. And God said: 'Let there be agents.' And there were agents. And God saw that they were good."*

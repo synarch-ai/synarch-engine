@@ -1,4 +1,6 @@
-# Pantheon Agent Naming Convention
+# Synarch Agent Naming Convention
+
+**Developer:** PraxLannister
 *The hierarchy of gods — from supreme deity to domain specialists*
 
 ---
@@ -7,7 +9,7 @@
 
 ```
                     ┌─────────────┐
-                    │  PANTHEON   │  ← The Supreme Agent (CEO)
+                    │  SYNARCH   │  ← The Supreme Agent (CEO)
                     │  God of Gods│     Talks to human, delegates everything
                     └──────┬──────┘
                            │
@@ -23,13 +25,13 @@
 
 ---
 
-## Tier 1: PANTHEON — The Supreme Agent
+## Tier 1: SYNARCH — The Supreme Agent
 
-**Pantheon** is the god of gods. The CEO. The only agent the human interacts with directly.
+**Synarch** is the god of gods. The CEO. The only agent the human interacts with directly.
 
 | Name | Role | Inspired By |
 |---|---|---|
-| **Pantheon** | Supreme Orchestrator / CEO | The temple housing ALL the gods |
+| **Synarch** | Supreme Orchestrator / CEO | The temple housing ALL the gods |
 
 **Responsibilities:**
 - Receives human goals and decomposes into strategic objectives
@@ -42,7 +44,7 @@
 
 ## Tier 2: C-Suite Deities — Domain Leaders
 
-Each C-Suite deity owns an entire domain. They manage their specialist agents and report to Pantheon.
+Each C-Suite deity owns an entire domain. They manage their specialist agents and report to Synarch.
 
 | Name | Role | Mythology | Why This Name |
 |---|---|---|---|
@@ -110,7 +112,7 @@ Each C-Suite deity owns an entire domain. They manage their specialist agents an
 
 ## Naming Rules
 
-1. **Pantheon** is always singular, always the top. Never pluralized.
+1. **Synarch** is always singular, always the top. Never pluralized.
 2. **C-Suite names** are used as-is: "Zeus says...", "Thoth recommends..."
 3. **Specialist names** are prefixed by their domain in logs: `[Zeus.Hephaestus]`, `[Thoth.Hermes]`
 4. **Cross-mythology is intentional** — Greek + Egyptian + Norse + Hindu + Roman = universal, not culturally narrow
@@ -122,8 +124,8 @@ Each C-Suite deity owns an entire domain. They manage their specialist agents an
 ## Example Mission Control Log
 
 ```
-[Pantheon]      → Received goal: "Research event bus options and implement NATS prototype"
-[Pantheon]      → Delegating research to Thoth, implementation to Zeus
+[Synarch]      → Received goal: "Research event bus options and implement NATS prototype"
+[Synarch]      → Delegating research to Thoth, implementation to Zeus
 [Thoth]         → Assigning Hermes for information gathering
 [Thoth.Hermes]  → Querying NotebookLM: "event bus architectures for multi-agent systems"
 [Thoth.Hermes]  → Found: NATS vs Redis Streams vs RabbitMQ comparison (source: SAMAS notes)
@@ -136,7 +138,7 @@ Each C-Suite deity owns an entire domain. They manage their specialist agents an
 [Athena.Janus]  → Code review requested. Reviewing Hephaestus's deliverable...
 [Athena.Janus]  → ✅ Approved. 2 minor suggestions applied.
 [Midas.Lakshmi] → Task cost: 12,400 tokens ($0.03). Under budget.
-[Pantheon]      → Task complete. Deliverable: NATS integration prototype + research report.
+[Synarch]      → Task complete. Deliverable: NATS integration prototype + research report.
 ```
 
 ---
@@ -145,7 +147,7 @@ Each C-Suite deity owns an entire domain. They manage their specialist agents an
 
 For the initial PoC, we activate:
 
-1. **Pantheon** — Supreme orchestrator
+1. **Synarch** — Supreme orchestrator
 2. **Zeus** — CTO (manages dev work)
 3. **Thoth** — CRO (manages research)
 4. **Hermes** — Researcher (under Thoth, queries NotebookLM)
@@ -155,4 +157,4 @@ For the initial PoC, we activate:
 
 ---
 
-*"In the Pantheon, every god has a throne. Every throne has a purpose. No god acts alone."*
+*"In the Synarch, every god has a throne. Every throne has a purpose. No god acts alone."*

@@ -1,15 +1,17 @@
 # ADR-001: Swarms vs Custom LangGraph
+
+**Developer:** PraxLannister
 *Architecture Decision Record | 2026-02-13 | Status: DECIDED*
 
 ---
 
 ## The Question
-Should Pantheon AI fork and build upon `kyegomez/swarms`, or keep it as reference and build custom LangGraph?
+Should Synarch AI fork and build upon `kyegomez/swarms`, or keep it as reference and build custom LangGraph?
 
 ## Analysis (Dual — Cline + Antigravity independently agreed)
 
 ### What Swarms Offers (v9.0.0)
-- `HierarchicalSwarm`: Director→Worker pattern (nearly identical to Pantheon→C-Suite→Specialist)
+- `HierarchicalSwarm`: Director→Worker pattern (nearly identical to Synarch→C-Suite→Specialist)
 - `litellm`: Universal model provider interface (Bedrock, Ollama, OpenAI, 100+)
 - MCP client tools: Native MCP server integration from Python
 - `model_router.py`: Complexity-based routing (maps to our Opus/Sonnet/Haiku/Ollama tiers)
@@ -40,7 +42,7 @@ Keep `swarms` in `references/` for pattern study. Build on LangGraph.
 
 | From Swarms | Our Implementation |
 |---|---|
-| `HIEARCHICAL_SWARM_SYSTEM_PROMPT` | Adapt for Pantheon's system prompt |
+| `HIEARCHICAL_SWARM_SYSTEM_PROMPT` | Adapt for Synarch's system prompt |
 | `HierarchicalOrder` Pydantic model | Use for structured task delegation |
 | `SwarmSpec` data structure | Use for mission specification |
 | Director→Plan→Order→Feedback loop | Implement in LangGraph StateGraph |

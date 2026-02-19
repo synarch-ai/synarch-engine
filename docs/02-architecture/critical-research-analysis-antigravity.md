@@ -1,16 +1,18 @@
-# ULTRATHINK: Critical Research Analysis of Pantheon AI
+# ULTRATHINK: Critical Research Analysis of Synarch AI
+
+**Developer:** PraxLannister
 *Analysis by Antigravity (Gemini 3 Pro) — 2026-02-13*
 
 ---
 
 ## 1. The Current State
-We have successfully defined a Hierarchical Multi-Agent System ("God" -> "Pantheon" -> "Specialists") and identified the core technology stack (Python/LangGraph, NotebookLM/MCP, Redis). We have looked at openclaw (Identity/Loop) and llm-council-plus (Committee UI).
+We have successfully defined a Hierarchical Multi-Agent System ("God" -> "Synarch" -> "Specialists") and identified the core technology stack (Python/LangGraph, NotebookLM/MCP, Redis). We have looked at openclaw (Identity/Loop) and llm-council-plus (Committee UI).
 
 ## 2. Critical Findings & Gaps
 
 ### Finding A: openclaw is "Identity-Rich" but "Orchestration-Poor"
 - **Observation:** openclaw excels at defining who an agent is (identity.md, system prompt compilation). It makes agents feel "alive".
-- **Gap:** It appears designed for linear, single-agent loops (or per-channel bots). It lacks the graph-based orchestration needed for "Pantheon" (where output of A inputs to B, conditional on C).
+- **Gap:** It appears designed for linear, single-agent loops (or per-channel bots). It lacks the graph-based orchestration needed for "Synarch" (where output of A inputs to B, conditional on C).
 - **Recommendation:** Adopt openclaw's Identity System (Structured Markdown Profiles) but discard its runner loop. Use LangGraph for the actual execution engine.
 
 ### Finding B: llm-council-plus is "Democratic" but "Passive"
@@ -25,7 +27,7 @@ We have successfully defined a Hierarchical Multi-Agent System ("God" -> "Panthe
 - **Decision (2026-02-13):** **DROP NotebookLM from PoC.** Make RAG a pluggable capability, not hardwired. Users choose their own RAG provider (NotebookLM, Qdrant, ChromaDB, etc.) in Phase 2.
 
 ## 3. Recommended "Wrapper" Strategy
-Do not just "clone and run". We should build a "Pantheon Core" wrapper that standardizes the interface between these disparate tools.
+Do not just "clone and run". We should build a "Synarch Core" wrapper that standardizes the interface between these disparate tools.
 
 ### The AgentNode Pattern (Proposed)
 Instead of raw LangChain runnables, every agent (Zeus, Thoth, etc.) should be wrapped in a standard Python class:
@@ -44,7 +46,7 @@ class AgentNode:
 ## 4. Suggested Additional References
 - `langchain-ai/langgraph` (Multi-Agent Supervisor): The gold standard for the routing logic you need. We must study `examples/multi_agent/supervisor.ipynb`.
 - `kyegomez/swarms`: A very aggressive, production-oriented Python framework for "Enterprise-Grade" swarms. Good for looking at structure (how they define an AbstractAgent).
-- `microsoft/autogen`: (Just for the "Group Chat" pattern). Even if we don't use their code, their concept of a "Manager" selecting the next speaker is exactly what "Pantheon" (The Agent) needs to do.
+- `microsoft/autogen`: (Just for the "Group Chat" pattern). Even if we don't use their code, their concept of a "Manager" selecting the next speaker is exactly what "Synarch" (The Agent) needs to do.
 
 ## 5. The "Buy vs Build" Verdict
 - **Identity:** BUY (Port from openclaw).
@@ -53,4 +55,4 @@ class AgentNode:
 - **Memory:** BUILD (Custom wrappers). Make RAG pluggable — user brings their own provider.
 
 ## 6. Actionable Next Step
-Construct the "God Tier" Identity File (god.md) ✅ DONE and the "Pantheon" System Prompt ✅ DONE. Now build the engine that runs them.
+Construct the "God Tier" Identity File (god.md) ✅ DONE and the "Synarch" System Prompt ✅ DONE. Now build the engine that runs them.
