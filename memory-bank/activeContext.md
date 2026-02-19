@@ -3,18 +3,18 @@
 ## Current Focus
 **PoC Phase 1 — Foundation** (ready to start implementation)
 
-## PRD v1.0 (2026-02-20)
-- **File:** `docs/01-requirements/prd-1.0-claude.md` (1,645 lines, 24 sections)
-- **Scope:** Exhaustive PoC specification — supersedes `poc-prd.md`
-- **Key additions over poc-prd.md:**
-  - Formal mission lifecycle state machine (11 states)
-  - Dual-store persistence architecture (metadata + checkpoints)
-  - Canonical NATS event envelope schema
-  - Full API specification (11 endpoints, typed schemas, error codes)
-  - HITL approval workflow with LangGraph interrupt
-  - 18 user stories across 5 epics
-  - Testing strategy, security model, risk register
-  - Aligned implementation phases (Task 1→6 from gap-closure plan)
+## PRD v1.0-final (2026-02-20)
+- **File:** `docs/01-requirements/prd-1.0-final.md` (1,240 lines, 30 sections)
+- **Scope:** Exhaustive PoC specification — merged from Claude + Codex PRDs
+- **Supersedes:** `poc-prd.md`, `prd-1.0-claude.md`, `prd-1.0-codex.md`
+- **Key features:**
+  - FR-1 to FR-44 requirement IDs cross-referenced throughout
+  - Product principles, Definition of Done (8-point gate), 5 open questions
+  - Idempotency contract (FR-14), event versioning (FR-19), approval timeout (FR-25)
+  - Approvals as first-class DB entity, provenance tracking (FR-20)
+  - SQL DDL, architecture diagrams, state machine, NATS subject tree, API specs
+  - Mobile layout, reference adoption traceability (10 targets)
+  - Brand-correct: #121214 plate, Geist Sans/Mono, aligned with ADR-004 W1-W5
 
 ## Repository
 - **URL:** https://github.com/synarch-ai/synarch-engine (private)
