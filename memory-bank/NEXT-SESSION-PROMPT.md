@@ -59,7 +59,7 @@
 
 ## STEP 5: Read Branding
 
-32. `branding/brand-identity.md` — V3 Design System (LOCKED): Cyber-Sovereign Industrialism
+32. `docs/modules/branding/brand-identity.md` — V3 Design System (LOCKED): Cyber-Sovereign Industrialism
 33. `README.md` — project README with logos and architecture
 
 ## STEP 6: Study Reference Repos (patterns, not code)

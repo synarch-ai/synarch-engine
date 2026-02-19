@@ -253,7 +253,7 @@ synarch-ai/
 ├── .gitignore                     # Protects .env + .auth-profile + node_modules
 ├── .auth-profile/                 # Playwright persistent browser session
 ├── package.json                   # notebooklm-kit, playwright, tsx, dotenv
-├── NOTEBOOKLM-SDK-SETUP-GUIDE.md  # This file
+├── docs/modules/notebooklm/NOTEBOOKLM-SDK-SETUP-GUIDE.md  # This file
 ├── scripts/
 │   ├── auth-refresh.ts            # ♻️ Auto cookie refresh
 │   ├── test-connection.ts         # 🧪 Connection test
@@ -265,7 +265,7 @@ synarch-ai/
 │   ├── download-slides.ts         # 📥 Slide deck attempt
 │   └── download-source-guides.ts  # 📥 Direct source guide attempt
 └── notebook-lm-research/
-    ├── archive_report.md          # Archive summary
+    ├── (see docs/modules/notebooklm/archive_report.md)  # Archive summary
     ├── chat_history.json          # 20 chat messages
     ├── sources.json               # Legacy source list
     └── full-archive/

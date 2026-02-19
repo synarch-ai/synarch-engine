@@ -109,7 +109,7 @@
 - Modify: `apps/web/app/globals.css`
 - Modify: `apps/web/app/page.tsx`
 - Modify: component files under `apps/web/components/*`
-- Reference: `branding/brand-identity.md`
+- Reference: `docs/modules/branding/brand-identity.md`
 
 **Steps:**
 1. Implement core CSS variables from V3 design system.
@@ -119,7 +119,7 @@
 5. Validate desktop cockpit + mobile datapad behavior.
 
 **Verification:**
-- Visual check against V3 directives in `branding/brand-identity.md`.
+- Visual check against V3 directives in `docs/modules/branding/brand-identity.md`.
 - No generic starter styles remain in Mission Control.
 
 ---

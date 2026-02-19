@@ -154,7 +154,7 @@ Open **http://localhost:3000** — Mission Control awaits your orders.
 | [**Gap Closure Implementation Plan (2026-02-19)**](docs/plans/2026-02-19-gap-closure-and-reference-adoption.md) | Sequenced execution plan to move from PoC stubs to production-grade baseline |
 | [**Mission Control UI/UX Strategy**](docs/03-product/mission-control-ui-ux-and-functionality-strategy.md) | Reference-backed product plan for cockpit UX, HITL controls, and operator trust surfaces |
 | [**Agent Naming Convention**](docs/02-architecture/agent-naming-convention.md) | 20+ mythology-based agent names across 6 domains |
-| [**Brand Identity (V3)**](branding/brand-identity.md) | Design system: Cyber-Sovereign Industrialism |
+| [**Brand Identity (V3)**](docs/modules/branding/brand-identity.md) | Design system: Cyber-Sovereign Industrialism |
 | [**Vision Analysis**](docs/02-architecture/synarch-vision-analysis-cline.md) | Competition landscape, architectural innovations |
 
 ### Agent Souls

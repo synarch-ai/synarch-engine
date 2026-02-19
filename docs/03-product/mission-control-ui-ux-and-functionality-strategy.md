@@ -19,7 +19,7 @@ If Synarch is intended to be a real mission cockpit, the UI must be treated as a
 2. **Control authority:** operator can approve/reject/override sensitive actions.
 3. **Trust through traceability:** every output links to the agents, events, and tools that produced it.
 4. **Low-latency cognition:** dense information display without visual noise.
-5. **Brand fidelity:** strict adherence to V3 design system (`branding/brand-identity.md`).
+5. **Brand fidelity:** strict adherence to V3 design system (`docs/modules/branding/brand-identity.md`).
 
 ---
 

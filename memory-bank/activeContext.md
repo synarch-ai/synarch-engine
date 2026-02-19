@@ -30,8 +30,8 @@
 6. Dual vision analysis: Cline + Antigravity
 7. ADR-001: Swarms vs LangGraph — REFERENCE NOT FORK
 8. ADR-002: Branding pivot — Synarch AI → Synarch
-9. V3 Design System LOCKED: "Cyber-Sovereign Industrialism" (branding/brand-identity.md)
-10. Logo generation prompts created (branding/logo-prompts.md)
+9. V3 Design System LOCKED: "Cyber-Sovereign Industrialism" (docs/modules/branding/brand-identity.md)
+10. Logo generation prompts created (docs/modules/branding/logo-prompts.md)
 11. Repo renamed + transferred: PrakharMNNIT/synarch-ai → synarch-ai/synarch-engine
 12. Local dir renamed: synarch-ai → synarch-engine
 

@@ -761,7 +761,7 @@ All side-effecting endpoints (`POST`) accept an `Idempotency-Key` header. If the
 
 ### 14.1 Design System (FR-33 to FR-36)
 
-**V3 "Cyber-Sovereign Industrialism" is LOCKED.** Source of truth: `branding/brand-identity.md`
+**V3 "Cyber-Sovereign Industrialism" is LOCKED.** Source of truth: `docs/modules/branding/brand-identity.md`
 
 | Token | Value | Usage |
 |---|---|---|
@@ -1214,7 +1214,7 @@ v1.0 is complete **only when ALL are true:**
 | 3 | Mission Control UX Strategy | `docs/03-product/mission-control-ui-ux-and-functionality-strategy.md` |
 | 4 | Reference Deep-Dives Index | `docs/04-reference-deep-dives/README.md` |
 | 5 | Gap Closure Implementation Plan | `docs/plans/2026-02-19-gap-closure-and-reference-adoption.md` |
-| 6 | V3 Design System | `branding/brand-identity.md` |
+| 6 | V3 Design System | `docs/modules/branding/brand-identity.md` |
 | 7 | Agent Souls | `docs/agents/*/soul.md` |
 | 8 | Claude PRD (superseded) | `docs/01-requirements/prd-1.0-claude.md` |
 | 9 | Codex PRD (superseded) | `docs/01-requirements/prd-1.0-codex.md` |
