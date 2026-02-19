@@ -298,7 +298,7 @@ Every agent loads its `soul.md` file as the foundation of its system prompt. A s
 ┌─────────────────────────────────────────────────────────────┐
 │                     GATEWAY (FastAPI)                         │
 │  POST /mission/start         GET /mission/{id}/stream       │
-│  GET  /mission/{id}/state    POST /mission/{id}/approve     │
+│  GET  /mission/{id}/state    POST /mission/{id}/approvals/{approval_id}/decision │
 │  POST /mission/{id}/cancel   GET /agents                    │
 └──────────────────────┬──────────────────────────────────────┘
                        │
@@ -715,7 +715,7 @@ class AgentNode:
 | POST | `/mission/start` | Create + start mission | `Idempotency-Key` header | FR-1 |
 | GET | `/mission/{id}/state` | Current mission state | — | FR-4 |
 | GET | `/mission/{id}/stream` | SSE event stream | Reconnect via `lastEventId` | FR-18 |
-| POST | `/mission/{id}/approve` | Approve/reject HITL | `Idempotency-Key` header | FR-22 |
+| POST | `/mission/{id}/approvals/{approval_id}/decision` | Approve/reject HITL request by approval ID | `Idempotency-Key` header | FR-22 |
 | POST | `/mission/{id}/cancel` | Cancel mission | `Idempotency-Key` header | FR-3 |
 | POST | `/mission/{id}/pause` | Pause mission | `Idempotency-Key` header | FR-3 |
 | POST | `/mission/{id}/resume` | Resume paused mission | `Idempotency-Key` header | FR-3 |
@@ -744,6 +744,8 @@ All side-effecting endpoints (`POST`) accept an `Idempotency-Key` header. If the
 | Code | HTTP | Description |
 |---|---|---|
 | `MISSION_NOT_FOUND` | 404 | Mission ID doesn't exist |
+| `APPROVAL_NOT_FOUND` | 404 | Approval ID doesn't exist for mission |
+| `APPROVAL_ALREADY_DECIDED` | 409 | Approval request already resolved |
 | `MISSION_NOT_RUNNING` | 409 | Action requires running mission |
 | `MISSION_NOT_AWAITING_APPROVAL` | 409 | No pending approval |
 | `IDEMPOTENCY_CONFLICT` | 409 | Key reused with different payload |
@@ -848,7 +850,7 @@ High-impact actions require approval from the agent's superior AND God. In PoC: 
 5. NATS: synarch.approval.{id}.requested
 6. SSE → Mission Control approval modal
 7. God: APPROVE or REJECT (with optional reason)
-8. POST /mission/{id}/approve
+8. POST /mission/{id}/approvals/{approval_id}/decision
 9. Approval record updated (decided_by, decided_at, reason)
 10. Graph resumes with decision
 11. If timeout (FR-25): auto-reject after configurable period (default 300s)
@@ -1014,7 +1016,7 @@ AWS_SECRET_ACCESS_KEY=<secret>
 |---|---|---|---|
 | FR-1 | Create mission with goal, mode, constraints | §9, §13 | P0 |
 | FR-2 | Durable mission record with unique ID and thread context | §9 | P0 |
-| FR-3 | Mission states: created, running, awaiting_approval, paused, failed, completed, cancelled | §8 | P0 |
+| FR-3 | Mission states: created, planning, executing, awaiting_approval, reviewing, revising, synthesizing, paused, failed, completed, cancelled | §8 | P0 |
 | FR-4 | Mission state queryable at any time via API | §13 | P0 |
 | FR-5 | Mission resumes from persisted state after restart | §9, §10 | P0 |
 | FR-6 | LangGraph StateGraph as orchestration core | §10 | P0 |
@@ -1059,22 +1061,24 @@ AWS_SECRET_ACCESS_KEY=<secret>
 
 ---
 
-## 22. Reference Adoption Requirements
+## 22. Reference Adoption Strategy
 
-Mandatory adoption targets for v1.0, traced to deep-dives:
+Adoption strategy traced to deep-dives and aligned with ADR-004 decisions:
 
-| # | Reference | Pattern | Deep-Dive | Status |
-|---|---|---|---|---|
-| 1 | LangGraph | Postgres checkpointer, interrupts, conditional routing | `docs/04-reference-deep-dives/langgraph/` | Required |
-| 2 | OpenClaw | Control-plane idempotency, auth rigor, approval lifecycle | `docs/04-reference-deep-dives/openclaw/` | Required |
-| 3 | CrewAI | Event taxonomy, listener-style extension points | `docs/04-reference-deep-dives/crewAI/` | Required |
-| 4 | Letta | Memory block model, run-step completion semantics | `docs/04-reference-deep-dives/letta/` | Required |
-| 5 | LLM Council+ | Staged deliberation UX, mode visibility | `docs/04-reference-deep-dives/llm-council-plus/` | Required |
-| 6 | Playwright-MCP | Deterministic browser specialist tooling | `docs/04-reference-deep-dives/playwright-mcp/` | Phase 2 |
-| 7 | MCP-Use | Session management, inspector dev loop | `docs/04-reference-deep-dives/mcp-use/` | Phase 2 |
-| 8 | Smolagents | Secure code execution policy, telemetry shape | `docs/04-reference-deep-dives/smolagents/` | Required |
-| 9 | Magentic-UI | Co-planning, guarded action UX | `docs/04-reference-deep-dives/magentic-ui/` | Required |
-| 10 | Composio | User/org scoped integration routing | `docs/04-reference-deep-dives/composio/` | Phase 2 |
+| # | Reference | Decision | Pattern | Deep-Dive | Delivery Phase |
+|---|---|---|---|---|---|
+| 1 | LangGraph | Adopt | Postgres checkpointer, interrupts, conditional routing | `docs/04-reference-deep-dives/langgraph/` | Milestones A-B |
+| 2 | OpenClaw | Adopt Patterns | Control-plane idempotency, auth rigor, approval lifecycle | `docs/04-reference-deep-dives/openclaw/` | Milestones B-D |
+| 3 | CrewAI | Adopt Patterns | Event taxonomy, listener-style extension points | `docs/04-reference-deep-dives/crewAI/` | Milestone B |
+| 4 | Autogen | Reference Only | MCP workbench and multi-agent tooling patterns | `docs/04-reference-deep-dives/autogen/` | Reference only |
+| 5 | Letta | Adopt Patterns | Memory block model, run-step completion semantics | `docs/04-reference-deep-dives/letta/` | Milestone C+ |
+| 6 | LLM Council+ | Adopt Patterns | Staged deliberation UX, mode visibility | `docs/04-reference-deep-dives/llm-council-plus/` | Milestone C |
+| 7 | Playwright-MCP | Adopt | Deterministic browser specialist tooling | `docs/04-reference-deep-dives/playwright-mcp/` | Phase 2 |
+| 8 | MCP-Use | Adopt Patterns | Session management, inspector dev loop | `docs/04-reference-deep-dives/mcp-use/` | Phase 2 |
+| 9 | Smolagents | Adopt Patterns | Secure code execution policy, telemetry shape | `docs/04-reference-deep-dives/smolagents/` | Milestone D / Phase 2 |
+| 10 | Magentic-UI | Adopt Patterns | Co-planning, guarded action UX | `docs/04-reference-deep-dives/magentic-ui/` | Milestone C |
+| 11 | Composio | Adopt Patterns | User/org scoped integration routing | `docs/04-reference-deep-dives/composio/` | Phase 2 |
+| 12 | Swarms | Reference Only | Architecture catalog/pattern source; no runtime migration or fork | `docs/04-reference-deep-dives/swarms/` | Reference only |
 
 Governance: `docs/02-architecture/reference-adoption-matrix.md` and `docs/02-architecture/adr-004-gap-closure-and-reference-adoption-contract.md`
 
