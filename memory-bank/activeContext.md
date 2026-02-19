@@ -62,12 +62,19 @@
 - **Composio:** `docs/04-reference-deep-dives/composio/README.md`
 - **Swarms:** `docs/04-reference-deep-dives/swarms/README.md`
 
+## Architecture Decision (2026-02-20)
+- **ADR-005:** Modular Monolith with Hexagonal Architecture
+- **File:** `docs/02-architecture/adr-005-modular-monolith-hexagonal-architecture.md`
+- **Pattern:** domain/ (pure) → ports/ (abstract) → adapters/ (infra) → api/ (thin)
+- **Three planes:** Control (LangGraph state), Observation (NATS), Persistence (PostgreSQL)
+- **NOT microservices** — LangGraph requires in-process execution
+
 ## Immediate Next Steps (M1: Foundation)
-1. Keep naming consistency (`Synarch`, `Synarch Engine`, `synarch.*`) across code/docs
-2. `docker compose up` — NATS, Qdrant, PostgreSQL, Ollama
-3. FastAPI skeleton with litellm integration
-4. LangGraph StateGraph with Synarch as entry node
-5. Next.js Mission Control with V3 design system
+1. Restructure backend to match hexagonal architecture (domain/ports/adapters/api)
+2. `docker compose up` — verify NATS, Qdrant, PostgreSQL, Ollama
+3. Implement Milestone A: PostgreSQL schema, repositories, checkpointer
+4. Implement Milestone B: Conditional routing, HITL, idempotency
+5. Implement Milestone C: Mission Control cockpit with V3 design system
 
 ## Open Questions
 - AgentNode base class design (from Antigravity's "Wrapper Strategy")
