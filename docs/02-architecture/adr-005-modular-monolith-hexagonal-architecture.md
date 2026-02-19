@@ -1,7 +1,8 @@
 # ADR-005: Modular Monolith with Hexagonal Architecture
 
-**Status:** PROPOSED  
+**Status:** ACCEPTED  
 **Date:** 2026-02-20  
+**Accepted:** 2026-02-20 by PraxLannister (God)  
 **Author:** Claude (BackendPE / Distinguished Principal Engineer mode)  
 **Deciders:** PraxLannister (God)
 
@@ -261,6 +262,58 @@ FastAPI routes receive ports via `Depends()`, never concrete adapters.
 ### 4. Frontend is Fully Decoupled
 
 Next.js communicates ONLY via HTTP REST + SSE. No shared code, no shared imports. Could be replaced with any SSE-consuming client.
+
+---
+
+## Event Delivery Semantics (Resolves FR-16 vs ADR Conflict)
+
+**The conflict:** FR-16 says "NATS required for runtime event publication." ADR-005 says "removing NATS should not break mission execution."
+
+**Resolution:** Both are correct at different levels:
+
+- **FR-16 is a DEPLOYMENT requirement:** NATS must be running in production. The system is designed to use it. Startup health checks verify NATS connectivity.
+- **ADR-005 is an ARCHITECTURE constraint:** The domain/orchestrator must not have a hard dependency on NATS. If `EventBusPort.publish()` fails, the mission graph continues — the event is lost (degraded observability) but the agent's work is not rolled back.
+
+**Concrete policy:**
+
+| Scenario | Behavior |
+|---|---|
+| NATS healthy | Events published normally, SSE streams to UI |
+| NATS temporarily unreachable | `EventBusPort.publish()` logs warning, does NOT throw. Mission continues. Events written to `mission_events` table as fallback (outbox pattern). |
+| NATS down at startup | Health check fails, backend logs error. Mission start is allowed but warns operator that observability is degraded. |
+| NATS recovers | Outbox events can be replayed from `mission_events` table to NATS for catch-up. |
+
+**Implementation:** The NATS adapter wraps publish in try/except. On failure, it writes to the `mission_events` PostgreSQL table (which exists regardless). The SSE bridge can fall back to polling `mission_events` if NATS subscription fails.
+
+This ensures:
+- **Control plane (LangGraph)** never depends on observation plane (NATS)
+- **Observation plane** degrades gracefully, never blocks
+- **Persistence plane** serves as durable outbox for event replay
+
+---
+
+## Migration Path: Legacy → Hexagonal
+
+**Current layout** (`backend/src/*`) → **Target layout** (`backend/domain/`, `backend/ports/`, etc.)
+
+| Current Path | Target Path | Notes |
+|---|---|---|
+| `backend/src/agents/agent_node.py` | `backend/domain/agents/base.py` | Rename + add ABC |
+| `backend/src/agents/synarch.py` | `backend/domain/agents/synarch.py` | Move, remove infra imports |
+| `backend/src/agents/zeus.py` | `backend/domain/agents/zeus.py` | Move |
+| `backend/src/agents/thoth.py` | `backend/domain/agents/thoth.py` | Move |
+| `backend/src/orchestrator/state.py` | `backend/domain/orchestrator/state.py` | Move |
+| `backend/src/orchestrator/graph.py` | `backend/domain/orchestrator/graph.py` | Move, extract routing to routing.py |
+| `backend/src/api/server.py` | `backend/api/routes/missions.py` | Split into route modules |
+| `backend/main.py` | `backend/main.py` | Keep, add container bootstrap |
+| (new) | `backend/ports/*.py` | Create abstract interfaces |
+| (new) | `backend/adapters/postgres/` | Extract from in-memory MISSIONS |
+| (new) | `backend/adapters/nats/` | New: NervousSystem client |
+| (new) | `backend/adapters/litellm/` | New: ModelProvider adapter |
+| (new) | `backend/config.py` | New: pydantic-settings |
+| (new) | `backend/container.py` | New: DI wiring |
+
+**Migration strategy:** Incremental, not big-bang. Move one module at a time, verify tests pass after each move. Start with `domain/models/` and `ports/` (zero-risk), then migrate agents, then wire adapters.
 
 ---
 

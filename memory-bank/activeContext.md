@@ -13,7 +13,7 @@
   - Idempotency contract (FR-14), event versioning (FR-19), approval timeout (FR-25)
   - Approvals as first-class DB entity, provenance tracking (FR-20)
   - SQL DDL, architecture diagrams, state machine, NATS subject tree, API specs
-  - Mobile layout, reference adoption traceability (10 targets)
+  - Mobile layout, reference adoption traceability (12 targets in §22)
   - Brand-correct: #121214 plate, Geist Sans/Mono, aligned with ADR-004 W1-W5
 
 ## Repository
