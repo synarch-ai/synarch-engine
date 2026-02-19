@@ -22,6 +22,7 @@
 - [x] Adoption enforcement playbook created (`docs/02-architecture/adoption-enforcement-playbook.md`)
 - [x] Mission Control UI/UX strategy created (`docs/03-product/mission-control-ui-ux-and-functionality-strategy.md`)
 - [x] PR template created with mandatory governance checks (`.github/pull_request_template.md`)
+- [x] Source-level reference deep-dive set created for all 12 references (`docs/04-reference-deep-dives/README.md`)
 - [ ] Replace in-memory mission state with durable persistence
 - [ ] Introduce non-linear graph routing + HITL approval path
 - [ ] Replace placeholder agent runtime with `litellm` + structured NATS events

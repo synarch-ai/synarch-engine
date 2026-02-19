@@ -5,7 +5,7 @@
 
 ## Repository
 - **URL:** https://github.com/synarch-ai/synarch-engine (private)
-- **Local:** `/Users/praxlannister/Documents/workspace/synarch-engine`
+- **Local:** `/Users/praxlannister/Documents/workspace/synarch-ai/synarch-engine`
 - **Org:** github.com/synarch-ai
 
 ## What Was Done (2026-02-13)
@@ -13,7 +13,7 @@
 2. 7 agent soul files: God, Synarch (CEO), Zeus, Thoth, Hermes, Hephaestus, Janus
 3. PoC PRD with litellm model routing (provider-agnostic)
 4. Agent naming convention (mythology hierarchy, 20+ names)
-5. 7 reference repos: OpenClaw, CrewAI, LangGraph, Letta, LLM-Council-Plus, Swarms, AutoGen
+5. 12 reference repos tracked in `references/` for architecture patterns and implementation study
 6. Dual vision analysis: Cline + Antigravity
 7. ADR-001: Swarms vs LangGraph — REFERENCE NOT FORK
 8. ADR-002: Branding pivot — Synarch AI → Synarch
@@ -25,7 +25,7 @@
 ## Key Decisions
 - **Company:** Synarch (syn=together + arch=govern)
 - **Product:** Synarch Engine
-- **CEO Agent:** Synarch (renamed from Synarch)
+- **CEO Agent:** Synarch
 - **Gods:** Zeus, Thoth, Hermes, Hephaestus, Janus — unchanged
 - **User:** God — unchanged
 - **Models:** litellm (wraps Bedrock, Ollama, OpenAI, 100+)
@@ -34,8 +34,23 @@
 - **NotebookLM:** DROPPED from PoC (Phase 2 RAG)
 - **Design System:** V3 "Cyber-Sovereign Industrialism" — amber #FFB900 on void #0A0A0B
 
+## Reference Intelligence (2026-02-19)
+- **Index:** `docs/04-reference-deep-dives/README.md`
+- **Autogen:** `docs/04-reference-deep-dives/autogen/README.md`
+- **LangGraph:** `docs/04-reference-deep-dives/langgraph/README.md`
+- **OpenClaw:** `docs/04-reference-deep-dives/openclaw/README.md`
+- **CrewAI:** `docs/04-reference-deep-dives/crewAI/README.md`
+- **Letta:** `docs/04-reference-deep-dives/letta/README.md`
+- **LLM Council Plus:** `docs/04-reference-deep-dives/llm-council-plus/README.md`
+- **Magentic-UI:** `docs/04-reference-deep-dives/magentic-ui/README.md`
+- **MCP-Use:** `docs/04-reference-deep-dives/mcp-use/README.md`
+- **Playwright-MCP:** `docs/04-reference-deep-dives/playwright-mcp/README.md`
+- **Smolagents:** `docs/04-reference-deep-dives/smolagents/README.md`
+- **Composio:** `docs/04-reference-deep-dives/composio/README.md`
+- **Swarms:** `docs/04-reference-deep-dives/swarms/README.md`
+
 ## Immediate Next Steps (M1: Foundation)
-1. Operation Rename: synarch → synarch in code (agent files, NATS subjects, classes)
+1. Keep naming consistency (`Synarch`, `Synarch Engine`, `synarch.*`) across code/docs
 2. `docker compose up` — NATS, Qdrant, PostgreSQL, Ollama
 3. FastAPI skeleton with litellm integration
 4. LangGraph StateGraph with Synarch as entry node
