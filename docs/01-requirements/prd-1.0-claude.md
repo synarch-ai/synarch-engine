@@ -57,7 +57,7 @@ Six mythologically-named AI agents — organized in a strict hierarchy from God 
 
 ### PoC Demo Scenario
 
-The Oracle (human user) types into Mission Control:
+God (human user) types into Mission Control:
 
 > *"Research the best event bus for Synarch's nervous system and implement a working NATS integration prototype with tests."*
 
@@ -983,18 +983,18 @@ data: {"id":"evt-125","type":"approval.requested","mission_id":"m-1","agent":"he
 
 | Token | Value | Usage |
 |---|---|---|
-| `--void` | `#0A0A0B` | Background, base layer |
-| `--plate` | `#141416` | Card/panel surfaces |
-| `--overlay` | `#1E1E22` | Elevated surfaces, modals |
-| `--amber` | `#FFB900` | Primary signal, active states, CTAs |
-| `--grid-dot` | `#2A2A2E` | 40px grid dot pattern |
-| `--text-primary` | `#F5F5F5` | Primary text |
-| `--text-secondary` | `#A0A0A8` | Secondary/muted text |
-| `--border` | `#2A2A2E` | Panel borders |
-| `--font-display` | Space Grotesk | Headings, agent names |
-| `--font-body` | Inter | Body text, logs |
-| `--font-mono` | JetBrains Mono | Code, technical output |
-| `--radius` | `0px` | All corners — no pills, no rounding |
+| `--bg-void` | `#0A0A0B` | Main background (Layer 0) |
+| `--bg-plate` | `#121214` | Component background (Layer 1) |
+| `--bg-active` | `#18181B` | Hover state |
+| `--signal-amber` | `#FFB900` | Primary signal, active states, CTAs |
+| `--border-primary` | `#27272A` | Panel borders (Zinc-800) |
+| `--border-active` | `#3F3F46` | Active borders (Zinc-700) |
+| `--border-highlight` | `#FFB900` | Highlight borders (Amber) |
+| Grid dot | `rgba(39,39,42,0.2)` | 40px crosshair grid pattern |
+| `--font-display` | Space Grotesk | Headings, module titles (500, 700) |
+| `--font-ui` | Geist Sans | UI text, body (400, 500) |
+| `--font-mono` | Geist Mono / JetBrains Mono | Code, logs, technical output |
+| `--radius` | `0px` global, `2px` inputs | Sharp corners — `>4px` forbidden |
 
 **Agent Signature Colors:**
 
@@ -1552,7 +1552,7 @@ Aligned with `docs/plans/2026-02-19-gap-closure-and-reference-adoption.md`:
 
 ### Phase 5: Brand Enforcement (Task 5)
 - [ ] V3 CSS variables and grid background
-- [ ] Space Grotesk / Inter / JetBrains Mono fonts
+- [ ] Space Grotesk / Geist Sans / Geist Mono fonts
 - [ ] Agent signature colors throughout UI
 - [ ] 0px radius enforcement
 - [ ] Plate/void/overlay depth system
