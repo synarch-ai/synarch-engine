@@ -932,7 +932,7 @@ cp .env.example .env.local
 Then edit `backend/.env.local` and set at minimum:
 
 ```env
-DATABASE_URL=postgresql://synarch:<same_password_as_root_env_local>@localhost:5432/synarch
+DATABASE_URL=postgresql://synarch:<same_password_as_root_env_local>@localhost:5433/synarch
 NATS_URL=nats://localhost:4222
 QDRANT_URL=http://localhost:6333
 OLLAMA_API_BASE=http://localhost:11434

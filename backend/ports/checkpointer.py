@@ -10,6 +10,11 @@ class CheckpointerPort(ABC):
         ...
 
     @abstractmethod
+    async def close(self) -> None:
+        """Close checkpoint storage connections."""
+        ...
+
+    @abstractmethod
     def get_checkpointer(self) -> Any:
         """Return the underlying checkpointer for LangGraph compilation."""
         ...

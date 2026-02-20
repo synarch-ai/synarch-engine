@@ -15,7 +15,7 @@ services:
   postgres:
     image: postgres:16
     ports:
-      - "5432:5432"
+      - "5433:5432"  # 5433 external to avoid conflict with local PG on 5432
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-synarch}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-synarch_local}

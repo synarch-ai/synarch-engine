@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables / .env file."""
 
     # --- Database ---
-    database_url: str = "postgresql://synarch:synarch_local@localhost:5432/synarch"
+    database_url: str = "postgresql://synarch:synarch_local@localhost:5433/synarch"
 
     # --- NATS ---
     nats_url: str = "nats://localhost:4222"

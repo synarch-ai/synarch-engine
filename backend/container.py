@@ -60,4 +60,5 @@ async def create_container(settings: Settings) -> Container:
 async def shutdown_container(container: Container) -> None:
     """Gracefully shutdown all adapters."""
     await container.event_bus.close()
+    await container.checkpointer.close()
     logger.info("Container shutdown complete.")
