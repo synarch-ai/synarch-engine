@@ -17,9 +17,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: synarch
-      POSTGRES_PASSWORD: synarch_password
-      POSTGRES_DB: synarch_state
+      POSTGRES_USER: ${POSTGRES_USER:-synarch}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-synarch_local}
+      POSTGRES_DB: ${POSTGRES_DB:-synarch}
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

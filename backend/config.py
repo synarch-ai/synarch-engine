@@ -1,6 +1,6 @@
 """Synarch Engine — Configuration via pydantic-settings."""
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
 
 
@@ -45,7 +45,12 @@ class Settings(BaseSettings):
     approval_timeout_seconds: int = 300
     default_authority_mode: str = "supervised"
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    # Prefer local developer overrides in .env.local, then fall back to .env.
+    model_config = SettingsConfigDict(
+        env_file=(".env.local", ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
 
 @lru_cache

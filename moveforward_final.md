@@ -757,7 +757,7 @@ Note: "Current AI session" = whichever AI (Claude/Cline, Codex, Antigravity) God
 ```bash
 cd /Users/praxlannister/Documents/workspace/synarch-ai/synarch-engine
 
-docker compose -f infra/docker-compose.yml up -d
+docker compose --env-file .env.local -f infra/docker-compose.yml up -d
 
 cd backend
 pip install -r requirements.txt
@@ -821,3 +821,251 @@ Do not return to broad pre implementation documentation mode.
 Do not code new scope without FR and CAP linkage.
 
 The correct path is disciplined execution with visible working slices each week.
+
+---
+
+## 21) Environment, Keys, and Secrets Guide (env.local)
+
+This section defines exactly which keys are needed, at which phase and step, and how to generate or obtain them safely.
+
+## 21.1 Secret Management Rules (Mandatory)
+
+1. Never commit real secrets to git.
+2. Keep only example files in git (`*.example`).
+3. Use `.env.local` for local development secrets.
+4. Keep backend and frontend env files separate.
+5. Rotate credentials if they are accidentally exposed.
+
+Why:
+- Prevents secret leakage and environment drift.
+
+## 21.2 Env File Locations
+
+Use these files:
+1. Repository root: `.env.local`
+- Purpose: docker compose variable injection (PostgreSQL credentials and any infra-level vars).
+
+2. Backend: `backend/.env.local`
+- Purpose: runtime settings consumed by `backend/config.py`.
+- Note: backend now loads `.env.local` first, then `.env`.
+
+3. Frontend: `apps/web/.env.local`
+- Purpose: Next.js client-facing config (`NEXT_PUBLIC_*`).
+
+Why separate files:
+- Least privilege and clearer ownership of keys.
+
+## 21.3 Key Matrix by Phase and Step
+
+Legend:
+- Required: must exist for that phase to pass.
+- Optional: needed only if that provider or feature is used.
+
+| Key | Used by | First required at phase/step | Required | How to obtain/generate |
+|---|---|---|---|---|
+| `POSTGRES_USER` | docker compose postgres service | Phase 0, infra startup step | Yes | Choose value, e.g. `synarch` |
+| `POSTGRES_PASSWORD` | docker compose postgres service | Phase 0, infra startup step | Yes | Generate with `openssl rand -base64 24` |
+| `POSTGRES_DB` | docker compose postgres service | Phase 0, infra startup step | Yes | Choose value, e.g. `synarch` |
+| `DATABASE_URL` | backend checkpointer + repos | Phase 0, backend startup step | Yes | Compose from postgres vars |
+| `NATS_URL` | backend NATS adapter | Phase 0, backend startup step | Yes | `nats://localhost:4222` for local |
+| `QDRANT_URL` | backend vector store (future phases) | Phase 0 setup baseline | Recommended | `http://localhost:6333` |
+| `OLLAMA_API_BASE` | litellm local model path | Phase 2, runtime step | Optional/Recommended | `http://localhost:11434` |
+| `AWS_REGION_NAME` | Bedrock model invocation | Phase 2, runtime step | Required for Bedrock | AWS region, e.g. `us-east-1` |
+| `AWS_ACCESS_KEY_ID` | Bedrock model invocation | Phase 2, runtime step | Required for Bedrock | IAM user or STS temporary creds |
+| `AWS_SECRET_ACCESS_KEY` | Bedrock model invocation | Phase 2, runtime step | Required for Bedrock | IAM user or STS temporary creds |
+| `AWS_SESSION_TOKEN` | Bedrock with temporary creds | Phase 2, runtime step | Optional | STS / SSO temporary session token |
+| `MODEL_SYNARCH` | agent model override | Phase 2, model routing step | Optional | Set explicit model string |
+| `MODEL_ZEUS` | agent model override | Phase 2, model routing step | Optional | Set explicit model string |
+| `MODEL_THOTH` | agent model override | Phase 2, model routing step | Optional | Set explicit model string |
+| `MODEL_HERMES` | agent model override | Phase 2, model routing step | Optional | Set explicit model string |
+| `MODEL_HEPHAESTUS` | agent model override | Phase 2, model routing step | Optional | Set explicit model string |
+| `MODEL_JANUS` | agent model override | Phase 2, model routing step | Optional | Set explicit model string |
+| `APPROVAL_TIMEOUT_SECONDS` | HITL timeout behavior | Phase 2, HITL step | Yes | Integer seconds (default `300`) |
+| `DEFAULT_AUTHORITY_MODE` | mission governance mode | Phase 2, HITL step | Yes | `guided`, `supervised`, or `free_rein` |
+| `DEBUG` | backend runtime logging/detail | Phase 0 startup | Recommended | `true` local, `false` production |
+| `CORS_ORIGINS` | backend API CORS | Phase 3, UI integration step | Yes | JSON array, e.g. `["http://localhost:3000"]` |
+| `NEXT_PUBLIC_API_BASE_URL` | frontend REST client | Phase 3, UI wiring step | Yes | `http://localhost:8000` |
+| `NEXT_PUBLIC_SSE_BASE_URL` | frontend SSE client | Phase 3, UI wiring step | Yes | `http://localhost:8000` |
+| `NEXT_PUBLIC_ENABLE_MISSION_STREAM` | frontend feature flag | Phase 3, UI stream step | Optional | `true` or `false` |
+
+## 21.4 Important Consistency Rule
+
+`DATABASE_URL` must match `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DB`.
+
+Why:
+- If these drift, backend checkpointer and repositories fail at startup or runtime.
+
+Validation check:
+```bash
+psql "$DATABASE_URL" -c 'select 1;'
+```
+
+---
+
+## 22) Step-by-Step Setup Guide to Generate env.local Files
+
+## Step A: Generate root `.env.local` for Docker Compose
+
+From repository root:
+
+```bash
+cd /Users/praxlannister/Documents/workspace/synarch-ai/synarch-engine
+cp .env.local.example .env.local
+```
+
+Generate secure password:
+
+```bash
+openssl rand -base64 24
+```
+
+Then replace `replace_with_secure_password` in `.env.local`.
+
+Why:
+- Compose reads these values and initializes PostgreSQL consistently.
+
+## Step B: Generate `backend/.env.local`
+
+```bash
+cd /Users/praxlannister/Documents/workspace/synarch-ai/synarch-engine/backend
+cp .env.example .env.local
+```
+
+Then edit `backend/.env.local` and set at minimum:
+
+```env
+DATABASE_URL=postgresql://synarch:<same_password_as_root_env_local>@localhost:5432/synarch
+NATS_URL=nats://localhost:4222
+QDRANT_URL=http://localhost:6333
+OLLAMA_API_BASE=http://localhost:11434
+AWS_REGION_NAME=us-east-1
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_SESSION_TOKEN=
+DEBUG=true
+CORS_ORIGINS=["http://localhost:3000"]
+APPROVAL_TIMEOUT_SECONDS=300
+DEFAULT_AUTHORITY_MODE=supervised
+```
+
+Why:
+- Backend config is loaded from this file and powers all runtime adapters.
+
+## Step C: Generate `apps/web/.env.local`
+
+```bash
+cd /Users/praxlannister/Documents/workspace/synarch-ai/synarch-engine/apps/web
+cp .env.local.example .env.local
+```
+
+Edit and keep:
+
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+NEXT_PUBLIC_SSE_BASE_URL=http://localhost:8000
+NEXT_PUBLIC_ENABLE_MISSION_STREAM=true
+```
+
+Why:
+- Frontend must know where to call backend and stream events.
+
+## Step D: Start stack with root `.env.local`
+
+```bash
+cd /Users/praxlannister/Documents/workspace/synarch-ai/synarch-engine
+docker compose --env-file .env.local -f infra/docker-compose.yml up -d
+```
+
+Then start backend and frontend in separate shells.
+
+---
+
+## 23) How to Obtain Cloud API Credentials (Bedrock)
+
+## Option 1: IAM access key pair (simple local PoC)
+
+1. Create IAM user with Bedrock invoke permission.
+2. Generate access key pair.
+3. Put values in `backend/.env.local` as `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+4. Set `AWS_REGION_NAME` to the enabled Bedrock region.
+
+## Option 2: AWS SSO / STS temporary credentials (recommended)
+
+1. Authenticate with AWS SSO in terminal.
+2. Export temporary credentials to environment.
+3. Copy values to `backend/.env.local` including `AWS_SESSION_TOKEN`.
+4. Reissue when token expires.
+
+Why option 2 is preferred:
+- Reduces risk of long-lived credential leakage.
+
+---
+
+## 24) Phase-by-Phase Secret Checklist
+
+## Phase 0 checklist
+- [ ] root `.env.local` created.
+- [ ] postgres variables set.
+- [ ] `backend/.env.local` created.
+- [ ] `DATABASE_URL` connects successfully.
+- [ ] `NATS_URL` reachable.
+
+## Phase 1 checklist
+- [ ] migration runs with `DATABASE_URL`.
+- [ ] checkpointer setup succeeds.
+
+## Phase 2 checklist
+- [ ] Bedrock or Ollama credentials configured for selected models.
+- [ ] `APPROVAL_TIMEOUT_SECONDS` and `DEFAULT_AUTHORITY_MODE` set.
+- [ ] model override keys set if non-default routing needed.
+
+## Phase 3 checklist
+- [ ] `apps/web/.env.local` created.
+- [ ] frontend base URLs match backend host/port.
+- [ ] CORS origins include frontend URL.
+
+## Phase 4 checklist
+- [ ] secret redaction tests passing.
+- [ ] no secrets in event stream payload snapshots.
+- [ ] no secrets in frontend logs.
+
+## Phase 5 checklist (if executed)
+- [ ] external integration keys scoped by actor or organization context.
+- [ ] rotation and revocation procedure documented for each integration.
+
+---
+
+## 25) Quick Troubleshooting for Env Setup
+
+1. Backend cannot connect to PostgreSQL.
+- Check `DATABASE_URL` matches root `.env.local` postgres values.
+- Re-run `docker compose --env-file .env.local ... up -d`.
+
+2. NATS events are dropped.
+- Check `NATS_URL` in `backend/.env.local`.
+- Verify NATS container is healthy and reachable on `4222`.
+
+3. Bedrock calls fail with auth errors.
+- Validate region and credentials.
+- If using temporary creds, verify session token not expired.
+
+4. Frontend cannot call backend.
+- Validate `NEXT_PUBLIC_API_BASE_URL` and `NEXT_PUBLIC_SSE_BASE_URL`.
+- Validate backend CORS includes frontend origin.
+
+5. Compose values not applied.
+- Ensure command includes `--env-file .env.local`.
+- Confirm `.env.local` is in repo root.
+
+---
+
+## 26) Final Rule for Secrets During Implementation
+
+For every PR that introduces a new provider or integration:
+1. Add key names to this section.
+2. Add `.example` entries, never real values.
+3. Add runtime validation for missing required keys.
+4. Add tests covering missing-key failure behavior.
+
+Reason:
+- Keeps environment management deterministic and secure as scope grows.
