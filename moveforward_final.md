@@ -286,11 +286,12 @@ Without environment proof and requirement traceability, implementation starts bl
 - Why: maps `FR-1..FR-44` to `CAP`, phase, and test IDs.
 
 ### Code and setup required
-1. Create `.env` from `.env.example` with real credentials.
+1. Create `backend/.env.local` from `backend/.env.example` with real credentials.
 - Why: all services need configured environment to start.
+- Note: there is no root `.env.example`. Backend env is the primary config file.
 2. Bring up infra services via Docker Compose.
 - Why: validates runtime dependency availability.
-3. Pull Ollama model: `docker exec ollama ollama pull llama3.1:8b`
+3. Pull Ollama model: `ollama pull llama3.1:8b` (if Ollama runs natively) or `docker exec infra-ollama-1 ollama pull llama3.1:8b` (if using Docker Ollama).
 - Why: Hermes agent needs local LLM available.
 4. Install backend and frontend dependencies.
 - Why: baseline reproducibility for all subsequent phases.
@@ -904,11 +905,15 @@ psql "$DATABASE_URL" -c 'select 1;'
 
 ## Step A: Generate root `.env.local` for Docker Compose
 
-From repository root:
+From repository root, create `.env.local` manually (no `.env.local.example` exists at root):
 
 ```bash
 cd /Users/praxlannister/Documents/workspace/synarch-ai/synarch-engine
-cp .env.local.example .env.local
+cat > .env.local << 'EOF'
+POSTGRES_USER=synarch
+POSTGRES_PASSWORD=REPLACE_WITH_SECURE_PASSWORD
+POSTGRES_DB=synarch
+EOF
 ```
 
 Generate secure password:
