@@ -284,8 +284,6 @@ Without environment proof and requirement traceability, implementation starts bl
 ### Documents required
 1. `traceability-matrix-1.0.md`
 - Why: maps `FR-1..FR-44` to `CAP`, phase, and test IDs.
-2. `roadmap-1.0.md`
-- Why: baseline timeline and ownership.
 
 ### Code and setup required
 1. Create `.env` from `.env.example` with real credentials.
