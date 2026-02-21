@@ -107,6 +107,7 @@ Tier 3: 🔨Hephaestus  🪶Hermes  🎭Janus
 - **All agent events publish to NATS** subjects: `synarch.agent.{name}.{event}`
 - **God = Human user**, Synarch = CEO, hierarchy is enforced
 - **V3 Design System** is LOCKED — amber #FFB900, void #0A0A0B, Space Grotesk, no pills, 0px radius
+- **Pencil.dev MCP Server** is integrated for rapid frontend UI generation using `.pen` files.
 
 ## MODEL ROUTING (litellm)
 

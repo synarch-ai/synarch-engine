@@ -107,7 +107,7 @@ case "$ENGINE" in
 esac
 
 CMD=(
-  npx -y ralphy-cli
+  ./ralphy.sh
   "$ENGINE_FLAG"
   --github "$REPO"
   --github-label "$LABEL"
