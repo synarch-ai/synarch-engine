@@ -40,10 +40,20 @@ class Settings(BaseSettings):
     model_hermes: str = "ollama/llama3.1:8b"
     model_hephaestus: str = "bedrock/anthropic.claude-sonnet-4-20250514-v1:0"
     model_janus: str = "bedrock/anthropic.claude-3-5-haiku-20241022-v1:0"
+    model_call_budget_cap: int = 24
+    budget_counter_ttl_seconds: int = 86400
+    require_durable_checkpointer: bool = True
 
     # --- HITL ---
     approval_timeout_seconds: int = 300
     default_authority_mode: str = "supervised"
+
+    # --- Redis ---
+    redis_url: str = "redis://localhost:6379/0"
+
+    # --- API ---
+    idempotency_ttl_seconds: int = 86400
+    enable_idempotency_middleware: bool = True
 
     # Prefer local developer overrides in .env.local, then fall back to .env.
     model_config = SettingsConfigDict(

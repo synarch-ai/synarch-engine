@@ -31,7 +31,10 @@ class SynarchAgent(AgentNode):
             f"Return a JSON array of step descriptions."
         )
 
-        response = await self.invoke_llm([{"role": "user", "content": prompt}])
+        response = await self.invoke_llm(
+            [{"role": "user", "content": prompt}],
+            mission_id=mission_id,
+        )
 
         await self.emit_event(
             EventTypes.MISSION_PLANNED,
@@ -61,7 +64,10 @@ class SynarchAgent(AgentNode):
             f"Synthesize a final report for God (the human user)."
         )
 
-        response = await self.invoke_llm([{"role": "user", "content": prompt}])
+        response = await self.invoke_llm(
+            [{"role": "user", "content": prompt}],
+            mission_id=mission_id,
+        )
 
         await self.emit_event(
             EventTypes.MISSION_COMPLETED,

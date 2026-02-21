@@ -5,6 +5,9 @@ from pydantic import BaseModel, Field
 class MissionStartRequest(BaseModel):
     goal: str = Field(..., min_length=1, description="Natural language mission goal")
     authority_mode: str = Field(default="supervised", description="guided | supervised | free_rein")
+    cost_budget: float | None = Field(default=None, description="Optional mission budget in USD")
+    constraints: dict = Field(default_factory=dict, description="Mission constraints")
+    metadata: dict = Field(default_factory=dict, description="Mission metadata")
 
 
 class ApprovalDecisionRequest(BaseModel):

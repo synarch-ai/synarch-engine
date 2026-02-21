@@ -1,11 +1,13 @@
 """Mission API routes (FR-1, FR-3, FR-4, FR-18, FR-22)."""
+import base64
+import json
 import logging
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, Depends, Request, status
 from sse_starlette.sse import EventSourceResponse
 
-from api.dependencies import get_mission_repository
+from api.dependencies import get_mission_repository, get_mission_runtime
 from api.middleware.errors import MissionNotFoundError, SynarchError
 from api.schemas.requests import MissionStartRequest
 from api.schemas.responses import MissionStartResponse, MissionStateResponse, MissionListResponse, MissionSummary
@@ -41,11 +43,33 @@ def _value(value: object) -> str:
     return str(value)
 
 
-@router.post("/mission/start", response_model=MissionStartResponse)
+def _decode_cursor(cursor: str | None) -> int:
+    if not cursor:
+        return 0
+    try:
+        raw = base64.urlsafe_b64decode(cursor.encode("utf-8")).decode("utf-8")
+        data = json.loads(raw)
+        value = int(data.get("offset", 0))
+        return max(value, 0)
+    except Exception:
+        raise SynarchError(
+            "INVALID_CURSOR",
+            "Invalid pagination cursor.",
+            status_code=422,
+        )
+
+
+def _encode_cursor(offset: int) -> str:
+    payload = json.dumps({"offset": offset}, separators=(",", ":")).encode("utf-8")
+    return base64.urlsafe_b64encode(payload).decode("utf-8")
+
+
+@router.post("/mission/start", response_model=MissionStartResponse, status_code=status.HTTP_201_CREATED)
 async def start_mission(
     req: MissionStartRequest,
-    background_tasks: BackgroundTasks,
+    request: Request,
     mission_repo: MissionRepository = Depends(get_mission_repository),
+    mission_runtime=Depends(get_mission_runtime),
 ):
     """Create and start a new mission (FR-1)."""
     mission = Mission(
@@ -56,17 +80,19 @@ async def start_mission(
     mission.thread_id = str(mission.id)
     persisted = await mission_repo.create(mission)
 
-    # TODO: Wire LangGraph execution in background_tasks (Milestone A)
+    await mission_runtime.launch_mission(persisted.id)
     return MissionStartResponse(
         mission_id=str(persisted.id),
         status=_value(persisted.status),
-        stream_url=f"/mission/{persisted.id}/stream",
+        stream_url=f"/api/v1/mission/{persisted.id}/stream",
+        request_id=request.state.request_id,
     )
 
 
 @router.get("/mission/{mission_id}/state", response_model=MissionStateResponse)
 async def get_mission_state(
     mission_id: str,
+    request: Request,
     mission_repo: MissionRepository = Depends(get_mission_repository),
 ):
     """Get current mission state (FR-4)."""
@@ -85,7 +111,9 @@ async def get_mission_state(
         deliverables=[],
         created_at=mission.created_at,
         updated_at=mission.updated_at,
+        completed_at=mission.completed_at,
         error_context=mission.error_context,
+        request_id=request.state.request_id,
     )
 
 
@@ -112,6 +140,7 @@ async def stream_mission_events(
 @router.post("/mission/{mission_id}/cancel")
 async def cancel_mission(
     mission_id: str,
+    request: Request,
     mission_repo: MissionRepository = Depends(get_mission_repository),
 ):
     """Cancel a running mission (FR-3)."""
@@ -124,12 +153,17 @@ async def cancel_mission(
         MissionStatus.CANCELLED.value,
         expected_version=mission.version,
     )
-    return {"mission_id": mission_id, "status": MissionStatus.CANCELLED.value}
+    return {
+        "mission_id": mission_id,
+        "status": MissionStatus.CANCELLED.value,
+        "request_id": request.state.request_id,
+    }
 
 
 @router.post("/mission/{mission_id}/pause")
 async def pause_mission(
     mission_id: str,
+    request: Request,
     mission_repo: MissionRepository = Depends(get_mission_repository),
 ):
     """Pause a running mission (FR-3)."""
@@ -142,12 +176,17 @@ async def pause_mission(
         MissionStatus.PAUSED.value,
         expected_version=mission.version,
     )
-    return {"mission_id": mission_id, "status": MissionStatus.PAUSED.value}
+    return {
+        "mission_id": mission_id,
+        "status": MissionStatus.PAUSED.value,
+        "request_id": request.state.request_id,
+    }
 
 
 @router.post("/mission/{mission_id}/resume")
 async def resume_mission(
     mission_id: str,
+    request: Request,
     mission_repo: MissionRepository = Depends(get_mission_repository),
 ):
     """Resume a paused mission (FR-3)."""
@@ -160,17 +199,23 @@ async def resume_mission(
         MissionStatus.EXECUTING.value,
         expected_version=mission.version,
     )
-    return {"mission_id": mission_id, "status": MissionStatus.EXECUTING.value}
+    return {
+        "mission_id": mission_id,
+        "status": MissionStatus.EXECUTING.value,
+        "request_id": request.state.request_id,
+    }
 
 
 @router.get("/missions", response_model=MissionListResponse)
 async def list_missions(
+    request: Request,
     status: str | None = None,
     limit: int = 50,
-    offset: int = 0,
+    cursor: str | None = None,
     mission_repo: MissionRepository = Depends(get_mission_repository),
 ):
     """List all missions (FR-4)."""
+    offset = _decode_cursor(cursor)
     missions = await mission_repo.list(status=status, limit=limit, offset=offset)
     summaries = [
         MissionSummary(
@@ -181,4 +226,5 @@ async def list_missions(
         )
         for m in missions
     ]
-    return MissionListResponse(missions=summaries, total=len(summaries))
+    next_cursor = _encode_cursor(offset + limit) if len(summaries) == limit else None
+    return MissionListResponse(items=summaries, next_cursor=next_cursor, request_id=request.state.request_id)

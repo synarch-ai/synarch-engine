@@ -2,9 +2,6 @@
 from typing import TypedDict, List, Optional, Annotated
 import operator
 
-from domain.models.agent_message import MissionPhase, AgentMessage
-
-
 class TaskAssignment(TypedDict):
     task_id: str
     agent: str
@@ -27,7 +24,7 @@ class MissionState(TypedDict):
 
     # Execution
     phase: str  # MissionPhase value
-    tasks: List[TaskAssignment]
+    tasks: Annotated[List[TaskAssignment], operator.add]
     current_agent: str
 
     # Communication (append-only via reducer)
@@ -39,7 +36,7 @@ class MissionState(TypedDict):
     revision_count: int
 
     # Output
-    deliverables: List[dict]
+    deliverables: Annotated[List[dict], operator.add]
     final_output: Optional[str]
 
     # Control

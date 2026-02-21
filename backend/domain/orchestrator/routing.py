@@ -31,6 +31,8 @@ def route_after_review(state: MissionState) -> str:
     verdict = state.get("review_verdict", "PASS")
     revision_count = state.get("revision_count", 0)
 
+    if verdict == "FAIL":
+        return "fail"
     if verdict == "REVISE" and revision_count < 3:
         return "revise"
     return "synthesize"

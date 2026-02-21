@@ -19,7 +19,10 @@ class HephaestusAgent(AgentNode):
             f"Generate working, production-quality code with tests. Include file paths."
         )
 
-        response = await self.invoke_llm([{"role": "user", "content": prompt}])
+        response = await self.invoke_llm(
+            [{"role": "user", "content": prompt}],
+            mission_id=mission_id,
+        )
 
         await self.emit_event(
             EventTypes.AGENT_RESULT,

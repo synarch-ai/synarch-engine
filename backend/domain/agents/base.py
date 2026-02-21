@@ -2,8 +2,10 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any
+import inspect
 
 from domain.orchestrator.state import MissionState
+from domain.orchestrator.exceptions import BudgetExceededError
 from domain.events.envelope import EventEnvelope
 from domain.events.types import EventTypes
 
@@ -25,12 +27,14 @@ class AgentNode(ABC):
         soul_path: str,
         model_provider: Any = None,  # ModelProviderPort (injected)
         event_bus: Any = None,       # EventBusPort (injected)
+        budget_guard: Any = None,    # Callable(mission_id, agent, model)
     ):
         self.name = name
         self.model = model
         self.soul_path = soul_path
         self.model_provider = model_provider
         self.event_bus = event_bus
+        self.budget_guard = budget_guard
         self._soul: str | None = None
 
     @property
@@ -54,7 +58,17 @@ class AgentNode(ABC):
         """Call LLM via ModelProviderPort with soul as system prompt (FR-11)."""
         if self.model_provider is None:
             raise RuntimeError(f"Agent {self.name}: model_provider not injected")
-        
+
+        mission_id = kwargs.pop("mission_id", None)
+        if mission_id and self.budget_guard is not None:
+            maybe_result = self.budget_guard(
+                mission_id=mission_id,
+                agent=self.name,
+                model=self.model,
+            )
+            if inspect.isawaitable(maybe_result):
+                await maybe_result
+
         full_messages = [
             {"role": "system", "content": self.soul},
             *messages,
@@ -121,10 +135,21 @@ class AgentNode(ABC):
             )
             
             return result
+        except BudgetExceededError as e:
+            await self.emit_event(
+                EventTypes.AGENT_ERROR,
+                mission_id,
+                {
+                    "agent": self.name,
+                    "error": str(e),
+                    "error_code": "BUDGET_EXCEEDED",
+                },
+            )
+            raise
         except Exception as e:
             await self.emit_event(
                 EventTypes.AGENT_ERROR,
                 mission_id,
                 {"agent": self.name, "error": str(e)},
             )
-            return {"error": str(e)}
+            raise

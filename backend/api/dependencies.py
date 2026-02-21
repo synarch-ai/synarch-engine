@@ -30,3 +30,16 @@ def get_mission_repository(
             status_code=503,
         )
     return container.mission_repo
+
+
+def get_mission_runtime(
+    container: Container = Depends(get_container),
+):
+    """Get mission orchestration runtime from container."""
+    if container.mission_runtime is None:
+        raise SynarchError(
+            "MISSION_RUNTIME_UNAVAILABLE",
+            "Mission runtime is not initialized.",
+            status_code=503,
+        )
+    return container.mission_runtime

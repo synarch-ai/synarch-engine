@@ -21,7 +21,10 @@ class ZeusAgent(AgentNode):
             f"Create a technical implementation plan. Be specific about what code to write."
         )
 
-        response = await self.invoke_llm([{"role": "user", "content": prompt}])
+        response = await self.invoke_llm(
+            [{"role": "user", "content": prompt}],
+            mission_id=mission_id,
+        )
 
         await self.emit_event(
             EventTypes.AGENT_DELEGATED,

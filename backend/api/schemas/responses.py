@@ -1,12 +1,13 @@
 """API response schemas."""
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class MissionStartResponse(BaseModel):
     mission_id: str
     status: str
     stream_url: str
+    request_id: str
 
 
 class MissionStateResponse(BaseModel):
@@ -15,11 +16,13 @@ class MissionStateResponse(BaseModel):
     status: str
     authority_mode: str
     plan: list[str] | None = None
-    tasks: list[dict] = []
-    deliverables: list[dict] = []
+    tasks: list[dict] = Field(default_factory=list)
+    deliverables: list[dict] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
+    completed_at: datetime | None = None
     error_context: dict | None = None
+    request_id: str
 
 
 class MissionSummary(BaseModel):
@@ -30,8 +33,9 @@ class MissionSummary(BaseModel):
 
 
 class MissionListResponse(BaseModel):
-    missions: list[MissionSummary]
-    total: int
+    items: list[MissionSummary]
+    next_cursor: str | None = None
+    request_id: str
 
 
 class ApprovalResponse(BaseModel):
@@ -39,6 +43,7 @@ class ApprovalResponse(BaseModel):
     approval_id: str
     decision: str
     resumed: bool
+    request_id: str
 
 
 class HealthResponse(BaseModel):
@@ -51,7 +56,7 @@ class HealthResponse(BaseModel):
 class ErrorDetail(BaseModel):
     code: str
     message: str
-    details: dict = {}
+    details: dict = Field(default_factory=dict)
     request_id: str = ""
 
 

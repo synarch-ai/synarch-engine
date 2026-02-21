@@ -10,7 +10,7 @@ def build_graph(agent_nodes: dict) -> StateGraph:
     
     Args:
         agent_nodes: Dict mapping node names to async callables.
-            Expected keys: synarch, zeus, thoth, hermes, hephaestus, janus, synthesize
+            Expected keys: synarch, zeus, thoth, hermes, hephaestus, janus, synthesize, fail
     
     Returns:
         Compiled StateGraph ready for checkpointer attachment.
@@ -25,6 +25,7 @@ def build_graph(agent_nodes: dict) -> StateGraph:
     graph.add_node("hephaestus", agent_nodes["hephaestus"])
     graph.add_node("janus", agent_nodes["janus"])
     graph.add_node("synthesize", agent_nodes["synthesize"])
+    graph.add_node("fail", agent_nodes["fail"])
 
     # Entry point: Synarch plans and decomposes
     graph.set_entry_point("synarch")
@@ -56,10 +57,12 @@ def build_graph(agent_nodes: dict) -> StateGraph:
         {
             "synthesize": "synthesize",
             "revise": "zeus",  # revision loops back to execution
+            "fail": "fail",
         },
     )
 
     # Synthesis → END
     graph.add_edge("synthesize", END)
+    graph.add_edge("fail", END)
 
     return graph

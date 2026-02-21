@@ -3,7 +3,6 @@ import logging
 from uuid import uuid4
 from fastapi import Request
 from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +32,10 @@ class ApprovalNotFoundError(SynarchError):
         super().__init__("APPROVAL_NOT_FOUND", f"Approval '{approval_id}' not found.", 404)
 
 
+def _request_id(request: Request) -> str:
+    return getattr(request.state, "request_id", str(uuid4()))
+
+
 async def synarch_error_handler(request: Request, exc: SynarchError) -> JSONResponse:
     """Convert SynarchError to standard error envelope."""
     return JSONResponse(
@@ -42,7 +45,7 @@ async def synarch_error_handler(request: Request, exc: SynarchError) -> JSONResp
                 "code": exc.code,
                 "message": exc.message,
                 "details": exc.details,
-                "request_id": str(uuid4()),
+                "request_id": _request_id(request),
             }
         },
     )
@@ -58,7 +61,7 @@ async def generic_error_handler(request: Request, exc: Exception) -> JSONRespons
                 "code": "INTERNAL_ERROR",
                 "message": "An internal error occurred.",
                 "details": {},
-                "request_id": str(uuid4()),
+                "request_id": _request_id(request),
             }
         },
     )

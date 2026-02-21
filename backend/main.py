@@ -45,7 +45,11 @@ async def lifespan(app):
 
 # Create app with lifespan
 settings = get_settings()
-app = create_app(cors_origins=settings.cors_origins)
+app = create_app(
+    cors_origins=settings.cors_origins,
+    enable_idempotency=settings.enable_idempotency_middleware,
+    idempotency_ttl_seconds=settings.idempotency_ttl_seconds,
+)
 app.router.lifespan_context = lifespan
 
 

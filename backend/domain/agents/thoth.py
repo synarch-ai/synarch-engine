@@ -21,7 +21,10 @@ class ThothAgent(AgentNode):
             f"Create a research plan. Specify what information to find and from what sources."
         )
 
-        response = await self.invoke_llm([{"role": "user", "content": prompt}])
+        response = await self.invoke_llm(
+            [{"role": "user", "content": prompt}],
+            mission_id=mission_id,
+        )
 
         await self.emit_event(
             EventTypes.AGENT_DELEGATED,

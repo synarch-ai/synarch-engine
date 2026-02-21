@@ -21,7 +21,10 @@ class JanusAgent(AgentNode):
             f"Provide specific feedback."
         )
 
-        response = await self.invoke_llm([{"role": "user", "content": prompt}])
+        response = await self.invoke_llm(
+            [{"role": "user", "content": prompt}],
+            mission_id=mission_id,
+        )
 
         # Extract verdict (simplified — will use structured output)
         verdict = "PASS"

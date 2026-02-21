@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from datetime import datetime
 from uuid import UUID, uuid4
@@ -220,6 +221,33 @@ class PostgresMissionRepository(MissionRepository):
                 if expected_version is None:
                     expected_version = int(current["version"])
 
+                from_status = str(current["status"])
+                allowed_transitions = {
+                    "created": {"planning", "executing", "paused", "cancelled", "failed"},
+                    "planning": {"executing", "cancelled", "failed"},
+                    "executing": {"awaiting_approval", "reviewing", "synthesizing", "paused", "paused_awaiting_resources", "completed", "cancelled", "failed"},
+                    "awaiting_approval": {"executing", "paused", "cancelled", "failed"},
+                    "reviewing": {"revising", "synthesizing", "failed"},
+                    "revising": {"executing", "reviewing", "failed"},
+                    "synthesizing": {"completed", "failed"},
+                    "paused": {"executing", "cancelled", "failed"},
+                    "paused_awaiting_resources": {"executing", "cancelled", "failed"},
+                    "completed": set(),
+                    "cancelled": set(),
+                    "failed": set(),
+                }
+                if from_status != status_value and status_value not in allowed_transitions.get(from_status, set()):
+                    raise SynarchError(
+                        "MISSION_INVALID_TRANSITION",
+                        f"Invalid mission transition: {from_status} -> {status_value}",
+                        status_code=409,
+                        details={
+                            "mission_id": str(mission_id),
+                            "from_status": from_status,
+                            "to_status": status_value,
+                        },
+                    )
+
                 updated = await conn.fetchrow(
                     """
                     UPDATE missions
@@ -389,13 +417,59 @@ class PostgresMissionRepository(MissionRepository):
                 for row in rows
             ]
 
+    async def patch_payload(
+        self,
+        mission_id: UUID,
+        *,
+        plan: list[str] | None = None,
+        error_context: dict | None = None,
+    ) -> None:
+        plan_json = json.dumps(plan) if plan is not None else None
+        error_context_json = json.dumps(error_context) if error_context is not None else None
+        if plan_json is None and error_context_json is None:
+            return
+
+        async with self.pool.acquire() as conn:
+            async with conn.transaction():
+                await conn.execute(
+                    """
+                    INSERT INTO mission_payloads (mission_id, plan, error_context)
+                    VALUES ($1::uuid, $2::jsonb, $3::jsonb)
+                    ON CONFLICT (mission_id) DO UPDATE
+                    SET
+                        plan = COALESCE(EXCLUDED.plan, mission_payloads.plan),
+                        error_context = COALESCE(EXCLUDED.error_context, mission_payloads.error_context)
+                    """,
+                    mission_id,
+                    plan_json,
+                    error_context_json,
+                )
+                await conn.execute(
+                    """
+                    UPDATE missions
+                    SET updated_at = NOW()
+                    WHERE id = $1::uuid
+                      AND deleted_at IS NULL
+                    """,
+                    mission_id,
+                )
+
 
 async def create_postgres_pool(database_url: str) -> asyncpg.Pool:
     """Create a shared asyncpg pool for repository adapters."""
-    return await asyncpg.create_pool(
-        dsn=database_url,
-        min_size=1,
-        max_size=10,
-        command_timeout=30,
-        timeout=10,
-    )
+    attempts = 0
+    max_attempts = 5
+    while True:
+        try:
+            return await asyncpg.create_pool(
+                dsn=database_url,
+                min_size=1,
+                max_size=10,
+                command_timeout=30,
+                timeout=10,
+            )
+        except Exception:
+            attempts += 1
+            if attempts >= max_attempts:
+                raise
+            await asyncio.sleep(min(2**attempts, 10))

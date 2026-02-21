@@ -16,6 +16,7 @@ class MissionStatus(str, Enum):
     SYNTHESIZING = "synthesizing"
     COMPLETED = "completed"
     PAUSED = "paused"
+    PAUSED_AWAITING_RESOURCES = "paused_awaiting_resources"
     CANCELLED = "cancelled"
     FAILED = "failed"
 

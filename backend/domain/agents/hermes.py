@@ -19,7 +19,10 @@ class HermesAgent(AgentNode):
             f"Provide thorough research findings with source citations where possible."
         )
 
-        response = await self.invoke_llm([{"role": "user", "content": prompt}])
+        response = await self.invoke_llm(
+            [{"role": "user", "content": prompt}],
+            mission_id=mission_id,
+        )
 
         await self.emit_event(
             EventTypes.AGENT_RESULT,

@@ -22,6 +22,15 @@ class MissionRepository(ABC):
     @abstractmethod
     async def list(self, status: str | None = None, limit: int = 50, offset: int = 0) -> list[Mission]: ...
 
+    @abstractmethod
+    async def patch_payload(
+        self,
+        mission_id: UUID,
+        *,
+        plan: list[str] | None = None,
+        error_context: dict | None = None,
+    ) -> None: ...
+
 
 class TaskRepository(ABC):
     @abstractmethod
