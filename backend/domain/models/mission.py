@@ -7,17 +7,17 @@ from uuid import UUID, uuid4
 
 
 class MissionStatus(str, Enum):
-    CREATED = "CREATED"
-    PLANNING = "PLANNING"
-    EXECUTING = "EXECUTING"
-    AWAITING_APPROVAL = "AWAITING_APPROVAL"
-    REVIEWING = "REVIEWING"
-    REVISING = "REVISING"
-    SYNTHESIZING = "SYNTHESIZING"
-    COMPLETED = "COMPLETED"
-    PAUSED = "PAUSED"
-    CANCELLED = "CANCELLED"
-    FAILED = "FAILED"
+    CREATED = "created"
+    PLANNING = "planning"
+    EXECUTING = "executing"
+    AWAITING_APPROVAL = "awaiting_approval"
+    REVIEWING = "reviewing"
+    REVISING = "revising"
+    SYNTHESIZING = "synthesizing"
+    COMPLETED = "completed"
+    PAUSED = "paused"
+    CANCELLED = "cancelled"
+    FAILED = "failed"
 
 
 class AuthorityMode(str, Enum):

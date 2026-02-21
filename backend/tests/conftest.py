@@ -15,7 +15,7 @@ def sample_mission_state():
         "authority_mode": "supervised",
         "plan": [],
         "plan_rationale": "",
-        "phase": "PLANNING",
+        "phase": "planning",
         "tasks": [],
         "current_agent": "",
         "messages": [],

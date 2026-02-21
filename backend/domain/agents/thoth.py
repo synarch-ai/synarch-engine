@@ -29,7 +29,7 @@ class ThothAgent(AgentNode):
             {"delegate_to": "hermes", "tasks": research_tasks},
         )
 
-        tasks = [{"task_id": f"res-{i}", "agent": "hermes", "description": t, "status": "PENDING", "result": None} for i, t in enumerate(research_tasks)]
+        tasks = [{"task_id": f"res-{i}", "agent": "hermes", "description": t, "status": "pending", "result": None} for i, t in enumerate(research_tasks)]
 
         return {
             "current_agent": "thoth",

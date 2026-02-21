@@ -29,7 +29,7 @@ class ZeusAgent(AgentNode):
             {"delegate_to": "hephaestus", "tasks": engineering_tasks},
         )
 
-        tasks = [{"task_id": f"eng-{i}", "agent": "hephaestus", "description": t, "status": "PENDING", "result": None} for i, t in enumerate(engineering_tasks)]
+        tasks = [{"task_id": f"eng-{i}", "agent": "hephaestus", "description": t, "status": "pending", "result": None} for i, t in enumerate(engineering_tasks)]
 
         return {
             "current_agent": "zeus",

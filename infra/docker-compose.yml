@@ -1,47 +1,70 @@
-version: '3.8'
-
 services:
   # NATS JetStream (Event Bus)
   nats:
-    image: nats:latest
+    image: nats:2.10
     ports:
       - "4222:4222" # Client port
       - "8222:8222" # HTTP monitoring/management
     command: "-js -m 8222"
     volumes:
       - nats_data:/data
+    restart: unless-stopped
 
-  # PostgreSQL (State Store for LangGraph)
+  # PostgreSQL + pgvector (durable state + semantic memory)
   postgres:
-    image: postgres:16
+    image: pgvector/pgvector:pg16
     ports:
-      - "5433:5432"  # 5433 external to avoid conflict with local PG on 5432
+      - "5433:5432" # avoid conflict with host postgres on 5432
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-synarch}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-synarch_local}
       POSTGRES_DB: ${POSTGRES_DB:-synarch}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ../backend/adapters/postgres/migrations/001_initial.sql:/docker-entrypoint-initdb.d/001_initial.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-synarch} -d ${POSTGRES_DB:-synarch}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # Redis (rate limiting + lightweight state)
+  redis:
+    image: redis:7.2-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
 
   # Qdrant (Vector Memory)
   qdrant:
-    image: qdrant/qdrant
+    image: qdrant/qdrant:latest
     ports:
       - "6333:6333"
     volumes:
       - qdrant_data:/qdrant/storage
+    restart: unless-stopped
 
-  # Ollama (Local LLMs) - Optional if running on host, but good for isolation
-  # Note: GPU passthrough requires specific docker config. running CPU mode by default here.
+  # Ollama (Local LLMs)
   ollama:
-    image: ollama/ollama
+    image: ollama/ollama:latest
     ports:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+    restart: unless-stopped
 
 volumes:
   nats_data:
   postgres_data:
+  redis_data:
   qdrant_data:
   ollama_data:

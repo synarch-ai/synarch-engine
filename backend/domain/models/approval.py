@@ -6,10 +6,10 @@ from uuid import UUID, uuid4
 
 
 class ApprovalStatus(str, Enum):
-    PENDING = "PENDING"
-    APPROVED = "APPROVED"
-    REJECTED = "REJECTED"
-    TIMED_OUT = "TIMED_OUT"
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    TIMEOUT = "timeout"
 
 
 class RiskLevel(str, Enum):

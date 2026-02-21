@@ -41,6 +41,6 @@ class JanusAgent(AgentNode):
             "review_verdict": verdict,
             "review_feedback": response,
             "revision_count": revision_count + (1 if verdict == "REVISE" else 0),
-            "phase": "REVIEWING",
+            "phase": "reviewing",
             "messages": [{"agent": "janus", "role": "review", "content": response, "timestamp": "", "metadata": {"verdict": verdict}}],
         }

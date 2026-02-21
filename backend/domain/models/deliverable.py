@@ -13,10 +13,10 @@ class DeliverableType(str, Enum):
 
 
 class ReviewStatus(str, Enum):
-    PENDING_REVIEW = "PENDING_REVIEW"
-    APPROVED = "APPROVED"
-    REJECTED = "REJECTED"
-    REVISION_REQUESTED = "REVISION_REQUESTED"
+    PENDING_REVIEW = "pending_review"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    REVISION_REQUIRED = "revision_required"
 
 
 class Deliverable(BaseModel):

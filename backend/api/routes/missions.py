@@ -33,7 +33,7 @@ async def start_mission(req: MissionStartRequest, background_tasks: BackgroundTa
     # TODO: Wire LangGraph execution in background_tasks (Milestone A)
     return MissionStartResponse(
         mission_id=mission_id,
-        status="CREATED",
+        status="created",
         stream_url=f"/mission/{mission_id}/stream",
     )
 
@@ -63,7 +63,7 @@ async def stream_mission_events(mission_id: str):
     """SSE stream of mission events (FR-18). Placeholder until NATS wired."""
     async def _placeholder_generator():
         import asyncio, json
-        yield f"event: mission.state_changed\ndata: {json.dumps({'mission_id': mission_id, 'status': 'CREATED'})}\n\n"
+        yield f"event: mission.state_changed\ndata: {json.dumps({'mission_id': mission_id, 'status': 'created'})}\n\n"
         await asyncio.sleep(30)
         yield ": keepalive\n\n"
     
@@ -77,7 +77,7 @@ async def cancel_mission(mission_id: str):
     if not mission:
         raise MissionNotFoundError(mission_id)
     mission["status"] = MissionStatus.CANCELLED
-    return {"mission_id": mission_id, "status": "CANCELLED"}
+    return {"mission_id": mission_id, "status": "cancelled"}
 
 
 @router.post("/mission/{mission_id}/pause")
@@ -87,7 +87,7 @@ async def pause_mission(mission_id: str):
     if not mission:
         raise MissionNotFoundError(mission_id)
     mission["status"] = MissionStatus.PAUSED
-    return {"mission_id": mission_id, "status": "PAUSED"}
+    return {"mission_id": mission_id, "status": "paused"}
 
 
 @router.post("/mission/{mission_id}/resume")
@@ -97,7 +97,7 @@ async def resume_mission(mission_id: str):
     if not mission:
         raise MissionNotFoundError(mission_id)
     mission["status"] = MissionStatus.EXECUTING
-    return {"mission_id": mission_id, "status": "EXECUTING"}
+    return {"mission_id": mission_id, "status": "executing"}
 
 
 @router.get("/missions", response_model=MissionListResponse)

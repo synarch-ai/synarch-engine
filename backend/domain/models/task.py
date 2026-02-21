@@ -7,11 +7,11 @@ from uuid import UUID, uuid4
 
 
 class TaskStatus(str, Enum):
-    PENDING = "PENDING"
-    IN_PROGRESS = "IN_PROGRESS"
-    COMPLETED = "COMPLETED"
-    FAILED = "FAILED"
-    REVISION_NEEDED = "REVISION_NEEDED"
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    REVISION_NEEDED = "revision_needed"
 
 
 class Task(BaseModel):

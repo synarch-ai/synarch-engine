@@ -6,12 +6,12 @@ from pydantic import BaseModel, Field
 
 
 class MissionPhase(str, Enum):
-    PLANNING = "PLANNING"
-    EXECUTING = "EXECUTING"
-    REVIEWING = "REVIEWING"
-    REVISING = "REVISING"
-    SYNTHESIZING = "SYNTHESIZING"
-    AWAITING_APPROVAL = "AWAITING_APPROVAL"
+    PLANNING = "planning"
+    EXECUTING = "executing"
+    REVIEWING = "reviewing"
+    REVISING = "revising"
+    SYNTHESIZING = "synthesizing"
+    AWAITING_APPROVAL = "awaiting_approval"
 
 
 class MessageRole(str, Enum):
