@@ -10,6 +10,7 @@ from uuid import UUID
 from fastapi.testclient import TestClient
 
 from api.app import create_app
+from api.middleware.errors import SynarchError
 from domain.models.mission import Mission
 from ports.persistence import MissionRepository
 
@@ -24,6 +25,7 @@ class InMemoryMissionRepository(MissionRepository):
         now = datetime.utcnow()
         mission.created_at = now
         mission.updated_at = now
+        mission.version = 1
         self._missions[mission.id] = mission
         return mission
 
@@ -34,7 +36,16 @@ class InMemoryMissionRepository(MissionRepository):
         mission = self._missions.get(mission_id)
         if mission is None:
             return
+        expected_version = kwargs.get("expected_version")
+        if expected_version is not None and mission.version != int(expected_version):
+            raise SynarchError(
+                "MISSION_CONFLICT",
+                f"Mission '{mission_id}' was modified concurrently.",
+                status_code=409,
+                details={"expected_version": int(expected_version), "current_version": mission.version},
+            )
         mission.status = status
+        mission.version += 1
         mission.updated_at = datetime.utcnow()
         if status == "completed":
             mission.completed_at = mission.updated_at

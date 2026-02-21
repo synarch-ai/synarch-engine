@@ -119,7 +119,11 @@ async def cancel_mission(
     mission = await mission_repo.get(mission_uuid)
     if not mission:
         raise MissionNotFoundError(mission_id)
-    await mission_repo.update_status(mission_uuid, MissionStatus.CANCELLED.value)
+    await mission_repo.update_status(
+        mission_uuid,
+        MissionStatus.CANCELLED.value,
+        expected_version=mission.version,
+    )
     return {"mission_id": mission_id, "status": MissionStatus.CANCELLED.value}
 
 
@@ -133,7 +137,11 @@ async def pause_mission(
     mission = await mission_repo.get(mission_uuid)
     if not mission:
         raise MissionNotFoundError(mission_id)
-    await mission_repo.update_status(mission_uuid, MissionStatus.PAUSED.value)
+    await mission_repo.update_status(
+        mission_uuid,
+        MissionStatus.PAUSED.value,
+        expected_version=mission.version,
+    )
     return {"mission_id": mission_id, "status": MissionStatus.PAUSED.value}
 
 
@@ -147,7 +155,11 @@ async def resume_mission(
     mission = await mission_repo.get(mission_uuid)
     if not mission:
         raise MissionNotFoundError(mission_id)
-    await mission_repo.update_status(mission_uuid, MissionStatus.EXECUTING.value)
+    await mission_repo.update_status(
+        mission_uuid,
+        MissionStatus.EXECUTING.value,
+        expected_version=mission.version,
+    )
     return {"mission_id": mission_id, "status": MissionStatus.EXECUTING.value}
 
 

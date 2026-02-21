@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 
 import asyncpg
 
+from api.middleware.errors import SynarchError
 from domain.models.mission import Mission
 from ports.persistence import MissionRepository
 
@@ -57,7 +58,7 @@ class PostgresMissionRepository(MissionRepository):
                     """
                     INSERT INTO missions (id, goal, authority_mode, status, thread_id)
                     VALUES ($1::uuid, $2, $3, $4::mission_status, $5)
-                    RETURNING id, goal, status, authority_mode, created_at, updated_at, completed_at, thread_id
+                    RETURNING id, goal, status, authority_mode, version, created_at, updated_at, completed_at, thread_id
                     """,
                     mission.id,
                     mission.goal,
@@ -143,6 +144,7 @@ class PostgresMissionRepository(MissionRepository):
             goal=row["goal"],
             status=row["status"],
             authority_mode=row["authority_mode"],
+            version=row["version"],
             plan=mission.plan,
             created_at=row["created_at"],
             updated_at=row["updated_at"],
@@ -160,6 +162,7 @@ class PostgresMissionRepository(MissionRepository):
                     m.goal,
                     m.status,
                     m.authority_mode,
+                    m.version,
                     m.created_at,
                     m.updated_at,
                     m.completed_at,
@@ -180,6 +183,7 @@ class PostgresMissionRepository(MissionRepository):
                 goal=row["goal"],
                 status=row["status"],
                 authority_mode=row["authority_mode"],
+                version=row["version"],
                 plan=row["plan"],
                 created_at=row["created_at"],
                 updated_at=row["updated_at"],
@@ -191,29 +195,146 @@ class PostgresMissionRepository(MissionRepository):
     async def update_status(self, mission_id: UUID, status: str, **kwargs) -> None:
         status_value = _enum_value(status)
         completed_at = kwargs.get("completed_at")
+        expected_version = kwargs.get("expected_version")
         if not isinstance(completed_at, datetime):
             completed_at = None
 
         async with self.pool.acquire() as conn:
-            await conn.execute(
-                """
-                UPDATE missions
-                SET
-                    status = $2::mission_status,
-                    version = version + 1,
-                    updated_at = NOW(),
-                    completed_at = CASE
-                        WHEN $3::timestamptz IS NOT NULL THEN $3::timestamptz
-                        WHEN $2::mission_status = 'completed' THEN NOW()
-                        ELSE completed_at
-                    END
-                WHERE id = $1::uuid
-                  AND deleted_at IS NULL
-                """,
-                mission_id,
-                status_value,
-                completed_at,
-            )
+            async with conn.transaction():
+                current = await conn.fetchrow(
+                    """
+                    SELECT id, status, version
+                    FROM missions
+                    WHERE id = $1::uuid
+                      AND deleted_at IS NULL
+                    """,
+                    mission_id,
+                )
+                if current is None:
+                    raise SynarchError(
+                        "MISSION_NOT_FOUND",
+                        f"Mission '{mission_id}' not found.",
+                        status_code=404,
+                    )
+
+                if expected_version is None:
+                    expected_version = int(current["version"])
+
+                updated = await conn.fetchrow(
+                    """
+                    UPDATE missions
+                    SET
+                        status = $2::mission_status,
+                        version = version + 1,
+                        updated_at = NOW(),
+                        completed_at = CASE
+                            WHEN $3::timestamptz IS NOT NULL THEN $3::timestamptz
+                            WHEN $2::mission_status = 'completed' THEN NOW()
+                            ELSE completed_at
+                        END
+                    WHERE id = $1::uuid
+                      AND deleted_at IS NULL
+                      AND version = $4::integer
+                    RETURNING id, status, version
+                    """,
+                    mission_id,
+                    status_value,
+                    completed_at,
+                    int(expected_version),
+                )
+
+                if updated is None:
+                    latest_version = await conn.fetchval(
+                        "SELECT version FROM missions WHERE id = $1::uuid",
+                        mission_id,
+                    )
+                    raise SynarchError(
+                        "MISSION_CONFLICT",
+                        f"Mission '{mission_id}' was modified concurrently.",
+                        status_code=409,
+                        details={
+                            "mission_id": str(mission_id),
+                            "expected_version": int(expected_version),
+                            "current_version": int(latest_version) if latest_version is not None else None,
+                        },
+                    )
+
+                event_id = uuid4()
+                event_type = "mission.state_changed"
+                subject = "synarch.mission_events.mission.state_changed"
+                event_payload = json.dumps(
+                    {
+                        "mission_id": str(mission_id),
+                        "from_status": str(current["status"]),
+                        "to_status": status_value,
+                        "version": int(updated["version"]),
+                    }
+                )
+                outbox_headers = json.dumps(
+                    {
+                        "X-Mission-Id": str(mission_id),
+                        "X-Event-Type": event_type,
+                    }
+                )
+
+                sequence = await conn.fetchval(
+                    "SELECT next_mission_sequence($1::uuid)",
+                    mission_id,
+                )
+
+                await conn.execute(
+                    """
+                    INSERT INTO mission_events (
+                        event_id,
+                        mission_id,
+                        sequence,
+                        event_type,
+                        subject,
+                        schema_version,
+                        payload
+                    )
+                    VALUES (
+                        $1::uuid,
+                        $2::uuid,
+                        $3::bigint,
+                        $4,
+                        $5,
+                        $6,
+                        $7::jsonb
+                    )
+                    """,
+                    event_id,
+                    mission_id,
+                    sequence,
+                    event_type,
+                    subject,
+                    "1.0",
+                    event_payload,
+                )
+
+                await conn.execute(
+                    """
+                    INSERT INTO mission_event_outbox (
+                        event_id,
+                        mission_id,
+                        subject,
+                        payload,
+                        headers
+                    )
+                    VALUES (
+                        $1::uuid,
+                        $2::uuid,
+                        $3,
+                        $4::jsonb,
+                        $5::jsonb
+                    )
+                    """,
+                    event_id,
+                    mission_id,
+                    subject,
+                    event_payload,
+                    outbox_headers,
+                )
 
     async def list(
         self,
@@ -234,6 +355,7 @@ class PostgresMissionRepository(MissionRepository):
                 m.goal,
                 m.status,
                 m.authority_mode,
+                m.version,
                 m.created_at,
                 m.updated_at,
                 m.completed_at,
@@ -256,6 +378,7 @@ class PostgresMissionRepository(MissionRepository):
                     goal=row["goal"],
                     status=row["status"],
                     authority_mode=row["authority_mode"],
+                    version=row["version"],
                     plan=row["plan"],
                     created_at=row["created_at"],
                     updated_at=row["updated_at"],
@@ -274,4 +397,5 @@ async def create_postgres_pool(database_url: str) -> asyncpg.Pool:
         min_size=1,
         max_size=10,
         command_timeout=30,
+        timeout=10,
     )

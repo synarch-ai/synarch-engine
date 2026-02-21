@@ -31,6 +31,7 @@ class Mission(BaseModel):
     goal: str
     status: MissionStatus = MissionStatus.CREATED
     authority_mode: AuthorityMode = AuthorityMode.SUPERVISED
+    version: int = 1
     plan: list[str] | None = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
