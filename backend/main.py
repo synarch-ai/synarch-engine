@@ -31,6 +31,7 @@ async def lifespan(app):
 
     # Bootstrap DI container
     _container = await create_container(settings)
+    app.state.container = _container
     logger.info("All adapters initialized. Synarch Engine ready.")
 
     yield
@@ -38,6 +39,7 @@ async def lifespan(app):
     # Shutdown
     if _container:
         await shutdown_container(_container)
+    app.state.container = None
     logger.info("Synarch Engine shutdown complete.")
 
 
