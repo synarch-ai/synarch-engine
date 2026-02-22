@@ -7,6 +7,15 @@ from domain.models.mission import Mission
 from domain.models.task import Task
 from domain.models.deliverable import Deliverable
 from domain.models.approval import Approval
+from domain.events.envelope import EventEnvelope
+
+
+class EventRepository(ABC):
+    @abstractmethod
+    async def create(self, event: EventEnvelope) -> EventEnvelope: ...
+
+    @abstractmethod
+    async def list_by_mission(self, mission_id: UUID, limit: int = 100, offset: int = 0) -> List[EventEnvelope]: ...
 
 
 class MissionRepository(ABC):

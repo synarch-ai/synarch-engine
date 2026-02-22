@@ -1,8 +1,8 @@
-# Synarch Engine Implementation Master Plan (v2.1)
+# Synarch Engine Implementation Master Plan (v2.2)
 
 **Document Control:**
 - **Status:** Canonical Execution Baseline
-- **Version:** 2.1
+- **Version:** 2.2
 - **Date:** 2026-02-22
 - **Source of Truth:**
     - **PRD v1.2** (`docs/01-requirements/PRD-final.MD`)
@@ -24,58 +24,56 @@ Each slice executes the "Ralph Loop":
 
 ## 2. Slice Status Tracker
 
-| Slice | Description | FR Mapping | Status | Dependencies |
+| Slice | Issue | Description | Status | Dependencies |
 |---|---|---|---|---|
-| **S01** | Durable mission bootstrap + persisted state API | FR-1, FR-2, FR-75 | **DONE** | - |
-| **S02** | LangGraph core routing + prompt/model baseline | FR-6, FR-7, FR-11 | **DONE** | S01 |
-| **S03** | Typed event contract + NATS publication | FR-13, FR-16..20 | **OPEN** | S02 |
-| **S04** | Reconnect-safe NATS->SSE + live mission inspect UI | FR-18, FR-26, FR-76 | **OPEN** | S03 |
-| **S05** | Checkpoint persistence + crash recovery | FR-5, FR-10 | **OPEN** | S01 |
-| **S06** | HITL interrupt/resume + approval persistence | FR-8, FR-21..25, FR-77 | **OPEN** | S01, S05 |
-| **S07** | Approval inbox + deliberation timeline + mode visibility | FR-28, FR-29, FR-32 | **OPEN** | S06 |
-| **S08** | Tasks/blockers/deliverables board projection | FR-30 | **OPEN** | S04 |
-| **S09** | Idempotency middleware + retry metadata | FR-14, FR-15, FR-78 | **OPEN** | S01 |
-| **S10** | Auth modes + attribution + secrets discipline | FR-41, FR-42, FR-79 | **OPEN** | S01 |
-| **S11** | Least privilege + guardrails + injection defense | FR-43, FR-51..55 | **OPEN** | S10 |
-| **S12** | Mission Control design-system + brand compliance | FR-33..36 | **OPEN** | - |
-| **S13** | Build/lint/type + critical path CI gates | FR-81, FR-82 | **OPEN** | - |
-| **S14** | Eval baseline + cost telemetry + reference adoption | FR-45, FR-47, FR-83 | **OPEN** | S02 |
-| **S15** | LLM-as-judge + regression suite + quality dashboards | FR-46, FR-48..50 | **OPEN** | S14 |
-| **S16** | Context assembly + token budgets + memory write patterns | FR-57..59 | **OPEN** | S14 |
-| **S17** | Memory lifecycle + compaction/anti-context-rot | FR-60, FR-84 | **OPEN** | S16 |
-| **S18** | AgentTool composition + dynamic tool selection | FR-68, FR-73 | **OPEN** | S02 |
-| **S19** | Dynamic model routing + budget degradation strategy | FR-72, FR-74 | **OPEN** | S14 |
-| **S20** | Confidence scoring + progressive trust + graceful handoff | FR-69..71 | **OPEN** | S06 |
-| **S21** | Config-driven agents + schema validation + hot reload | FR-65..67 | **OPEN** | S02 |
-| **S22** | MCP server/client + inspect loop + tooling | FR-37, FR-40, FR-61/62 | **OPEN** | S18 |
-| **S23** | A2A readiness + discovery cards | FR-63, FR-64 | **OPEN** | S22 |
-| **S24** | Scoped integrations + external trigger routing | FR-38, FR-39 | **OPEN** | S22 |
-| **S25** | Integration supply-chain security checks | FR-56 | **OPEN** | S24 |
-| **S26** | Sandboxed execution for untrusted code | FR-80 | **OPEN** | S11 |
-| **S27** | Replay/time-travel debugging + SLO instrumentation | FR-85, FR-86 | **OPEN** | S05, S03 |
-| ... | S28-S43 (Advanced/Enterprise) | - | **PENDING** | - |
+| **S01** | #2 | Durable mission bootstrap + persisted state API | **DONE** | - |
+| **S02** | #3 | LangGraph core routing + prompt/model baseline | **DONE** | S01 |
+| **S03** | #4 | Typed event contract + NATS publication | **OPEN** | S02 |
+| **S04** | #5 | Reconnect-safe NATS->SSE + live mission inspect UI | **OPEN** | S03 |
+| **S05** | #6 | Checkpoint persistence + crash recovery | **BUILD COMPLETE** | S01 |
+| **S06** | #7 | HITL interrupt/resume + approval persistence | **OPEN** | S01, S05 |
+| **S07** | #8 | Approval inbox + deliberation timeline + mode visibility | **OPEN** | S06 |
+| **S08** | #9 | Tasks/blockers/deliverables board projection | **OPEN** | S04 |
+| **S09** | #10 | Idempotency middleware + retry metadata | **OPEN** | S01 |
+| **S10** | #11 | Auth modes + attribution + secrets discipline | **OPEN** | S01 |
+| **S11** | #12 | Least privilege + guardrails + injection defense | **OPEN** | S10 |
+| **S12** | #13 | Mission Control design-system + brand compliance | **OPEN** | - |
+| **S13** | #14 | Build/lint/type + critical path CI gates | **OPEN** | - |
+| **S14** | #15 | Eval baseline + cost telemetry + reference adoption | **OPEN** | S02 |
+| **S15** | #16 | LLM-as-judge + regression suite + quality dashboards | **OPEN** | S14 |
+| **S16** | #17 | Context assembly + token budgets + memory write patterns | **OPEN** | S14 |
+| **S17** | #18 | Memory lifecycle + compaction/anti-context-rot | **OPEN** | S16 |
+| **S18** | #19 | AgentTool composition + dynamic tool selection | **OPEN** | S02 |
+| **S19** | #20 | Dynamic model routing + budget degradation strategy | **OPEN** | S14 |
+| **S20** | #21 | Confidence scoring + progressive trust + graceful handoff | **OPEN** | S06 |
+| **S21** | #22 | Config-driven agents + schema validation + hot reload | **OPEN** | S02 |
+| **S22** | #23 | MCP server/client + inspect loop + tooling | **OPEN** | S18 |
+| **S23** | #24 | A2A readiness + discovery cards | **OPEN** | S22 |
+| **S24** | #25 | Scoped integrations + external trigger routing | **OPEN** | S22 |
+| **S25** | #26 | Integration supply-chain security checks | **OPEN** | S24 |
+| **S26** | #27 | Sandboxed execution for untrusted code | **OPEN** | S11 |
+| **S27** | #28 | Replay/time-travel debugging + SLO instrumentation | **OPEN** | S05, S03 |
 
 ---
 
 ## 3. Immediate Execution Plan
 
-### Step 1: Verify & Finalize Persistence (S05)
-*   **Context:** `PostgresMissionRepository` and `LangGraphCheckpointer` are implemented (Phase 1 PR).
-*   **Task:** Verify integration with live PostgreSQL (via `scripts/migrate.py` and integration tests). Ensure `missions.thread_id` and checkpoints are 1:1.
-*   **DoD:** Mission resumes from DB checkpoint after process restart.
+### Step 1: Event Nervous System (S03 - Issue #4)
+*   **Context:** `NATSEventBus` exists but needs hardening. `EventEnvelope` needs validation against `umbrella-event-catalog.md`.
+*   **Invariant:** "Event writes follow transactional outbox + mission-sequence allocator."
+*   **Task:**
+    1.  Implement `PostgresEventRepository` using DB sequence function.
+    2.  Harden `EventEnvelope` with schema versioning.
+    3.  Implement "Dual Write" logic (DB first, then NATS) or Outbox logic in the EventBus adapter.
+*   **DoD:** Integration test where event is persisted to DB with correct sequence AND published to NATS mock.
 
-### Step 2: Event Nervous System (S03)
-*   **Task:** Implement `NATSEventBus` with Typed Event Contracts (CloudEvents envelope).
-*   **Docs:** Update `umbrella-event-catalog.md`.
-*   **DoD:** Runtime events published to NATS subjects `synarch.mission.{id}.{type}`.
-
-### Step 3: Mission Control Streaming (S04)
+### Step 2: Mission Control Streaming (S04 - Issue #5)
 *   **Task:** Implement `SSEBridge` in `adapters/nats/sse_bridge.py`.
 *   **DoD:** Frontend receives live updates via `/api/missions/{id}/stream`.
 
-### Step 4: Governance & HITL (S06)
-*   **Task:** Implement `ApprovalRepository`, `interrupt` logic in graph, and Decision API.
-*   **DoD:** Mission pauses on `awaiting_approval`, resumes after API decision.
+### Step 3: Verify Persistence (S05 - Issue #6)
+*   **Status:** Build Complete (PR #45). Pending verification on live env.
+*   **Task:** Verify integration with live PostgreSQL.
 
 ---
 
