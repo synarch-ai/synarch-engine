@@ -493,6 +493,105 @@ class PostgresApprovalRepository(ApprovalRepository):
                 decided_at=row["decided_at"],
             )
 
+    async def list(self, mission_id: UUID, limit: int = 50, cursor: str | None = None) -> List[Approval]:
+        # Keyset pagination using requested_at
+        # Cursor is expected to be an ISO timestamp string
+        where_clause = "WHERE mission_id = $1"
+        args = [mission_id]
+
+        if cursor:
+            where_clause += " AND requested_at < $2"
+            args.append(datetime.fromisoformat(cursor))
+
+        args.append(limit)
+        limit_idx = len(args)
+
+        query = f"""
+            SELECT
+                id, mission_id, action_type, requested_by, description,
+                risk_level, status, timeout_seconds, requested_at,
+                decided_by, decision_reason, decided_at
+            FROM approvals
+            {where_clause}
+            ORDER BY requested_at DESC
+            LIMIT ${limit_idx}
+        """
+
+        async with self.pool.acquire() as conn:
+            rows = await conn.fetch(query, *args)
+            return [
+                Approval(
+                    id=row["id"],
+                    mission_id=row["mission_id"],
+                    action_type=row["action_type"],
+                    requested_by=row["requested_by"],
+                    description=row["description"],
+                    risk_level=RiskLevel(row["risk_level"]),
+                    status=ApprovalStatus(row["status"]),
+                    timeout_seconds=row["timeout_seconds"],
+                    requested_at=row["requested_at"],
+                    decided_by=row["decided_by"],
+                    decision_reason=row["decision_reason"],
+                    decided_at=row["decided_at"],
+                )
+                for row in rows
+            ]
+
+    async def get_pending(self, mission_id: UUID) -> Optional[Approval]:
+        query = """
+            SELECT
+                id, mission_id, action_type, requested_by, description,
+                risk_level, status, timeout_seconds, requested_at,
+                decided_by, decision_reason, decided_at
+            FROM approvals
+            WHERE mission_id = $1 AND status = 'pending'
+            ORDER BY requested_at DESC
+            LIMIT 1
+        """
+        async with self.pool.acquire() as conn:
+            row = await conn.fetchrow(query, mission_id)
+            if not row:
+                return None
+            return Approval(
+                id=row["id"],
+                mission_id=row["mission_id"],
+                action_type=row["action_type"],
+                requested_by=row["requested_by"],
+                description=row["description"],
+                risk_level=RiskLevel(row["risk_level"]),
+                status=ApprovalStatus(row["status"]),
+                timeout_seconds=row["timeout_seconds"],
+                requested_at=row["requested_at"],
+            )
+
+    async def decide(self, approval_id: UUID, decision: str, decided_by: str, reason: str | None = None) -> Approval:
+        query = """
+            UPDATE approvals
+            SET status = $1, decided_by = $2, decision_reason = $3, decided_at = NOW(), updated_at = NOW()
+            WHERE id = $4
+            RETURNING id, mission_id, action_type, requested_by, description,
+                      risk_level, status, timeout_seconds, requested_at,
+                      decided_by, decision_reason, decided_at
+        """
+        async with self.pool.acquire() as conn:
+            row = await conn.fetchrow(query, decision, decided_by, reason, approval_id)
+            if not row:
+                raise ValueError(f"Approval {approval_id} not found")
+            return Approval(
+                id=row["id"],
+                mission_id=row["mission_id"],
+                action_type=row["action_type"],
+                requested_by=row["requested_by"],
+                description=row["description"],
+                risk_level=RiskLevel(row["risk_level"]),
+                status=ApprovalStatus(row["status"]),
+                timeout_seconds=row["timeout_seconds"],
+                requested_at=row["requested_at"],
+                decided_by=row["decided_by"],
+                decision_reason=row["decision_reason"],
+                decided_at=row["decided_at"],
+            )
+
 
 class PostgresEventRepository(EventRepository):
     def __init__(self, pool: Pool):
