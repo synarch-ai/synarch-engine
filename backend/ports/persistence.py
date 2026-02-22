@@ -1,6 +1,6 @@
 """Abstract persistence ports — repository interfaces (FR-2, FR-4)."""
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, List, Dict
 from uuid import UUID
 
 from domain.models.mission import Mission
@@ -20,15 +20,15 @@ class MissionRepository(ABC):
     async def update_status(self, mission_id: UUID, status: str, **kwargs) -> None: ...
 
     @abstractmethod
-    async def list(self, status: str | None = None, limit: int = 50, offset: int = 0) -> list[Mission]: ...
+    async def list(self, status: str | None = None, limit: int = 50, offset: int = 0) -> List[Mission]: ...
 
     @abstractmethod
     async def patch_payload(
         self,
         mission_id: UUID,
         *,
-        plan: list[str] | None = None,
-        error_context: dict | None = None,
+        plan: List[str] | None = None,
+        error_context: Dict | None = None,
     ) -> None: ...
 
 
@@ -40,10 +40,10 @@ class TaskRepository(ABC):
     async def get(self, task_id: UUID) -> Optional[Task]: ...
 
     @abstractmethod
-    async def list_by_mission(self, mission_id: UUID) -> list[Task]: ...
+    async def list_by_mission(self, mission_id: UUID) -> List[Task]: ...
 
     @abstractmethod
-    async def update_status(self, task_id: UUID, status: str, result: dict | None = None) -> None: ...
+    async def update_status(self, task_id: UUID, status: str, result: Dict | None = None) -> None: ...
 
 
 class DeliverableRepository(ABC):
@@ -51,7 +51,7 @@ class DeliverableRepository(ABC):
     async def create(self, deliverable: Deliverable) -> Deliverable: ...
 
     @abstractmethod
-    async def list_by_mission(self, mission_id: UUID) -> list[Deliverable]: ...
+    async def list_by_mission(self, mission_id: UUID) -> List[Deliverable]: ...
 
 
 class ApprovalRepository(ABC):
