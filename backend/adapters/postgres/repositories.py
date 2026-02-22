@@ -10,76 +10,19 @@ from domain.models.mission import Mission, MissionStatus, AuthorityMode
 from domain.models.task import Task, TaskStatus
 from domain.models.deliverable import Deliverable, DeliverableType, ReviewStatus
 from domain.models.approval import Approval, ApprovalStatus, RiskLevel
+from domain.events.envelope import EventEnvelope, EventTelemetry
 from ports.persistence import (
     MissionRepository,
     TaskRepository,
     DeliverableRepository,
     ApprovalRepository,
+    EventRepository,
 )
 
 
 async def create_postgres_pool(dsn: str) -> Pool:
     return await asyncpg.create_pool(dsn)
 
-
-class PostgresMissionRepository(MissionRepository):
-    def __init__(self, pool: Pool):
-        self.pool = pool
-
-    async def create(self, mission: Mission) -> Mission:
-        query = """
-            INSERT INTO missions (
-                id, goal, status, authority_mode, version, thread_id,
-                created_at, updated_at, plan, error_context
-            )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-            RETURNING id
-        """
-        async with self.pool.acquire() as conn:
-            await conn.execute(
-                query,
-                mission.id,
-                mission.goal,
-                mission.status.value,
-                mission.authority_mode.value,
-                mission.version,
-                mission.thread_id,
-                mission.created_at,
-                mission.updated_at,
-                json.dumps(mission.plan) if mission.plan else None,
-                json.dumps(mission.error_context) if mission.error_context else None,
-            )
-        return mission
-
-    async def get(self, mission_id: UUID) -> Optional[Mission]:
-        query = """
-            SELECT
-                id, goal, status, authority_mode, version, thread_id,
-                created_at, updated_at, completed_at,
-                mp.plan, mp.error_context
-            FROM missions m
-            LEFT JOIN mission_payloads mp ON m.id = mp.mission_id
-            WHERE m.id = $1
-        """
-        # Note: mission_payloads join is needed if we use the sidecar table as per schema v2.0
-        # However, the CREATE above inserted into 'missions' directly for plan/error_context.
-        # Let's check the schema again.
-        # Schema v2.0 says: plan and error_context are in mission_payloads table.
-        # So my CREATE above was WRONG for v2.0 schema compliance.
-        # I need to insert into mission_payloads separately.
-
-        # Let's fix CREATE first.
-        return await self._get_impl(query, mission_id)
-
-    async def _get_impl(self, query: str, mission_id: UUID) -> Optional[Mission]:
-        async with self.pool.acquire() as conn:
-            # First try with join, assuming payload exists
-            # Actually, let's implement the corrected CREATE first, then GET makes sense.
-            pass
-
-    # ... refactoring below ...
-
-# RE-WRITING CLASS WITH CORRECT SCHEMA v2.0 COMPLIANCE
 
 class PostgresMissionRepository(MissionRepository):
     def __init__(self, pool: Pool):
@@ -491,56 +434,79 @@ class PostgresApprovalRepository(ApprovalRepository):
                 decided_at=row["decided_at"],
             )
 
-    async def get_pending(self, mission_id: UUID) -> Optional[Approval]:
+
+class PostgresEventRepository(EventRepository):
+    def __init__(self, pool: Pool):
+        self.pool = pool
+
+    async def create(self, event: EventEnvelope) -> EventEnvelope:
+        async with self.pool.acquire() as conn:
+            # 1. Allocate sequence
+            seq_val = await conn.fetchval("SELECT next_mission_sequence($1)", event.mission_id)
+            event.sequence = seq_val
+
+            # 2. Insert event
+            query = """
+                INSERT INTO mission_events (
+                    event_id, mission_id, sequence, event_type, subject,
+                    stage, agent, schema_version, correlation_id, causation_id,
+                    idempotency_key, payload, cost_usd, token_count, latency_ms, created_at
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+            """
+            await conn.execute(
+                query,
+                event.id,
+                event.mission_id,
+                event.sequence,
+                event.type,
+                event.subject,
+                event.stage,
+                event.agent,
+                event.schema_version,
+                event.correlation_id,
+                event.causation_id,
+                event.idempotency_key,
+                json.dumps(event.payload),
+                event.telemetry.cost_usd,
+                event.telemetry.tokens,
+                event.telemetry.latency_ms,
+                event.timestamp,
+            )
+        return event
+
+    async def list_by_mission(self, mission_id: UUID, limit: int = 100, offset: int = 0) -> List[EventEnvelope]:
         query = """
             SELECT
-                id, mission_id, action_type, requested_by, description,
-                risk_level, status, timeout_seconds, requested_at
-            FROM approvals
-            WHERE mission_id = $1 AND status = 'pending'
-            ORDER BY requested_at DESC
-            LIMIT 1
+                event_id, mission_id, sequence, event_type, subject,
+                stage, agent, schema_version, correlation_id, causation_id,
+                idempotency_key, payload, cost_usd, token_count, latency_ms, created_at
+            FROM mission_events
+            WHERE mission_id = $1
+            ORDER BY sequence ASC
+            LIMIT $2 OFFSET $3
         """
         async with self.pool.acquire() as conn:
-            row = await conn.fetchrow(query, mission_id)
-            if not row:
-                return None
-            return Approval(
-                id=row["id"],
-                mission_id=row["mission_id"],
-                action_type=row["action_type"],
-                requested_by=row["requested_by"],
-                description=row["description"],
-                risk_level=RiskLevel(row["risk_level"]),
-                status=ApprovalStatus(row["status"]),
-                timeout_seconds=row["timeout_seconds"],
-                requested_at=row["requested_at"],
-            )
-
-    async def decide(self, approval_id: UUID, decision: str, decided_by: str, reason: str | None = None) -> Approval:
-        query = """
-            UPDATE approvals
-            SET status = $1, decided_by = $2, decision_reason = $3, decided_at = NOW(), updated_at = NOW()
-            WHERE id = $4
-            RETURNING id, mission_id, action_type, requested_by, description,
-                      risk_level, status, timeout_seconds, requested_at,
-                      decided_by, decision_reason, decided_at
-        """
-        async with self.pool.acquire() as conn:
-            row = await conn.fetchrow(query, decision, decided_by, reason, approval_id)
-            if not row:
-                raise ValueError(f"Approval {approval_id} not found")
-            return Approval(
-                id=row["id"],
-                mission_id=row["mission_id"],
-                action_type=row["action_type"],
-                requested_by=row["requested_by"],
-                description=row["description"],
-                risk_level=RiskLevel(row["risk_level"]),
-                status=ApprovalStatus(row["status"]),
-                timeout_seconds=row["timeout_seconds"],
-                requested_at=row["requested_at"],
-                decided_by=row["decided_by"],
-                decision_reason=row["decision_reason"],
-                decided_at=row["decided_at"],
-            )
+            rows = await conn.fetch(query, str(mission_id), limit, offset)
+            return [
+                EventEnvelope(
+                    id=str(row["event_id"]),
+                    type=row["event_type"],
+                    subject=row["subject"],
+                    mission_id=str(row["mission_id"]),
+                    agent=row["agent"],
+                    stage=row["stage"],
+                    timestamp=row["created_at"],
+                    sequence=row["sequence"],
+                    schema_version=row["schema_version"],
+                    idempotency_key=row["idempotency_key"],
+                    correlation_id=str(row["correlation_id"]) if row["correlation_id"] else None,
+                    causation_id=str(row["causation_id"]) if row["causation_id"] else None,
+                    telemetry=EventTelemetry(
+                        cost_usd=float(row["cost_usd"]) if row["cost_usd"] is not None else None,
+                        tokens=row["token_count"],
+                        latency_ms=row["latency_ms"]
+                    ),
+                    payload=json.loads(row["payload"]),
+                )
+                for row in rows
+            ]

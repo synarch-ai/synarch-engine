@@ -10,6 +10,7 @@ from ports.persistence import (
     TaskRepository,
     ApprovalRepository,
     DeliverableRepository,
+    EventRepository,
 )
 from ports.event_bus import EventBusPort
 from ports.model_provider import ModelProviderPort
@@ -31,6 +32,7 @@ class Container:
     task_repo: TaskRepository
     approval_repo: ApprovalRepository
     deliverable_repo: DeliverableRepository
+    event_repo: EventRepository
 
     # Runtime
     mission_runtime: Any | None = None
@@ -51,11 +53,13 @@ async def create_container(settings: Settings) -> Container:
         PostgresTaskRepository,
         PostgresApprovalRepository,
         PostgresDeliverableRepository,
+        PostgresEventRepository,
     )
     mission_repo = PostgresMissionRepository(db_pool)
     task_repo = PostgresTaskRepository(db_pool)
     approval_repo = PostgresApprovalRepository(db_pool)
     deliverable_repo = PostgresDeliverableRepository(db_pool)
+    event_repo = PostgresEventRepository(db_pool)
 
     # --- 3. Adapters: Event Bus (NATS) ---
     # Assuming NATS client exists, if not we might need to stub or implement it.
@@ -118,6 +122,7 @@ async def create_container(settings: Settings) -> Container:
         task_repo=task_repo,
         approval_repo=approval_repo,
         deliverable_repo=deliverable_repo,
+        event_repo=event_repo,
         mission_runtime=mission_runtime,
     )
 
