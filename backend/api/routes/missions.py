@@ -7,8 +7,8 @@ from sse_starlette.sse import EventSourceResponse
 
 from container import Container
 from api.dependencies import get_container
-from api.schemas.requests import CreateMissionRequest
-from api.schemas.responses import MissionResponse
+from api.schemas.requests import MissionStartRequest as CreateMissionRequest
+from api.schemas.responses import MissionResponse, TaskResponse, DeliverableResponse
 from domain.models.mission import Mission, MissionStatus, AuthorityMode
 from adapters.nats.sse_bridge import SSEBridge
 
@@ -48,6 +48,26 @@ async def get_mission(
     if not mission:
         raise HTTPException(status_code=404, detail="Mission not found")
     return MissionResponse.model_validate(mission)
+
+
+@router.get("/{mission_id}/tasks", response_model=List[TaskResponse])
+async def list_mission_tasks(
+    mission_id: UUID,
+    container: Container = Depends(get_container),
+):
+    """List tasks for a mission."""
+    tasks = await container.task_repo.list_by_mission(mission_id)
+    return [TaskResponse.model_validate(t) for t in tasks]
+
+
+@router.get("/{mission_id}/deliverables", response_model=List[DeliverableResponse])
+async def list_mission_deliverables(
+    mission_id: UUID,
+    container: Container = Depends(get_container),
+):
+    """List deliverables for a mission."""
+    deliverables = await container.deliverable_repo.list_by_mission(mission_id)
+    return [DeliverableResponse.model_validate(d) for d in deliverables]
 
 
 @router.get("/{mission_id}/stream")
