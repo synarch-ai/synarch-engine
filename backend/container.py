@@ -100,18 +100,20 @@ async def create_container(settings: Settings) -> Container:
     await checkpointer.setup()
 
     # --- 6. Runtime: Mission Orchestrator ---
-    # This is likely domain logic that needs repositories.
-    # We will instantiate it if available.
     mission_runtime = None
     try:
         from domain.orchestrator.runtime import MissionOrchestratorRuntime
-        # Assuming runtime accepts repos
-        # We need to pass the checkpointer too.
-        # This part depends on the Runtime implementation which might be Phase 2.
-        # For Phase 1, we just need the persistence layer ready.
-        pass
-    except ImportError:
-        pass
+        mission_runtime = MissionOrchestratorRuntime(
+            mission_repo=mission_repo,
+            model_provider=model_provider,
+            event_bus=event_bus,
+            checkpointer=checkpointer,
+            redis_client=redis_client,
+            settings=settings,
+        )
+        logger.info("Mission runtime initialized.")
+    except ImportError as e:
+        logger.warning(f"Mission runtime could not be initialized: {e}")
 
     return Container(
         event_bus=event_bus,

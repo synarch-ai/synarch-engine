@@ -76,14 +76,9 @@ class EventEnvelope(BaseModel):
         # which aligns with type "mission.created".
         # So we can map type prefix to domain.
         
-        domain_parts = event_type.split(".")
-        if len(domain_parts) >= 1:
-            # e.g. "mission.created" -> domain="mission"
-            # e.g. "agent.thinking" -> domain="agent"
-            # Subject: synarch.mission_events.mission.created
-            subject = f"synarch.mission_events.{event_type}"
-        else:
-            subject = f"synarch.mission_events.system.unknown"
+        # Pattern: synarch.mission_events.{mission_id}.{event_type}
+        # This allows filtering by mission_id at the NATS server level
+        subject = f"synarch.mission_events.{mission_id}.{event_type}"
 
         return cls(
             type=event_type,
