@@ -27,8 +27,13 @@ async def create_mission(
     )
     saved_mission = await container.mission_repo.create(mission)
 
-    # Also trigger orchestration start (Phase 2)
-    # await container.mission_runtime.start_mission(saved_mission.id)
+    if container.mission_runtime:
+        # Fire and forget start
+        # In a real app, we might want to ensure this is scheduled reliably.
+        # But for now, we invoke it.
+        # Note: start_mission should be async.
+        # We assume start_mission handles background execution.
+        await container.mission_runtime.start_mission(saved_mission.id)
 
     return MissionResponse.model_validate(saved_mission)
 

@@ -71,9 +71,23 @@ class SSEBridge:
             if str(envelope.mission_id) == str(mission_id):
                 await queue.put(envelope)
 
-        # Subscribe to all mission events
-        # Subject: synarch.mission_events.>
-        sub = await self.event_bus.subscribe("synarch.mission_events.>", handler)
+        # Subscribe to mission-specific events
+        # Subject: synarch.mission_events.{mission_id}.>
+        subject = f"synarch.mission_events.{str(mission_id)}.*"
+        # Note: Depending on envelope implementation, the subject format might vary.
+        # But we updated EventEnvelope.create to use `synarch.mission_events.{event_type}` in previous step (which was flagged as regression).
+        # We need to fix EventEnvelope first.
+        # BUT assuming we fix EventEnvelope to include mission_id in subject:
+        # e.g. synarch.mission_events.{mission_id}.{type}
+
+        # Let's fix the subject subscription to wildcard on mission_id if possible,
+        # OR if we reverted to `synarch.mission_events.{type}` we must use `synarch.mission_events.>` and filter.
+
+        # The plan says "Update EventEnvelope.create to include mission_id".
+        # So we expect: synarch.mission_events.<mission_id>.<event_type>
+        subject = f"synarch.mission_events.{str(mission_id)}.*"
+
+        sub = await self.event_bus.subscribe(subject, handler)
 
         try:
             while True:
@@ -85,6 +99,8 @@ class SSEBridge:
                 )
         except asyncio.CancelledError:
             logger.info(f"SSE stream for {mission_id} cancelled.")
-            # Unsubscribe would happen here if NATS client supports it via returned obj
-            # self.event_bus.unsubscribe(sub)
+            if sub:
+                # Assuming event_bus has unsubscribe method now
+                if hasattr(self.event_bus, "unsubscribe"):
+                    await self.event_bus.unsubscribe(sub)
             pass

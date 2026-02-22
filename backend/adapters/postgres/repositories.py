@@ -61,6 +61,65 @@ class PostgresMissionRepository(MissionRepository):
                     json.dumps(mission.plan) if mission.plan else None,
                     json.dumps(mission.error_context) if mission.error_context else None,
                 )
+
+                # 3. Create and Persist 'mission.created' Event + Outbox (Atomic)
+                # We duplicate the EventRepo logic here to ensure atomicity within the same transaction connection
+                event = EventEnvelope.create(
+                    event_type="mission.created",
+                    mission_id=str(mission.id),
+                    payload={
+                        "goal": mission.goal,
+                        "authority_mode": mission.authority_mode.value
+                    },
+                    agent="god",  # Created by user/god
+                    stage="created"
+                )
+
+                # 3a. Allocate Sequence
+                seq_val = await conn.fetchval("SELECT next_mission_sequence($1)", str(mission.id))
+                event.sequence = seq_val
+
+                # 3b. Insert Event
+                await conn.execute(
+                    """
+                    INSERT INTO mission_events (
+                        event_id, mission_id, sequence, event_type, subject,
+                        stage, agent, schema_version, correlation_id, causation_id,
+                        idempotency_key, payload, cost_usd, token_count, latency_ms, created_at
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+                    """,
+                    event.id,
+                    event.mission_id,
+                    event.sequence,
+                    event.type,
+                    event.subject,
+                    event.stage,
+                    event.agent,
+                    event.schema_version,
+                    event.correlation_id,
+                    event.causation_id,
+                    event.idempotency_key,
+                    json.dumps(event.payload),
+                    event.telemetry.cost_usd,
+                    event.telemetry.tokens,
+                    event.telemetry.latency_ms,
+                    event.timestamp,
+                )
+
+                # 3c. Insert Outbox
+                await conn.execute(
+                    """
+                    INSERT INTO mission_event_outbox (
+                        event_id, mission_id, subject, payload, created_at
+                    ) VALUES ($1, $2, $3, $4, $5)
+                    """,
+                    event.id,
+                    event.mission_id,
+                    event.subject,
+                    json.dumps(event.payload),
+                    event.timestamp,
+                )
+
         return mission
 
     async def get(self, mission_id: UUID) -> Optional[Mission]:
@@ -441,37 +500,53 @@ class PostgresEventRepository(EventRepository):
 
     async def create(self, event: EventEnvelope) -> EventEnvelope:
         async with self.pool.acquire() as conn:
-            # 1. Allocate sequence
-            seq_val = await conn.fetchval("SELECT next_mission_sequence($1)", event.mission_id)
-            event.sequence = seq_val
+            async with conn.transaction():
+                # 1. Allocate sequence
+                seq_val = await conn.fetchval("SELECT next_mission_sequence($1)", event.mission_id)
+                event.sequence = seq_val
 
-            # 2. Insert event
-            query = """
-                INSERT INTO mission_events (
-                    event_id, mission_id, sequence, event_type, subject,
-                    stage, agent, schema_version, correlation_id, causation_id,
-                    idempotency_key, payload, cost_usd, token_count, latency_ms, created_at
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-            """
-            await conn.execute(
-                query,
-                event.id,
-                event.mission_id,
-                event.sequence,
-                event.type,
-                event.subject,
-                event.stage,
-                event.agent,
-                event.schema_version,
-                event.correlation_id,
-                event.causation_id,
-                event.idempotency_key,
-                json.dumps(event.payload),
-                event.telemetry.cost_usd,
-                event.telemetry.tokens,
-                event.telemetry.latency_ms,
-                event.timestamp,
-            )
+                # 2. Insert event (History)
+                query = """
+                    INSERT INTO mission_events (
+                        event_id, mission_id, sequence, event_type, subject,
+                        stage, agent, schema_version, correlation_id, causation_id,
+                        idempotency_key, payload, cost_usd, token_count, latency_ms, created_at
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+                """
+                await conn.execute(
+                    query,
+                    event.id,
+                    event.mission_id,
+                    event.sequence,
+                    event.type,
+                    event.subject,
+                    event.stage,
+                    event.agent,
+                    event.schema_version,
+                    event.correlation_id,
+                    event.causation_id,
+                    event.idempotency_key,
+                    json.dumps(event.payload),
+                    event.telemetry.cost_usd,
+                    event.telemetry.tokens,
+                    event.telemetry.latency_ms,
+                    event.timestamp,
+                )
+
+                # 3. Insert Outbox (Reliable Publishing)
+                outbox_query = """
+                    INSERT INTO mission_event_outbox (
+                        event_id, mission_id, subject, payload, created_at
+                    ) VALUES ($1, $2, $3, $4, $5)
+                """
+                await conn.execute(
+                    outbox_query,
+                    event.id,
+                    event.mission_id,
+                    event.subject,
+                    json.dumps(event.payload),
+                    event.timestamp,
+                )
         return event
 
     async def list_by_mission(self, mission_id: UUID, limit: int = 100, offset: int = 0) -> List[EventEnvelope]:

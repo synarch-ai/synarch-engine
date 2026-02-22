@@ -62,6 +62,14 @@ class NATSEventBus(EventBusPort):
 
         return await self._nc.subscribe(subject, cb=_handler)
 
+    async def unsubscribe(self, subscription: Any) -> None:
+        """Unsubscribe from a NATS subject."""
+        if subscription:
+            try:
+                await subscription.unsubscribe()
+            except Exception as e:
+                logger.warning("Error unsubscribing: %s", e)
+
     async def close(self) -> None:
         if self._nc and self._connected:
             await self._nc.drain()

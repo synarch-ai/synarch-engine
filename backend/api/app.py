@@ -1,6 +1,6 @@
 """FastAPI application factory."""
 from fastapi import FastAPI
-from api.routes import missions, agents, health
+from api.routes import missions, agents, health, approvals
 from api.middleware.cors import add_cors
 from api.middleware.request_id import RequestIdMiddleware
 from api.middleware.idempotency import IdempotencyMiddleware

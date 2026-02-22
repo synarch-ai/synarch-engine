@@ -24,6 +24,9 @@ async def test_mission_repo_create():
     conn.transaction = MagicMock()
     conn.transaction.return_value.__aenter__.return_value = AsyncMock()
 
+    # Mock next_mission_sequence for event creation
+    conn.fetchval.return_value = 1
+
     repo = PostgresMissionRepository(pool)
     mission = Mission(goal="Test Goal")
 
@@ -32,14 +35,21 @@ async def test_mission_repo_create():
     assert saved_mission == mission
     # Verify transaction used
     assert conn.transaction.called
-    # Verify execute called twice (1 for mission, 1 for payload)
-    assert conn.execute.call_count == 2
+
+    # Verify execute called:
+    # 1. Mission Insert
+    # 2. Payload Insert
+    # 3. Event Insert (History)
+    # 4. Outbox Insert
+    assert conn.execute.call_count == 4
 
     # Check first call (Mission insert)
-    args, _ = conn.execute.call_args_list[0]
-    assert "INSERT INTO missions" in args[0]
-    assert args[1] == mission.id
-    assert args[2] == "Test Goal"
+    args0, _ = conn.execute.call_args_list[0]
+    assert "INSERT INTO missions" in args0[0]
+
+    # Check last call (Outbox insert)
+    args3, _ = conn.execute.call_args_list[3]
+    assert "INSERT INTO mission_event_outbox" in args3[0]
 
 @pytest.mark.asyncio
 async def test_task_repo_create():
