@@ -18,6 +18,8 @@ from ports.persistence import (
     ApprovalRepository,
     EventRepository,
 )
+from domain.security.context import get_actor
+from domain.security.secrets import registry
 
 
 async def create_postgres_pool(dsn: str) -> Pool:
@@ -71,7 +73,7 @@ class PostgresMissionRepository(MissionRepository):
                         "goal": mission.goal,
                         "authority_mode": mission.authority_mode.value
                     },
-                    agent="god",  # Created by user/god
+                    agent=get_actor(),  # Created by current user/actor (FR-42)
                     stage="created"
                 )
 
@@ -99,7 +101,7 @@ class PostgresMissionRepository(MissionRepository):
                     event.correlation_id,
                     event.causation_id,
                     event.idempotency_key,
-                    json.dumps(event.payload),
+                    registry.redact(json.dumps(event.payload)),
                     event.telemetry.cost_usd,
                     event.telemetry.tokens,
                     event.telemetry.latency_ms,
@@ -116,7 +118,7 @@ class PostgresMissionRepository(MissionRepository):
                     event.id,
                     event.mission_id,
                     event.subject,
-                    json.dumps(event.payload),
+                    registry.redact(json.dumps(event.payload)),
                     event.timestamp,
                 )
 
@@ -459,7 +461,7 @@ class PostgresApprovalRepository(ApprovalRepository):
                 approval.id,
                 approval.mission_id,
                 approval.action_type,
-                approval.requested_by,
+                approval.requested_by or get_actor(),
                 approval.description,
                 approval.risk_level.value,
                 approval.status.value,
@@ -628,7 +630,7 @@ class PostgresEventRepository(EventRepository):
                     event.correlation_id,
                     event.causation_id,
                     event.idempotency_key,
-                    json.dumps(event.payload),
+                    registry.redact(json.dumps(event.payload)),
                     event.telemetry.cost_usd,
                     event.telemetry.tokens,
                     event.telemetry.latency_ms,
@@ -646,7 +648,7 @@ class PostgresEventRepository(EventRepository):
                     event.id,
                     event.mission_id,
                     event.subject,
-                    json.dumps(event.payload),
+                    registry.redact(json.dumps(event.payload)),
                     event.timestamp,
                 )
         return event

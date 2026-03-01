@@ -4,7 +4,9 @@ from api.routes import missions, agents, health, approvals
 from api.middleware.cors import add_cors
 from api.middleware.request_id import RequestIdMiddleware
 from api.middleware.idempotency import IdempotencyMiddleware
+from api.middleware.auth import AuthMiddleware
 from api.middleware.errors import SynarchError, synarch_error_handler, generic_error_handler
+import os
 
 
 def create_app(
@@ -21,7 +23,14 @@ def create_app(
     )
 
     # Middleware
+    # Order matters: RequestId -> Auth -> Idempotency -> CORS
     app.add_middleware(RequestIdMiddleware)
+    app.add_middleware(
+        AuthMiddleware,
+        auth_mode=os.getenv("AUTH_MODE", "NOAUTH"),
+        api_key=os.getenv("API_KEY", None),
+        proxy_header=os.getenv("PROXY_HEADER", "x-synarch-user")
+    )
     if enable_idempotency:
         app.add_middleware(IdempotencyMiddleware, ttl_seconds=idempotency_ttl_seconds)
     add_cors(app, cors_origins or ["http://localhost:3000"])
