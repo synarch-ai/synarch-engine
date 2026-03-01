@@ -82,6 +82,14 @@ class FakeApprovalRepository(ApprovalRepository):
                 return a
         return None
 
+    async def list(self, mission_id: UUID, limit: int = 50, cursor: str | None = None) -> List[Approval]:
+        filtered = [a for a in self.approvals.values() if a.mission_id == mission_id]
+        if cursor:
+            dt = datetime.fromisoformat(cursor)
+            filtered = [a for a in filtered if a.requested_at < dt]
+        filtered.sort(key=lambda x: x.requested_at, reverse=True)
+        return filtered[:limit]
+
     async def decide(self, approval_id: UUID, decision: str, decided_by: str, reason: str | None = None) -> Approval:
         if approval_id in self.approvals:
             approval = self.approvals[approval_id]

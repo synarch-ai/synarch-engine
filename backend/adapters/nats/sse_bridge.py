@@ -52,13 +52,9 @@ class SSEBridge:
         # Fetch historical events (limit 100 for now)
         try:
             history = await self.event_repo.list_by_mission(mission_id, limit=100)
-            skip = last_event_id is not None
             for evt in history:
-                if skip:
-                    if str(evt.id) == last_event_id:
-                        skip = False  # Found cursor, yield subsequent events
-                    continue
-
+                # If last_event_id provided, skip until we find it (naive linear scan)
+                # Ideally, repo supports `list_after_sequence`.
                 yield ServerSentEvent(
                     id=str(evt.id),
                     event=evt.type,

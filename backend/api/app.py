@@ -34,5 +34,6 @@ def create_app(
     app.include_router(missions.router, tags=["missions"], prefix="/api/v1")
     app.include_router(agents.router, tags=["agents"], prefix="/api/v1")
     app.include_router(health.router, tags=["health"], prefix="/api/v1")
+    app.include_router(approvals.router, tags=["approvals"], prefix="/api/v1")
 
     return app

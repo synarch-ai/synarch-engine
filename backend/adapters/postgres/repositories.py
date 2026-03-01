@@ -38,7 +38,7 @@ class PostgresMissionRepository(MissionRepository):
                     INSERT INTO missions (
                         id, goal, status, authority_mode, version, thread_id,
                         created_at, updated_at
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                    ) VALUES ($1::uuid, $2, $3::mission_status, $4::authority_mode, $5, $6, $7, $8)
                     """,
                     mission.id,
                     mission.goal,
@@ -55,7 +55,7 @@ class PostgresMissionRepository(MissionRepository):
                 await conn.execute(
                     """
                     INSERT INTO mission_payloads (mission_id, plan, error_context)
-                    VALUES ($1, $2, $3)
+                    VALUES ($1::uuid, $2::jsonb, $3::jsonb)
                     """,
                     mission.id,
                     json.dumps(mission.plan) if mission.plan else None,
@@ -76,7 +76,7 @@ class PostgresMissionRepository(MissionRepository):
                 )
 
                 # 3a. Allocate Sequence
-                seq_val = await conn.fetchval("SELECT next_mission_sequence($1)", str(mission.id))
+                seq_val = await conn.fetchval("SELECT next_mission_sequence($1::uuid)", str(mission.id))
                 event.sequence = seq_val
 
                 # 3b. Insert Event
@@ -86,7 +86,7 @@ class PostgresMissionRepository(MissionRepository):
                         event_id, mission_id, sequence, event_type, subject,
                         stage, agent, schema_version, correlation_id, causation_id,
                         idempotency_key, payload, cost_usd, token_count, latency_ms, created_at
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+                    ) VALUES ($1::uuid, $2::uuid, $3, $4, $5, $6, $7, $8, $9::uuid, $10::uuid, $11, $12::jsonb, $13, $14, $15, $16)
                     """,
                     event.id,
                     event.mission_id,
@@ -111,7 +111,7 @@ class PostgresMissionRepository(MissionRepository):
                     """
                     INSERT INTO mission_event_outbox (
                         event_id, mission_id, subject, payload, created_at
-                    ) VALUES ($1, $2, $3, $4, $5)
+                    ) VALUES ($1::uuid, $2::uuid, $3, $4::jsonb, $5)
                     """,
                     event.id,
                     event.mission_id,
@@ -130,7 +130,7 @@ class PostgresMissionRepository(MissionRepository):
                 mp.plan, mp.error_context
             FROM missions m
             LEFT JOIN mission_payloads mp ON m.id = mp.mission_id
-            WHERE m.id = $1 AND m.deleted_at IS NULL
+            WHERE m.id = $1::uuid AND m.deleted_at IS NULL
         """
         async with self.pool.acquire() as conn:
             row = await conn.fetchrow(query, mission_id)
@@ -156,8 +156,8 @@ class PostgresMissionRepository(MissionRepository):
             await conn.execute(
                 """
                 UPDATE missions
-                SET status = $1, updated_at = NOW()
-                WHERE id = $2
+                SET status = $1::mission_status, updated_at = NOW()
+                WHERE id = $2::uuid
                 """,
                 status,
                 mission_id,
@@ -169,7 +169,7 @@ class PostgresMissionRepository(MissionRepository):
         where_clause = "WHERE deleted_at IS NULL"
         args = []
         if status:
-            where_clause += " AND status = $1"
+            where_clause += " AND status = $1::mission_status"
             args.append(status)
 
         # Add limit/offset args
@@ -246,9 +246,9 @@ class PostgresMissionRepository(MissionRepository):
 
             query = f"""
                 INSERT INTO mission_payloads (mission_id, plan, error_context)
-                VALUES ($1,
-                    {'$2' if plan is not None else 'NULL'},
-                    {f'${3 if plan is not None else 2}' if error_context is not None else 'NULL'}
+                VALUES ($1::uuid,
+                    {'$2::jsonb' if plan is not None else 'NULL'},
+                    {f'${3 if plan is not None else 2}::jsonb' if error_context is not None else 'NULL'}
                 )
                 ON CONFLICT (mission_id) DO UPDATE SET
                 {update_clause}
@@ -256,13 +256,16 @@ class PostgresMissionRepository(MissionRepository):
             # Note: The VALUES params logic in dynamic query construction is tricky.
             # Simplified approach: Just UPDATE. We created payload row in create().
 
+            # For update clause with jsonb casting
+            upd_clause_cast = update_clause.replace("$2", "$2::jsonb").replace("$3", "$3::jsonb")
+
             await conn.execute(
-                f"UPDATE mission_payloads SET {update_clause} WHERE mission_id = $1",
+                f"UPDATE mission_payloads SET {upd_clause_cast} WHERE mission_id = $1::uuid",
                 *values
             )
 
             # Also touch mission updated_at
-            await conn.execute("UPDATE missions SET updated_at = NOW() WHERE id = $1", mission_id)
+            await conn.execute("UPDATE missions SET updated_at = NOW() WHERE id = $1::uuid", mission_id)
 
 
 class PostgresTaskRepository(TaskRepository):
@@ -278,7 +281,7 @@ class PostgresTaskRepository(TaskRepository):
                     INSERT INTO tasks (
                         id, mission_id, parent_task_id, assigned_agent, description,
                         status, priority, created_at
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                    ) VALUES ($1::uuid, $2::uuid, $3::uuid, $4, $5, $6::task_status, $7, $8)
                     """,
                     task.id,
                     task.mission_id,
@@ -295,7 +298,7 @@ class PostgresTaskRepository(TaskRepository):
                     await conn.execute(
                         """
                         INSERT INTO task_payloads (task_id, inputs, result)
-                        VALUES ($1, $2, $3)
+                        VALUES ($1::uuid, $2::jsonb, $3::jsonb)
                         """,
                         task.id,
                         json.dumps(task.inputs) if task.inputs else None,
@@ -311,7 +314,7 @@ class PostgresTaskRepository(TaskRepository):
                 tp.inputs, tp.result
             FROM tasks t
             LEFT JOIN task_payloads tp ON t.id = tp.task_id
-            WHERE t.id = $1
+            WHERE t.id = $1::uuid
         """
         async with self.pool.acquire() as conn:
             row = await conn.fetchrow(query, task_id)
@@ -339,7 +342,7 @@ class PostgresTaskRepository(TaskRepository):
                 tp.inputs, tp.result
             FROM tasks t
             LEFT JOIN task_payloads tp ON t.id = tp.task_id
-            WHERE t.mission_id = $1
+            WHERE t.mission_id = $1::uuid
             ORDER BY t.created_at ASC
         """
         async with self.pool.acquire() as conn:
@@ -366,12 +369,12 @@ class PostgresTaskRepository(TaskRepository):
             async with conn.transaction():
                 # Update status
                 await conn.execute(
-                    "UPDATE tasks SET status = $1, updated_at = NOW() WHERE id = $2",
+                    "UPDATE tasks SET status = $1::task_status, updated_at = NOW() WHERE id = $2::uuid",
                     status, task_id
                 )
                 if status == TaskStatus.COMPLETED.value:
                     await conn.execute(
-                        "UPDATE tasks SET completed_at = NOW() WHERE id = $1", task_id
+                        "UPDATE tasks SET completed_at = NOW() WHERE id = $1::uuid", task_id
                     )
 
                 # Update result if provided
@@ -379,8 +382,8 @@ class PostgresTaskRepository(TaskRepository):
                     await conn.execute(
                         """
                         INSERT INTO task_payloads (task_id, result)
-                        VALUES ($1, $2)
-                        ON CONFLICT (task_id) DO UPDATE SET result = $2
+                        VALUES ($1::uuid, $2::jsonb)
+                        ON CONFLICT (task_id) DO UPDATE SET result = $2::jsonb
                         """,
                         task_id, json.dumps(result)
                     )
@@ -395,7 +398,7 @@ class PostgresDeliverableRepository(DeliverableRepository):
             INSERT INTO deliverables (
                 id, mission_id, task_id, agent, type, content,
                 review_status, provenance_refs, created_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            ) VALUES ($1::uuid, $2::uuid, $3::uuid, $4, $5, $6::jsonb, $7::deliverable_review_status, $8::jsonb, $9)
         """
         async with self.pool.acquire() as conn:
             await conn.execute(
@@ -418,7 +421,7 @@ class PostgresDeliverableRepository(DeliverableRepository):
                 id, mission_id, task_id, agent, type, content,
                 review_status, provenance_refs, created_at
             FROM deliverables
-            WHERE mission_id = $1
+            WHERE mission_id = $1::uuid
             ORDER BY created_at DESC
         """
         async with self.pool.acquire() as conn:
@@ -448,7 +451,7 @@ class PostgresApprovalRepository(ApprovalRepository):
             INSERT INTO approvals (
                 id, mission_id, action_type, requested_by, description,
                 risk_level, status, timeout_seconds, requested_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            ) VALUES ($1::uuid, $2::uuid, $3, $4, $5, $6, $7::approval_status, $8, $9)
         """
         async with self.pool.acquire() as conn:
             await conn.execute(
@@ -472,7 +475,7 @@ class PostgresApprovalRepository(ApprovalRepository):
                 risk_level, status, timeout_seconds, requested_at,
                 decided_by, decision_reason, decided_at
             FROM approvals
-            WHERE id = $1
+            WHERE id = $1::uuid
         """
         async with self.pool.acquire() as conn:
             row = await conn.fetchrow(query, approval_id)
@@ -496,7 +499,7 @@ class PostgresApprovalRepository(ApprovalRepository):
     async def list(self, mission_id: UUID, limit: int = 50, cursor: str | None = None) -> List[Approval]:
         # Keyset pagination using requested_at
         # Cursor is expected to be an ISO timestamp string
-        where_clause = "WHERE mission_id = $1"
+        where_clause = "WHERE mission_id = $1::uuid"
         args = [mission_id]
 
         if cursor:
@@ -544,7 +547,7 @@ class PostgresApprovalRepository(ApprovalRepository):
                 risk_level, status, timeout_seconds, requested_at,
                 decided_by, decision_reason, decided_at
             FROM approvals
-            WHERE mission_id = $1 AND status = 'pending'
+            WHERE mission_id = $1::uuid AND status = 'pending'::approval_status
             ORDER BY requested_at DESC
             LIMIT 1
         """
@@ -567,8 +570,8 @@ class PostgresApprovalRepository(ApprovalRepository):
     async def decide(self, approval_id: UUID, decision: str, decided_by: str, reason: str | None = None) -> Approval:
         query = """
             UPDATE approvals
-            SET status = $1, decided_by = $2, decision_reason = $3, decided_at = NOW(), updated_at = NOW()
-            WHERE id = $4
+            SET status = $1::approval_status, decided_by = $2, decision_reason = $3, decided_at = NOW(), updated_at = NOW()
+            WHERE id = $4::uuid
             RETURNING id, mission_id, action_type, requested_by, description,
                       risk_level, status, timeout_seconds, requested_at,
                       decided_by, decision_reason, decided_at
@@ -601,7 +604,7 @@ class PostgresEventRepository(EventRepository):
         async with self.pool.acquire() as conn:
             async with conn.transaction():
                 # 1. Allocate sequence
-                seq_val = await conn.fetchval("SELECT next_mission_sequence($1)", event.mission_id)
+                seq_val = await conn.fetchval("SELECT next_mission_sequence($1::uuid)", event.mission_id)
                 event.sequence = seq_val
 
                 # 2. Insert event (History)
@@ -610,7 +613,7 @@ class PostgresEventRepository(EventRepository):
                         event_id, mission_id, sequence, event_type, subject,
                         stage, agent, schema_version, correlation_id, causation_id,
                         idempotency_key, payload, cost_usd, token_count, latency_ms, created_at
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+                    ) VALUES ($1::uuid, $2::uuid, $3, $4, $5, $6, $7, $8, $9::uuid, $10::uuid, $11, $12::jsonb, $13, $14, $15, $16)
                 """
                 await conn.execute(
                     query,
@@ -636,7 +639,7 @@ class PostgresEventRepository(EventRepository):
                 outbox_query = """
                     INSERT INTO mission_event_outbox (
                         event_id, mission_id, subject, payload, created_at
-                    ) VALUES ($1, $2, $3, $4, $5)
+                    ) VALUES ($1::uuid, $2::uuid, $3, $4::jsonb, $5)
                 """
                 await conn.execute(
                     outbox_query,
@@ -655,7 +658,7 @@ class PostgresEventRepository(EventRepository):
                 stage, agent, schema_version, correlation_id, causation_id,
                 idempotency_key, payload, cost_usd, token_count, latency_ms, created_at
             FROM mission_events
-            WHERE mission_id = $1
+            WHERE mission_id = $1::uuid
             ORDER BY sequence ASC
             LIMIT $2 OFFSET $3
         """
