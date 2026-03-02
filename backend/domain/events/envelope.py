@@ -53,7 +53,13 @@ class EventEnvelope(BaseModel):
     def to_json_bytes(self) -> bytes:
         """Serialize to JSON bytes for NATS publication."""
         # Use model_dump_json to handle datetime serialization automatically
-        return self.model_dump_json().encode("utf-8")
+        json_str = self.model_dump_json()
+
+        # Redact any active secrets before serializing
+        from domain.security.secrets import registry
+        redacted_json = registry.redact(json_str)
+
+        return redacted_json.encode("utf-8")
 
     @classmethod
     def create(

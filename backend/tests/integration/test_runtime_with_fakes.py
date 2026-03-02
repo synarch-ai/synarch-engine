@@ -38,6 +38,9 @@ async def test_full_mission_lifecycle_with_fakes():
     # But we want to test the *API* interaction with the runtime
     runtime = AsyncMock()
 
+    from tests.fakes.idempotency import FakeIdempotencyRepository
+    idempotency_repo = FakeIdempotencyRepository()
+
     container = Container(
         event_bus=event_bus,
         model_provider=model_provider,
@@ -48,6 +51,7 @@ async def test_full_mission_lifecycle_with_fakes():
         approval_repo=approval_repo,
         deliverable_repo=deliverable_repo,
         event_repo=event_repo,
+        idempotency_repo=idempotency_repo,
         mission_runtime=runtime
     )
 

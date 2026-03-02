@@ -21,7 +21,7 @@ def test_event_envelope_creation():
     )
 
     assert event.type == "mission.created"
-    assert event.subject == "synarch.mission_events.mission.created"
+    assert event.subject == "synarch.mission_events.test-mission-123.mission.created"
     assert event.mission_id == "test-mission-123"
     assert event.agent == "god"
     assert event.payload == payload
@@ -48,7 +48,17 @@ def test_event_envelope_serialization():
 async def test_event_repo_create():
     pool = MagicMock()
     conn = AsyncMock()
+    # Mock acquire() and transaction() context managers properly
     pool.acquire.return_value.__aenter__.return_value = conn
+    # Correct mock for an async context manager
+    transaction_mock = AsyncMock()
+    conn.transaction.return_value = transaction_mock
+    transaction_mock.__aenter__.return_value = transaction_mock
+    transaction_mock.__aexit__.return_value = None
+
+    # We also need to fix that AsyncMock.__call__ returns a coroutine by default.
+    # We want conn.transaction() to return the mock, not a coroutine.
+    conn.transaction = MagicMock(return_value=transaction_mock)
 
     # Mock next_mission_sequence
     conn.fetchval.return_value = 42
@@ -70,8 +80,9 @@ async def test_event_repo_create():
     conn.fetchval.assert_called_once()
     assert "next_mission_sequence" in conn.fetchval.call_args[0][0]
 
-    conn.execute.assert_called_once()
-    args = conn.execute.call_args[0]
+    # It gets called twice now: once for history, once for outbox
+    assert conn.execute.call_count == 2
+    args = conn.execute.call_args_list[0][0]
     assert "INSERT INTO mission_events" in args[0]
     # Check some values passed to execute
     # (query, id, mission_id, sequence, type, ...)
