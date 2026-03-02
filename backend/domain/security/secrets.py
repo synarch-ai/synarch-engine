@@ -1,4 +1,5 @@
 import re
+import logging
 from typing import Set
 
 class SecretRegistry:
@@ -36,3 +37,30 @@ class SecretRegistry:
 
 # Global registry instance
 registry = SecretRegistry()
+
+class SecretRedactionFilter(logging.Filter):
+    """
+    Standard library logging filter that redacts secrets from all log messages.
+    Usage: logger.addFilter(SecretRedactionFilter())
+    """
+    def filter(self, record: logging.LogRecord) -> bool:
+        # Pre-format the message entirely to catch strings hidden inside
+        # objects, dicts, etc., that the logger itself will stringify.
+        # This replaces the native lazy formatting but ensures perfect redaction.
+        try:
+            original_msg = record.getMessage()
+            record.msg = registry.redact(original_msg)
+            record.args = () # Clear args since we already formatted
+        except Exception:
+            # If getMessage fails, fall back to basic string redaction
+            if isinstance(record.msg, str):
+                record.msg = registry.redact(record.msg)
+
+        return True
+
+def setup_global_log_redaction():
+    """Applies the secret redaction filter to the root logger."""
+    root_logger = logging.getLogger()
+    redactor = SecretRedactionFilter()
+    for handler in root_logger.handlers:
+        handler.addFilter(redactor)

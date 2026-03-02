@@ -6,6 +6,7 @@ from api.middleware.request_id import RequestIdMiddleware
 from api.middleware.idempotency import IdempotencyMiddleware
 from api.middleware.auth import AuthMiddleware
 from api.middleware.errors import SynarchError, synarch_error_handler, generic_error_handler
+from domain.security.secrets import setup_global_log_redaction
 import os
 
 
@@ -21,6 +22,9 @@ def create_app(
         version="0.1.0",
         description="Autonomous Multi-Agent Orchestration Engine",
     )
+
+    # Set up global log redaction
+    setup_global_log_redaction()
 
     # Middleware
     # Order matters: RequestId -> Auth -> Idempotency -> CORS

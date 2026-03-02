@@ -75,3 +75,47 @@ def test_secret_redaction():
     redacted_json = registry.redact(json_str)
     assert "***REDACTED***" in redacted_json
     assert "SUPER_SECRET_TOKEN" not in redacted_json
+
+def test_secret_redaction_logging_filter(caplog):
+    import logging
+    from domain.security.secrets import registry, SecretRedactionFilter
+
+    # 1. Setup
+    logger = logging.getLogger("test_logger")
+    logger.setLevel(logging.INFO)
+    filter_instance = SecretRedactionFilter()
+    logger.addFilter(filter_instance)
+
+    registry.register("AWS_SECRET_KEY_123")
+
+    # 2. Log a secret
+    logger.info("Connecting with key AWS_SECRET_KEY_123 to server")
+
+    # 3. Assert Redaction
+    assert len(caplog.records) == 1
+    record = caplog.records[0]
+    assert "AWS_SECRET_KEY_123" not in record.getMessage()
+    assert "***REDACTED***" in record.getMessage()
+
+    # Clean up
+    logger.removeFilter(filter_instance)
+
+def test_secret_redaction_logging_dict_argument(caplog):
+    import logging
+    from domain.security.secrets import registry, SecretRedactionFilter
+
+    logger = logging.getLogger("test_dict_logger")
+    logger.setLevel(logging.INFO)
+    filter_instance = SecretRedactionFilter()
+    logger.addFilter(filter_instance)
+
+    registry.register("DICT_LOG_SECRET")
+
+    payload = {"user": "bob", "secret": "DICT_LOG_SECRET"}
+    logger.info("Handling request with payload: %s", payload)
+
+    assert len(caplog.records) == 1
+    msg = caplog.records[0].getMessage()
+
+    assert "DICT_LOG_SECRET" not in msg
+    assert "***REDACTED***" in msg

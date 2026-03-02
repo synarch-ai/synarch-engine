@@ -4,6 +4,7 @@ from langgraph.types import Command, interrupt
 
 from domain.orchestrator.state import MissionState
 from domain.orchestrator.routing import route_after_planning, route_after_review
+from domain.orchestrator.security_node import security_preflight_node
 
 
 def check_approval(state: MissionState) -> Command:
@@ -40,6 +41,9 @@ def build_graph(agent_nodes: dict) -> StateGraph:
     """
     graph = StateGraph(MissionState)
 
+    # Add security/guardrail nodes
+    graph.add_node("security_preflight", security_preflight_node)
+
     # Add agent nodes
     graph.add_node("synarch", agent_nodes["synarch"])
     graph.add_node("zeus", agent_nodes["zeus"])
@@ -50,8 +54,24 @@ def build_graph(agent_nodes: dict) -> StateGraph:
     graph.add_node("synthesize", agent_nodes["synthesize"])
     graph.add_node("fail", agent_nodes["fail"])
 
-    # Entry point: Synarch plans and decomposes
-    graph.set_entry_point("synarch")
+    # Entry point: Security scan before Synarch plans
+    graph.set_entry_point("security_preflight")
+
+    # Simple conditional router for security preflight
+    def route_after_security(state: MissionState) -> str:
+        error = state.get("error")
+        if error and error.startswith("SECURITY_VIOLATION"):
+            return "fail"
+        return "synarch"
+
+    graph.add_conditional_edges(
+        "security_preflight",
+        route_after_security,
+        {
+            "fail": "fail",
+            "synarch": "synarch"
+        }
+    )
 
     # After planning: conditional routing to Zeus and/or Thoth (FR-7)
     graph.add_conditional_edges(

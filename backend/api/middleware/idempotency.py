@@ -62,7 +62,15 @@ class IdempotencyMiddleware(BaseHTTPMiddleware):
                 status_code=503,
             )
 
+        # Fastapi BaseHTTPMiddleware body consumption fix
+        # request.body() consumes the stream. We must store the bytes and
+        # override the receive method so downstream endpoints can still read it.
         body_bytes = await request.body()
+
+        async def receive():
+            return {"type": "http.request", "body": body_bytes, "more_body": False}
+        request._receive = receive
+
         request_hash = hashlib.sha256(body_bytes).hexdigest()
         scope = f"{request.method}:{request.url.path}"
 
