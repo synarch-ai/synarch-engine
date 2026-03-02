@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from 'react';
 import { ApprovalCard, Approval } from './ApprovalCard';
 import { useMissionStream } from '../../hooks/useMissionStream';
