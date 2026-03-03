@@ -318,7 +318,7 @@ Mission, agent, task, deliverable, and approval domains are required.
 ### 14.3 Design System
 
 1. Design tokens are source of truth.
-2. Border-first and sharp-radius rules enforced.
+2. "Opaque Nexus" spatial UI enforced (Glass+Clay hybrid, extreme border-radii, noise textures, tactile shadows).
 3. PR gate requires brand compliance evidence.
 
 ---
