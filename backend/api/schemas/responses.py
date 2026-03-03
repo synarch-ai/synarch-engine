@@ -50,7 +50,17 @@ class MissionResponse(BaseModel):
     updated_at: datetime
     completed_at: Optional[datetime] = None
     error_context: Optional[Dict[str, Any]] = None
+    cost_usd: Optional[float] = None
+    total_tokens: Optional[int] = None
     # Lightweight response, tasks/deliverables fetched separately or via expansion if needed
+
+    model_config = {"from_attributes": True}
+
+
+class EvalResponse(BaseModel):
+    score: float
+    reasoning: str
+    dimension_scores: Dict[str, float]
 
     model_config = {"from_attributes": True}
 

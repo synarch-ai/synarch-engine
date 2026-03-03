@@ -8,8 +8,9 @@ from sse_starlette.sse import EventSourceResponse
 from adapters.nats.sse_bridge import SSEBridge
 from api.dependencies import get_container
 from api.schemas.requests import MissionStartRequest as CreateMissionRequest
-from api.schemas.responses import DeliverableResponse, MissionResponse, TaskResponse
+from api.schemas.responses import DeliverableResponse, EvalResponse, MissionResponse, TaskResponse
 from container import Container
+from domain.evals.judge import EvalRunner
 from domain.models.mission import AuthorityMode, Mission
 
 router = APIRouter(prefix="/missions", tags=["missions"])
@@ -90,3 +91,21 @@ async def stream_mission(
     return EventSourceResponse(
         bridge.stream_mission_events(mission_id, last_event_id)
     )
+
+@router.post("/{mission_id}/eval", response_model=EvalResponse)
+async def evaluate_mission(
+    mission_id: UUID,
+    container: Container = Depends(get_container),
+):
+    """Run an evaluation on a completed mission using LLM-as-a-judge (FR-45)."""
+    mission = await container.mission_repo.get(mission_id)
+    if not mission:
+        raise HTTPException(status_code=404, detail="Mission not found")
+
+    runner = EvalRunner(
+        model_provider=container.model_provider,
+        deliverable_repo=container.deliverable_repo,
+    )
+
+    result = await runner.evaluate_mission(mission)
+    return EvalResponse.model_validate(result)
