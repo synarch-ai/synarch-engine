@@ -1,13 +1,13 @@
 """Abstract persistence ports — repository interfaces (FR-2, FR-4)."""
 from abc import ABC, abstractmethod
-from typing import Optional, List, Dict
+from typing import Dict, List, Optional
 from uuid import UUID
 
+from domain.events.envelope import EventEnvelope
+from domain.models.approval import Approval
+from domain.models.deliverable import Deliverable
 from domain.models.mission import Mission
 from domain.models.task import Task
-from domain.models.deliverable import Deliverable
-from domain.models.approval import Approval
-from domain.events.envelope import EventEnvelope
 
 
 class EventRepository(ABC):

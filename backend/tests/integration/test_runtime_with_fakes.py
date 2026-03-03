@@ -1,25 +1,27 @@
-import pytest
-from uuid import uuid4
-from datetime import datetime
-from unittest.mock import MagicMock, AsyncMock
+import os
 
 # Add backend to path
 import sys
-import os
+from unittest.mock import AsyncMock, MagicMock
+from uuid import uuid4
+
+import pytest
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../../backend"))
 
-from container import Container
-from domain.models.mission import Mission, AuthorityMode
-from domain.models.approval import RiskLevel
-from api.schemas.approvals import DecideApprovalRequest
 from api.routes.approvals import decide_approval
+from api.schemas.approvals import DecideApprovalRequest
+from container import Container
+from domain.models.approval import RiskLevel
+from domain.models.mission import AuthorityMode, Mission
 from tests.fakes.persistence import (
+    FakeApprovalRepository,
+    FakeDeliverableRepository,
+    FakeEventRepository,
     FakeMissionRepository,
     FakeTaskRepository,
-    FakeApprovalRepository,
-    FakeEventRepository,
-    FakeDeliverableRepository
 )
+
 
 @pytest.mark.asyncio
 async def test_full_mission_lifecycle_with_fakes():
@@ -81,7 +83,7 @@ async def test_full_mission_lifecycle_with_fakes():
 
     # 4. API Decision
     decision_req = DecideApprovalRequest(decision="approved", reason="LGTM")
-    updated_approval = await decide_approval(approval_id, decision_req, container)
+    await decide_approval(approval_id, decision_req, container)
 
     # 5. Verify Outcome
     # DB State

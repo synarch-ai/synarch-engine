@@ -1,6 +1,7 @@
 """Error handling middleware — consistent error envelope (FR-14)."""
 import logging
 from uuid import uuid4
+
 from fastapi import Request
 from fastapi.responses import JSONResponse
 

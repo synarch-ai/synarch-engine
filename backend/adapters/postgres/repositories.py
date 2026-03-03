@@ -1,25 +1,25 @@
 import json
 from datetime import datetime
-from typing import List, Optional, Any
+from typing import List, Optional
 from uuid import UUID
 
 import asyncpg
-from asyncpg import Pool, Record
+from asyncpg import Pool
 
-from domain.models.mission import Mission, MissionStatus, AuthorityMode
-from domain.models.task import Task, TaskStatus
-from domain.models.deliverable import Deliverable, DeliverableType, ReviewStatus
-from domain.models.approval import Approval, ApprovalStatus, RiskLevel
 from domain.events.envelope import EventEnvelope, EventTelemetry
-from ports.persistence import (
-    MissionRepository,
-    TaskRepository,
-    DeliverableRepository,
-    ApprovalRepository,
-    EventRepository,
-)
+from domain.models.approval import Approval, ApprovalStatus, RiskLevel
+from domain.models.deliverable import Deliverable, DeliverableType, ReviewStatus
+from domain.models.mission import AuthorityMode, Mission, MissionStatus
+from domain.models.task import Task, TaskStatus
 from domain.security.context import get_actor
 from domain.security.secrets import registry
+from ports.persistence import (
+    ApprovalRepository,
+    DeliverableRepository,
+    EventRepository,
+    MissionRepository,
+    TaskRepository,
+)
 
 
 async def create_postgres_pool(dsn: str) -> Pool:
@@ -246,15 +246,6 @@ class PostgresMissionRepository(MissionRepository):
             # Construct dynamic query is safer
             update_clause = ", ".join(updates)
 
-            query = f"""
-                INSERT INTO mission_payloads (mission_id, plan, error_context)
-                VALUES ($1::uuid,
-                    {'$2::jsonb' if plan is not None else 'NULL'},
-                    {f'${3 if plan is not None else 2}::jsonb' if error_context is not None else 'NULL'}
-                )
-                ON CONFLICT (mission_id) DO UPDATE SET
-                {update_clause}
-            """
             # Note: The VALUES params logic in dynamic query construction is tricky.
             # Simplified approach: Just UPDATE. We created payload row in create().
 

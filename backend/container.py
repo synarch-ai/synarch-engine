@@ -1,21 +1,20 @@
 """Dependency injection container — wires ports to adapters."""
-import asyncio
 import logging
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from config import Settings
-from ports.persistence import (
-    MissionRepository,
-    TaskRepository,
-    ApprovalRepository,
-    DeliverableRepository,
-    EventRepository,
-)
+from ports.checkpointer import CheckpointerPort
 from ports.event_bus import EventBusPort
 from ports.idempotency import IdempotencyRepository
 from ports.model_provider import ModelProviderPort
-from ports.checkpointer import CheckpointerPort
+from ports.persistence import (
+    ApprovalRepository,
+    DeliverableRepository,
+    EventRepository,
+    MissionRepository,
+    TaskRepository,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -50,14 +49,14 @@ async def create_container(settings: Settings) -> Container:
     logger.info("PostgreSQL pool initialized.")
 
     # --- 2. Adapters: Repositories ---
+    from adapters.postgres.idempotency_repo import PostgresIdempotencyRepository
     from adapters.postgres.repositories import (
-        PostgresMissionRepository,
-        PostgresTaskRepository,
         PostgresApprovalRepository,
         PostgresDeliverableRepository,
         PostgresEventRepository,
+        PostgresMissionRepository,
+        PostgresTaskRepository,
     )
-    from adapters.postgres.idempotency_repo import PostgresIdempotencyRepository
     mission_repo = PostgresMissionRepository(db_pool)
     task_repo = PostgresTaskRepository(db_pool)
     approval_repo = PostgresApprovalRepository(db_pool)
@@ -112,7 +111,7 @@ async def create_container(settings: Settings) -> Container:
             model_provider=model_provider,
             event_bus=event_bus,
             checkpointer=checkpointer,
-            redis_client=redis_client,
+            redis_client=None,
             settings=settings,
         )
         logger.info("Mission runtime initialized.")

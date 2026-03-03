@@ -1,16 +1,16 @@
 """Mission API routes (FR-1, FR-4, FR-18)."""
-from typing import List, Optional
+from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sse_starlette.sse import EventSourceResponse
 
-from container import Container
+from adapters.nats.sse_bridge import SSEBridge
 from api.dependencies import get_container
 from api.schemas.requests import MissionStartRequest as CreateMissionRequest
-from api.schemas.responses import MissionResponse, TaskResponse, DeliverableResponse
-from domain.models.mission import Mission, MissionStatus, AuthorityMode
-from adapters.nats.sse_bridge import SSEBridge
+from api.schemas.responses import DeliverableResponse, MissionResponse, TaskResponse
+from container import Container
+from domain.models.mission import AuthorityMode, Mission
 
 router = APIRouter(prefix="/missions", tags=["missions"])
 

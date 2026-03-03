@@ -1,5 +1,5 @@
-import pytest
 from domain.events.envelope import EventEnvelope
+
 
 def test_event_envelope_subject_format():
     event = EventEnvelope.create(

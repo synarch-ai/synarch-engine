@@ -1,19 +1,20 @@
-from typing import List, Optional, Dict
-from uuid import UUID, uuid4
 from datetime import datetime
+from typing import Dict, List, Optional
+from uuid import UUID
 
-from domain.models.mission import Mission, MissionStatus
-from domain.models.task import Task
+from domain.events.envelope import EventEnvelope
 from domain.models.approval import Approval, ApprovalStatus
 from domain.models.deliverable import Deliverable
-from domain.events.envelope import EventEnvelope
+from domain.models.mission import Mission, MissionStatus
+from domain.models.task import Task
 from ports.persistence import (
-    MissionRepository,
-    TaskRepository,
     ApprovalRepository,
     DeliverableRepository,
-    EventRepository
+    EventRepository,
+    MissionRepository,
+    TaskRepository,
 )
+
 
 class FakeMissionRepository(MissionRepository):
     def __init__(self):

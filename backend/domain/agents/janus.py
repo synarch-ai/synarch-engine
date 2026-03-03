@@ -1,7 +1,7 @@
 """Janus — Reviewer Agent (Tier 3): Quality gate."""
 from domain.agents.base import AgentNode
-from domain.orchestrator.state import MissionState
 from domain.events.types import EventTypes
+from domain.orchestrator.state import MissionState
 
 
 class JanusAgent(AgentNode):

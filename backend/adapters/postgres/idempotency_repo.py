@@ -1,8 +1,10 @@
 import json
 from typing import Optional
+
 from asyncpg import Pool
 
-from ports.idempotency import IdempotencyRepository, IdempotencyRecord
+from ports.idempotency import IdempotencyRecord, IdempotencyRepository
+
 
 class PostgresIdempotencyRepository(IdempotencyRepository):
     def __init__(self, pool: Pool):

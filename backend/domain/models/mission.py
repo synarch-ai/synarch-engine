@@ -1,9 +1,9 @@
 """Domain model: Mission entity."""
 from datetime import datetime
 from enum import Enum
-from typing import Optional
-from pydantic import BaseModel, Field
 from uuid import UUID, uuid4
+
+from pydantic import BaseModel, Field
 
 
 class MissionStatus(str, Enum):

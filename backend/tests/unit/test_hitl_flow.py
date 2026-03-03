@@ -1,9 +1,12 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
+
+import pytest
+
 from api.routes.approvals import decide_approval
 from api.schemas.approvals import DecideApprovalRequest
 from domain.models.approval import Approval, ApprovalStatus, RiskLevel
+
 
 @pytest.mark.asyncio
 async def test_decide_approval_flow():

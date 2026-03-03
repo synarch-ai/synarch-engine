@@ -1,15 +1,17 @@
-import pytest
-from unittest.mock import AsyncMock, MagicMock
-from uuid import uuid4
-from datetime import datetime, timedelta
+import os
 
 # Adjust path
 import sys
-import os
+from datetime import datetime
+from unittest.mock import AsyncMock, MagicMock
+from uuid import uuid4
+
+import pytest
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../"))
 
 from adapters.postgres.repositories import PostgresApprovalRepository
-from domain.models.approval import Approval, ApprovalStatus, RiskLevel
+
 
 @pytest.mark.asyncio
 async def test_approval_pagination_logic():

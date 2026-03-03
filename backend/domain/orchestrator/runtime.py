@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 def _enum_value(value: object) -> str:
     if hasattr(value, "value"):
-        return str(getattr(value, "value"))
+        return str(value.value)
     return str(value)
 
 

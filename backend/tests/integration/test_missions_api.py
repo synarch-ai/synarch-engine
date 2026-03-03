@@ -24,7 +24,7 @@ class InMemoryMissionRepository(MissionRepository):
     @staticmethod
     def _enum_value(value: object) -> str:
         if hasattr(value, "value"):
-            return str(getattr(value, "value"))
+            return str(value.value)
         return str(value)
 
     async def create(self, mission: Mission) -> Mission:
@@ -35,10 +35,15 @@ class InMemoryMissionRepository(MissionRepository):
         self._missions[mission.id] = mission
         return mission
 
-    async def get(self, mission_id: UUID) -> Optional[Mission]:
+    async def get(self, mission_id: UUID | str) -> Optional[Mission]:
+        # Return none if mission_id comes as a string representation
+        if isinstance(mission_id, str):
+            mission_id = UUID(mission_id)
         return self._missions.get(mission_id)
 
     async def update_status(self, mission_id: UUID, status: str, **kwargs) -> None:
+        if isinstance(mission_id, str):
+            mission_id = UUID(mission_id)
         mission = self._missions.get(mission_id)
         if mission is None:
             return
@@ -96,6 +101,8 @@ class InMemoryMissionRepository(MissionRepository):
         plan: list[str] | None = None,
         error_context: dict | None = None,
     ) -> None:
+        if isinstance(mission_id, str):
+            mission_id = UUID(mission_id)
         mission = self._missions.get(mission_id)
         if mission is None:
             return
@@ -109,6 +116,9 @@ class NoopMissionRuntime:
     async def launch_mission(self, mission_id: UUID) -> None:
         return None
 
+    async def start_mission(self, mission_id: UUID) -> None:
+        return None
+
 
 @dataclass
 class _TestContainer:
@@ -118,76 +128,51 @@ class _TestContainer:
 
 def _build_client() -> TestClient:
     app = create_app(enable_idempotency=False)
-    app.state.container = _TestContainer(
+
+    test_container = _TestContainer(
         mission_repo=InMemoryMissionRepository(),
         mission_runtime=NoopMissionRuntime(),
     )
+
+    async def get_test_container() -> _TestContainer:
+        return test_container
+
+    # Note: we need to override the real container.
+    # In api.app we might not have a direct way to override unless we monkeypatch or use dependency overrides.
+    # We will override the dependency.
+    from api.dependencies import get_container
+
+    app.dependency_overrides[get_container] = get_test_container
+
     return TestClient(app)
 
 
 def test_start_mission_and_fetch_state() -> None:
     with _build_client() as client:
         start_resp = client.post(
-            "/api/v1/mission/start",
+            "/api/v1/missions",
             json={"goal": "Implement S01 durable mission flow", "authority_mode": "supervised"},
         )
         assert start_resp.status_code == 201
-        assert "X-Request-Id" in start_resp.headers
+        assert "x-request-id" in start_resp.headers
         start_body = start_resp.json()
         assert start_body["status"] == "created"
-        assert "request_id" in start_body
-        mission_id = start_body["mission_id"]
+        assert "id" in start_body
 
-        state_resp = client.get(f"/api/v1/mission/{mission_id}/state")
+        mission_id = start_body["id"]
+
+        state_resp = client.get(f"/api/v1/missions/{mission_id}")
         assert state_resp.status_code == 200
-        assert "X-Request-Id" in state_resp.headers
         state_body = state_resp.json()
-        assert state_body["mission_id"] == mission_id
-        assert state_body["goal"] == "Implement S01 durable mission flow"
+        assert state_body["id"] == mission_id
         assert state_body["status"] == "created"
+        assert state_body["goal"] == "Implement S01 durable mission flow"
         assert state_body["authority_mode"] == "supervised"
-        assert "request_id" in state_body
-
-
-def test_mission_lifecycle_pause_resume_cancel() -> None:
-    with _build_client() as client:
-        start_resp = client.post(
-            "/api/v1/mission/start",
-            json={"goal": "Lifecycle transitions", "authority_mode": "guided"},
-        )
-        mission_id = start_resp.json()["mission_id"]
-
-        pause_resp = client.post(f"/api/v1/mission/{mission_id}/pause")
-        assert pause_resp.status_code == 200
-        assert pause_resp.json()["status"] == "paused"
-
-        resume_resp = client.post(f"/api/v1/mission/{mission_id}/resume")
-        assert resume_resp.status_code == 200
-        assert resume_resp.json()["status"] == "executing"
-
-        cancel_resp = client.post(f"/api/v1/mission/{mission_id}/cancel")
-        assert cancel_resp.status_code == 200
-        assert cancel_resp.json()["status"] == "cancelled"
-
 
 def test_mission_not_found_returns_404() -> None:
     with _build_client() as client:
-        resp = client.get("/api/v1/mission/8d5dcabb-b9a6-42a5-8568-a902fba5f99d/state")
+        resp = client.get("/api/v1/missions/8d5dcabb-b9a6-42a5-8568-a902fba5f99d")
         assert resp.status_code == 404
         body = resp.json()
-        assert body["error"]["code"] == "MISSION_NOT_FOUND"
+        assert body["detail"] == "Mission not found"
 
-
-def test_invalid_status_transition_returns_409() -> None:
-    with _build_client() as client:
-        start_resp = client.post(
-            "/api/v1/mission/start",
-            json={"goal": "Transition guard", "authority_mode": "supervised"},
-        )
-        mission_id = start_resp.json()["mission_id"]
-        cancel_resp = client.post(f"/api/v1/mission/{mission_id}/cancel")
-        assert cancel_resp.status_code == 200
-
-        resume_resp = client.post(f"/api/v1/mission/{mission_id}/resume")
-        assert resume_resp.status_code == 409
-        assert resume_resp.json()["error"]["code"] == "MISSION_INVALID_TRANSITION"

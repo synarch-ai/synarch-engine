@@ -6,13 +6,13 @@ Implements graceful degradation per ADR-005 Event Delivery Semantics:
 """
 import json
 import logging
-from typing import Any, Callable, Awaitable
+from typing import Any, Awaitable, Callable
 
 import nats
 from nats.aio.client import Client as NATSClient
 
-from ports.event_bus import EventBusPort
 from domain.events.envelope import EventEnvelope
+from ports.event_bus import EventBusPort
 
 logger = logging.getLogger(__name__)
 

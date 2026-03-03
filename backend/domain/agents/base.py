@@ -1,13 +1,13 @@
 """Base agent node — soul loading and LLM invocation contract (FR-12)."""
+import inspect
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any
-import inspect
 
-from domain.orchestrator.state import MissionState
-from domain.orchestrator.exceptions import BudgetExceededError
 from domain.events.envelope import EventEnvelope
 from domain.events.types import EventTypes
+from domain.orchestrator.exceptions import BudgetExceededError
+from domain.orchestrator.state import MissionState
 
 
 class AgentNode(ABC):

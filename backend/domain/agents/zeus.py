@@ -1,7 +1,7 @@
 """Zeus — CTO Agent (Tier 2): Engineering command and delegation."""
 from domain.agents.base import AgentNode
-from domain.orchestrator.state import MissionState
 from domain.events.types import EventTypes
+from domain.orchestrator.state import MissionState
 
 
 class ZeusAgent(AgentNode):
@@ -16,9 +16,9 @@ class ZeusAgent(AgentNode):
             engineering_tasks = plan[:1]  # fallback
 
         prompt = (
-            f"You are Zeus, CTO of the Synarch hierarchy.\n\n"
-            f"ENGINEERING TASKS:\n" + "\n".join(f"- {t}" for t in engineering_tasks) + "\n\n"
-            f"Create a technical implementation plan. Be specific about what code to write."
+            "You are Zeus, CTO of the Synarch hierarchy.\n\n"
+            "ENGINEERING TASKS:\n" + "\n".join(f"- {t}" for t in engineering_tasks) + "\n\n"
+            "Create a technical implementation plan. Be specific about what code to write."
         )
 
         response = await self.invoke_llm(

@@ -1,6 +1,7 @@
 """LangGraph mission state schema (FR-6)."""
-from typing import TypedDict, List, Optional, Annotated
 import operator
+from typing import Annotated, List, Optional, TypedDict
+
 
 class TaskAssignment(TypedDict):
     task_id: str

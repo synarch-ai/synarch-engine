@@ -1,10 +1,10 @@
 """LangGraph StateGraph definition with conditional routing (FR-6 to FR-10)."""
-from langgraph.graph import StateGraph, END
-from langgraph.types import Command, interrupt
+from langgraph.graph import END, StateGraph
+from langgraph.types import Command
 
-from domain.orchestrator.state import MissionState
 from domain.orchestrator.routing import route_after_planning, route_after_review
 from domain.orchestrator.security_node import security_preflight_node
+from domain.orchestrator.state import MissionState
 
 
 def check_approval(state: MissionState) -> Command:

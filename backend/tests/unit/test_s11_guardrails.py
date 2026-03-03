@@ -1,8 +1,14 @@
 import pytest
 
+from domain.security.guardrails import (
+    GuardrailException,
+    InjectionScanner,
+    OutputSanitizer,
+    enforce_least_privilege,
+)
 from domain.security.permissions import AgentRole, PermissionProfile
-from domain.security.guardrails import GuardrailException, InjectionScanner, OutputSanitizer, enforce_least_privilege
 from domain.security.secrets import registry
+
 
 def test_permission_profile_roles_and_tools():
     # Restricted agent without explicit access
@@ -46,7 +52,7 @@ def test_output_sanitizer():
     assert "***REDACTED***" in redacted
 
 def test_requires_approval_decorator():
-    from domain.security.guardrails import requires_approval, ToolRejectedError, InfiniteRetryError
+    from domain.security.guardrails import InfiniteRetryError, ToolRejectedError, requires_approval
 
     @requires_approval(risk_level="high")
     def dangerous_tool(target: str, count: int, **kwargs) -> str:
@@ -106,8 +112,12 @@ def test_output_sanitizer_dict_and_list():
     assert result["keys"][1] == "***REDACTED***"
 
 def test_memory_leak_prevention_in_cache():
-    from domain.security.guardrails import _rejected_attempts_cache, requires_approval, ToolRejectedError
     import domain.security.guardrails as guardrails
+    from domain.security.guardrails import (
+        ToolRejectedError,
+        _rejected_attempts_cache,
+        requires_approval,
+    )
 
     # Temporarily drop cache limit to 2 for testing
     old_max = guardrails.MAX_CACHE_SIZE
@@ -130,9 +140,10 @@ def test_memory_leak_prevention_in_cache():
 
 @pytest.mark.asyncio
 async def test_requires_approval_decorator_async():
-    from domain.security.guardrails import requires_approval, ToolRejectedError
-    from domain.security.secrets import registry
     import asyncio
+
+    from domain.security.guardrails import ToolRejectedError, requires_approval
+    from domain.security.secrets import registry
 
     registry.register("ASYNC_SECRET")
 

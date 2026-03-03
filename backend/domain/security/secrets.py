@@ -1,6 +1,7 @@
-import re
 import logging
+import re
 from typing import Set
+
 
 class SecretRegistry:
     """Central registry for sensitive strings that must be redacted from logs and events."""
