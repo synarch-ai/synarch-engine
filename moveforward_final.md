@@ -28,17 +28,17 @@ Each slice executes the "Ralph Loop":
 |---|---|---|---|---|
 | **S01** | #2 | Durable mission bootstrap + persisted state API | **DONE** | - |
 | **S02** | #3 | LangGraph core routing + prompt/model baseline | **DONE** | S01 |
-| **S03** | #4 | Typed event contract + NATS publication | **OPEN** | S02 |
-| **S04** | #5 | Reconnect-safe NATS->SSE + live mission inspect UI | **OPEN** | S03 |
-| **S05** | #6 | Checkpoint persistence + crash recovery | **BUILD COMPLETE** | S01 |
-| **S06** | #7 | HITL interrupt/resume + approval persistence | **OPEN** | S01, S05 |
-| **S07** | #8 | Approval inbox + deliberation timeline + mode visibility | **OPEN** | S06 |
-| **S08** | #9 | Tasks/blockers/deliverables board projection | **OPEN** | S04 |
-| **S09** | #10 | Idempotency middleware + retry metadata | **OPEN** | S01 |
-| **S10** | #11 | Auth modes + attribution + secrets discipline | **OPEN** | S01 |
-| **S11** | #12 | Least privilege + guardrails + injection defense | **OPEN** | S10 |
-| **S12** | #13 | Mission Control design-system + brand compliance | **OPEN** | - |
-| **S13** | #14 | Build/lint/type + critical path CI gates | **OPEN** | - |
+| **S03** | #4 | Typed event contract + NATS publication | **DONE** | S02 |
+| **S04** | #5 | Reconnect-safe NATS->SSE + live mission inspect UI | **DONE** | S03 |
+| **S05** | #6 | Checkpoint persistence + crash recovery | **DONE** | S01 |
+| **S06** | #7 | HITL interrupt/resume + approval persistence | **DONE** | S01, S05 |
+| **S07** | #8 | Approval inbox + deliberation timeline + mode visibility | **DONE** | S06 |
+| **S08** | #9 | Tasks/blockers/deliverables board projection | **DONE** | S04 |
+| **S09** | #10 | Idempotency middleware + retry metadata | **DONE** | S01 |
+| **S10** | #11 | Auth modes + attribution + secrets discipline | **DONE** | S01 |
+| **S11** | #12 | Least privilege + guardrails + injection defense | **DONE** | S10 |
+| **S12** | #13 | Mission Control design-system + brand compliance | **DONE** | - |
+| **S13** | #14 | Build/lint/type + critical path CI gates | **DONE** | - |
 | **S14** | #15 | Eval baseline + cost telemetry + reference adoption | **OPEN** | S02 |
 | **S15** | #16 | LLM-as-judge + regression suite + quality dashboards | **OPEN** | S14 |
 | **S16** | #17 | Context assembly + token budgets + memory write patterns | **OPEN** | S14 |
@@ -58,22 +58,16 @@ Each slice executes the "Ralph Loop":
 
 ## 3. Immediate Execution Plan
 
-### Step 1: Event Nervous System (S03 - Issue #4)
-*   **Context:** `NATSEventBus` exists but needs hardening. `EventEnvelope` needs validation against `umbrella-event-catalog.md`.
-*   **Invariant:** "Event writes follow transactional outbox + mission-sequence allocator."
-*   **Task:**
-    1.  Implement `PostgresEventRepository` using DB sequence function.
-    2.  Harden `EventEnvelope` with schema versioning.
-    3.  Implement "Dual Write" logic (DB first, then NATS) or Outbox logic in the EventBus adapter.
-*   **DoD:** Integration test where event is persisted to DB with correct sequence AND published to NATS mock.
+### Current Status: Phase 0-1 (Runtime Closure) is COMPLETE (S01-S13).
+*   **Context:** The core runtime, persistence layer, NATS event bus, SSE streaming, idempotency middleware, hitl approvals, and guardrails have been successfully implemented and tested.
+*   **Next Phase:** Phase 2 (Production Readiness) spanning S14 to S21.
 
-### Step 2: Mission Control Streaming (S04 - Issue #5)
-*   **Task:** Implement `SSEBridge` in `adapters/nats/sse_bridge.py`.
-*   **DoD:** Frontend receives live updates via `/api/missions/{id}/stream`.
+### Step 1: Eval baseline + cost telemetry (S14 - Issue #15)
+*   **Task:** Implement evaluation framework baseline (FR-45), LLM-as-judge (FR-46), and track token/latency/mission cost telemetry (FR-47).
+*   **DoD:** Cost/telemetry objects injected into EventEnvelope, evaluations persist to DB, and reference adoption code updated.
 
-### Step 3: Verify Persistence (S05 - Issue #6)
-*   **Status:** Build Complete (PR #45). Pending verification on live env.
-*   **Task:** Verify integration with live PostgreSQL.
+### Step 2: LLM-as-judge + regression suite (S15 - Issue #16)
+*   **Task:** Build multi-dimensional dashboards for quality/safety (FR-49) and a CI regression suite (FR-48).
 
 ---
 

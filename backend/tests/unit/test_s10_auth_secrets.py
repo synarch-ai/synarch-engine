@@ -2,9 +2,10 @@ import pytest
 from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
 
-from domain.security.context import get_actor, current_actor
-from domain.security.secrets import registry
 from api.middleware.auth import AuthMiddleware
+from domain.security.context import get_actor
+from domain.security.secrets import registry
+
 
 @pytest.fixture
 def auth_app():
@@ -78,7 +79,8 @@ def test_secret_redaction():
 
 def test_secret_redaction_logging_filter(caplog):
     import logging
-    from domain.security.secrets import registry, SecretRedactionFilter
+
+    from domain.security.secrets import SecretRedactionFilter, registry
 
     # 1. Setup
     logger = logging.getLogger("test_logger")
@@ -102,7 +104,8 @@ def test_secret_redaction_logging_filter(caplog):
 
 def test_secret_redaction_logging_dict_argument(caplog):
     import logging
-    from domain.security.secrets import registry, SecretRedactionFilter
+
+    from domain.security.secrets import SecretRedactionFilter, registry
 
     logger = logging.getLogger("test_dict_logger")
     logger.setLevel(logging.INFO)

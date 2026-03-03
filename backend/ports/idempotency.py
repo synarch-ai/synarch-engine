@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Dict, Any
 from datetime import datetime
+from typing import Any, Dict, Optional
+
 
 class IdempotencyRecord:
     def __init__(self, scope: str, idempotency_key: str, request_hash: str, response_status: int, response_body: Dict[str, Any], expires_at: datetime):

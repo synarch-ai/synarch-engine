@@ -1,8 +1,9 @@
-from fastapi import Request, HTTPException
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.responses import Response
 
-from domain.security.context import set_actor, reset_actor
+from domain.security.context import reset_actor, set_actor
+
 
 class AuthMiddleware(BaseHTTPMiddleware):
     """

@@ -1,16 +1,17 @@
-import pytest
-from unittest.mock import AsyncMock, MagicMock
-from uuid import uuid4
 import hashlib
-from datetime import datetime, timedelta, timezone
-
-import sys
 import os
+import sys
+from datetime import datetime, timedelta, timezone
+from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../"))
 
 from api.middleware.idempotency import IdempotencyMiddleware
 from ports.idempotency import IdempotencyRecord
 from tests.fakes.idempotency import FakeIdempotencyRepository
+
 
 class MockRequest:
     def __init__(self, method, path, headers, body_bytes):

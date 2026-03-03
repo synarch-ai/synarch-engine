@@ -1,5 +1,6 @@
 """litellm adapter — ModelProviderPort implementation (FR-11)."""
 import litellm
+
 from ports.model_provider import ModelProviderPort
 
 

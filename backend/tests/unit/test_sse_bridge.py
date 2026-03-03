@@ -1,9 +1,12 @@
-import pytest
 import asyncio
 from unittest.mock import AsyncMock, MagicMock
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
+
+import pytest
+
 from adapters.nats.sse_bridge import SSEBridge
 from domain.events.envelope import EventEnvelope
+
 
 @pytest.mark.asyncio
 async def test_sse_bridge_replay_and_stream():

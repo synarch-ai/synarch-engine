@@ -1,6 +1,9 @@
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
+
 from domain.models.approval import RiskLevel
+
 
 class CreateApprovalRequest(BaseModel):
     action_type: str

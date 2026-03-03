@@ -4,11 +4,11 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from container import Container
 from api.dependencies import get_container
-from api.schemas.approvals import CreateApprovalRequest, DecideApprovalRequest
-from domain.models.approval import Approval, ApprovalStatus
+from api.schemas.approvals import DecideApprovalRequest
+from container import Container
 from domain.events.envelope import EventEnvelope
+from domain.models.approval import Approval, ApprovalStatus
 
 router = APIRouter(prefix="/approvals", tags=["approvals"])
 

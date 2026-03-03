@@ -1,8 +1,9 @@
 """Domain model: Approval entity (FR-21 to FR-25)."""
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, Field
 from uuid import UUID, uuid4
+
+from pydantic import BaseModel, Field
 
 
 class ApprovalStatus(str, Enum):

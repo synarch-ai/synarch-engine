@@ -1,15 +1,15 @@
-import pytest
 import json
-from unittest.mock import AsyncMock, MagicMock
-from uuid import uuid4
-from datetime import datetime
-
-import sys
 import os
+import sys
+from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../"))
 
-from domain.events.envelope import EventEnvelope, EventTelemetry
 from adapters.postgres.repositories import PostgresEventRepository
+from domain.events.envelope import EventEnvelope, EventTelemetry
+
 
 def test_event_envelope_creation():
     payload = {"foo": "bar"}

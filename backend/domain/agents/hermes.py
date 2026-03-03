@@ -1,7 +1,7 @@
 """Hermes — Researcher Agent (Tier 3): Information gathering."""
 from domain.agents.base import AgentNode
-from domain.orchestrator.state import MissionState
 from domain.events.types import EventTypes
+from domain.orchestrator.state import MissionState
 
 
 class HermesAgent(AgentNode):

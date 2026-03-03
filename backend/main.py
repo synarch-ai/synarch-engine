@@ -8,9 +8,9 @@ import uvicorn
 # Add backend/ to Python path for clean imports
 sys.path.insert(0, ".")
 
+from api.app import create_app
 from config import get_settings
 from container import create_container, shutdown_container
-from api.app import create_app
 
 logging.basicConfig(
     level=logging.INFO,

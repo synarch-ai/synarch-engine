@@ -1,16 +1,18 @@
-import pytest
-from unittest.mock import AsyncMock, MagicMock
-from uuid import uuid4
-from datetime import datetime
+import os
 
 # Adjust path for imports if needed
 import sys
-import os
+from unittest.mock import AsyncMock, MagicMock
+from uuid import uuid4
+
+import pytest
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../"))
 
-from domain.models.mission import Mission, MissionStatus
-from domain.models.task import Task
 from adapters.postgres.repositories import PostgresMissionRepository, PostgresTaskRepository
+from domain.models.mission import Mission
+from domain.models.task import Task
+
 
 @pytest.mark.asyncio
 async def test_mission_repo_create():

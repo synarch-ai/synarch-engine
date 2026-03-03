@@ -1,6 +1,6 @@
 """Abstract event bus port — publish/subscribe interface (FR-16)."""
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Awaitable
+from typing import Any, Awaitable, Callable
 
 from domain.events.envelope import EventEnvelope
 

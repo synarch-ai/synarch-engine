@@ -2,6 +2,7 @@
 from enum import Enum
 from typing import Any
 
+
 class RiskLevel(str, Enum):
     LOW = "low"        # e.g., read-only, harmless
     MEDIUM = "medium"  # e.g., standard generation

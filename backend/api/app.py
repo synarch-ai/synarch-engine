@@ -1,13 +1,15 @@
 """FastAPI application factory."""
-from fastapi import FastAPI
-from api.routes import missions, agents, health, approvals
-from api.middleware.cors import add_cors
-from api.middleware.request_id import RequestIdMiddleware
-from api.middleware.idempotency import IdempotencyMiddleware
-from api.middleware.auth import AuthMiddleware
-from api.middleware.errors import SynarchError, synarch_error_handler, generic_error_handler
-from domain.security.secrets import setup_global_log_redaction
 import os
+
+from fastapi import FastAPI
+
+from api.middleware.auth import AuthMiddleware
+from api.middleware.cors import add_cors
+from api.middleware.errors import SynarchError, generic_error_handler, synarch_error_handler
+from api.middleware.idempotency import IdempotencyMiddleware
+from api.middleware.request_id import RequestIdMiddleware
+from api.routes import agents, approvals, health, missions
+from domain.security.secrets import setup_global_log_redaction
 
 
 def create_app(

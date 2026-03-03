@@ -1,8 +1,9 @@
 """Canonical event envelope for the Synarch nervous system (FR-19, FR-20)."""
 from datetime import datetime
 from typing import Any, Optional
-from pydantic import BaseModel, Field
 from uuid import uuid4
+
+from pydantic import BaseModel, Field
 
 
 class EventTelemetry(BaseModel):

@@ -1,16 +1,18 @@
-import pytest
-from unittest.mock import AsyncMock, MagicMock
-from uuid import uuid4
-from datetime import datetime
+import os
 
 # Adjust path
 import sys
-import os
+from unittest.mock import AsyncMock, MagicMock
+from uuid import uuid4
+
+import pytest
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../"))
 
-from api.routes.missions import list_mission_tasks, list_mission_deliverables
-from domain.models.task import Task, TaskStatus
+from api.routes.missions import list_mission_deliverables, list_mission_tasks
 from domain.models.deliverable import Deliverable, DeliverableType, ReviewStatus
+from domain.models.task import Task, TaskStatus
+
 
 @pytest.mark.asyncio
 async def test_board_api_contracts():

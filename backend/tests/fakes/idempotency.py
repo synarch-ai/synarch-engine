@@ -1,7 +1,8 @@
-from typing import Optional, Dict, Any
 from datetime import datetime, timezone
+from typing import Dict, Optional
 
-from ports.idempotency import IdempotencyRepository, IdempotencyRecord
+from ports.idempotency import IdempotencyRecord, IdempotencyRepository
+
 
 class FakeIdempotencyRepository(IdempotencyRepository):
     def __init__(self):

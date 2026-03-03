@@ -1,14 +1,13 @@
 import asyncio
-import json
 import logging
 from typing import AsyncGenerator, Optional
 from uuid import UUID
 
 from sse_starlette.sse import ServerSentEvent
 
+from domain.events.envelope import EventEnvelope
 from ports.event_bus import EventBusPort
 from ports.persistence import EventRepository
-from domain.events.envelope import EventEnvelope
 
 logger = logging.getLogger(__name__)
 
