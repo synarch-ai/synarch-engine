@@ -1,60 +1,27 @@
-import { GlassCard } from '@/components/ui/GlassCard';
-import { TactileButton } from '@/components/ui/TactileButton';
-import { NeonBadge } from '@/components/ui/NeonBadge';
-import { Activity, ShieldAlert, Cpu } from 'lucide-react';
-import { ApprovalInbox } from '@/components/approvals/ApprovalInbox';
-import { TaskBoard } from '@/components/mission/TaskBoard';
-import { DeliverableFeed } from '@/components/mission/DeliverableFeed';
 
-export default function MissionControl() {
-  const missionId = '4358f853-2f62-4985-83c4-f24eaed8ca2c'; // Replace with dynamic id later
-
+export default function Home() {
   return (
-    <div className="flex flex-col gap-8 max-w-6xl mx-auto">
-
-      {/* Header Section */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-white/10 pb-6">
-        <div>
-          <h1 className="text-4xl font-display font-bold tracking-tight text-white flex items-center gap-3">
-            <Cpu className="text-neon-cyan w-8 h-8" />
-            SYNARCH <span className="font-light opacity-60">NEXUS</span>
-          </h1>
-          <p className="text-slate-400 font-mono text-sm mt-2 flex gap-3 items-center">
-            MISSION_ID: <span className="text-neon-cyan">{missionId}</span>
-            <NeonBadge status="active">EXECUTING</NeonBadge>
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <TactileButton variant="secondary">Intervene</TactileButton>
-          <TactileButton variant="danger">Abort Mission</TactileButton>
-        </div>
-      </header>
-
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-
-        {/* Left Column - Approvals */}
-        <div className="xl:col-span-1 flex flex-col gap-6">
-          <GlassCard glowColor="orange">
-            <ApprovalInbox missionId={missionId} />
-          </GlassCard>
-        </div>
-
-        {/* Middle Column - Task Board */}
-        <div className="xl:col-span-2">
-          <GlassCard glowColor="cyan" className="h-[600px] overflow-hidden flex flex-col">
-            <TaskBoard missionId={missionId} />
-          </GlassCard>
-        </div>
-
-        {/* Right Column - Feed */}
-        <div className="xl:col-span-1">
-          <GlassCard glowColor="green" className="h-[600px] overflow-hidden flex flex-col">
-            <DeliverableFeed missionId={missionId} />
-          </GlassCard>
-        </div>
-
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
+        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
+          Synarch AI Mission Control
+        </p>
       </div>
-    </div>
+
+      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-1 lg:text-left">
+        <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
+          <h2 className={`mb-3 text-2xl font-semibold`}>
+            Mission Log
+          </h2>
+          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
+            Real-time thought stream from the Synarch.
+          </p>
+          <div className="mt-4 p-4 bg-black text-green-400 rounded font-mono h-64 overflow-y-auto">
+            <p>Synarch: Initializing...</p>
+            <p>System: Waiting for orders.</p>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }

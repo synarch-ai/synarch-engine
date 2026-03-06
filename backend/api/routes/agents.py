@@ -1,6 +1,5 @@
 """Agent API routes."""
 from pathlib import Path
-
 from fastapi import APIRouter
 
 router = APIRouter()

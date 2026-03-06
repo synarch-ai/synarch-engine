@@ -1,7 +1,7 @@
 """Thoth — CRO Agent (Tier 2): Knowledge keeping and research planning."""
 from domain.agents.base import AgentNode
-from domain.events.types import EventTypes
 from domain.orchestrator.state import MissionState
+from domain.events.types import EventTypes
 
 
 class ThothAgent(AgentNode):
@@ -16,9 +16,9 @@ class ThothAgent(AgentNode):
             research_tasks = plan[:1]
 
         prompt = (
-            "You are Thoth, CRO of the Synarch hierarchy.\n\n"
-            "RESEARCH TASKS:\n" + "\n".join(f"- {t}" for t in research_tasks) + "\n\n"
-            "Create a research plan. Specify what information to find and from what sources."
+            f"You are Thoth, CRO of the Synarch hierarchy.\n\n"
+            f"RESEARCH TASKS:\n" + "\n".join(f"- {t}" for t in research_tasks) + "\n\n"
+            f"Create a research plan. Specify what information to find and from what sources."
         )
 
         response = await self.invoke_llm(

@@ -52,6 +52,12 @@ class InMemoryMissionRepository(MissionRepository):
             rows = [row for row in rows if str(row.status) == status or getattr(row.status, "value", None) == status]
         return rows[offset : offset + limit]
 
+    async def get_daily_metrics(self) -> list[dict]:
+        return []
+
+    async def refresh_daily_metrics(self) -> None:
+        pass
+
     async def patch_payload(
         self,
         mission_id: UUID,

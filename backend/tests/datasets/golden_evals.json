@@ -1,0 +1,28 @@
+[
+  {
+    "id": "golden_001",
+    "goal": "Write a python script that prints hello world.",
+    "plan": ["Write the script"],
+    "deliverables": [
+      {
+        "type": "code",
+        "agent": "hephaestus",
+        "content": {"code": "print('Hello World')"}
+      }
+    ],
+    "expected_min_score": 0.90
+  },
+  {
+    "id": "golden_002_fail",
+    "goal": "Analyze this data and return a JSON summary.",
+    "plan": ["Analyze data"],
+    "deliverables": [
+      {
+        "type": "research_report",
+        "agent": "hermes",
+        "content": {"text": "I am an AI and cannot analyze data."}
+      }
+    ],
+    "expected_max_score": 0.40
+  }
+]

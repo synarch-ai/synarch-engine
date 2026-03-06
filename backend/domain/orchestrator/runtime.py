@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 def _enum_value(value: object) -> str:
     if hasattr(value, "value"):
-        return str(value.value)
+        return str(getattr(value, "value"))
     return str(value)
 
 
@@ -206,29 +206,6 @@ class MissionOrchestratorRuntime:
             missions = await self.mission_repo.list(status=status, limit=500, offset=0)
             for mission in missions:
                 await self.launch_mission(mission.id)
-
-    async def start_mission(self, mission_id: UUID) -> None:
-        """Explicitly start a newly created mission."""
-        await self.launch_mission(mission_id)
-
-    async def resume_mission(self, mission_id: str, decision_payload: dict) -> None:
-        """Resume a mission from an interruption (HITL)."""
-        from langgraph.types import Command
-
-        # Retrieve thread_id from mission_repo
-        mission = await self.mission_repo.get(UUID(mission_id))
-        if not mission or not mission.thread_id:
-            raise ValueError(f"Mission {mission_id} not found or has no thread")
-
-        config = {"configurable": {"thread_id": mission.thread_id}}
-
-        # Resume the graph with the decision
-        # The 'interrupt' value is returned to the node that called it.
-        # We pass the decision payload.
-        await self._compiled_graph.ainvoke(
-            Command(resume=decision_payload),
-            config=config
-        )
 
     async def run_mission(self, mission_id: UUID) -> None:
         mission = await self.mission_repo.get(mission_id)

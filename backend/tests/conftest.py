@@ -1,6 +1,5 @@
 """Shared test fixtures for Synarch Engine."""
 import sys
-
 import pytest
 
 # Ensure backend/ is on Python path

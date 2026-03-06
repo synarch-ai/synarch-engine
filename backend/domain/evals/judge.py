@@ -10,7 +10,6 @@ from ports.persistence import DeliverableRepository
 
 logger = logging.getLogger(__name__)
 
-
 class EvaluationResult(BaseModel):
     score: float = Field(ge=0.0, le=1.0, description="Overall score between 0.0 and 1.0")
     reasoning: str = Field(description="Explanation of the score")
@@ -18,7 +17,6 @@ class EvaluationResult(BaseModel):
         default_factory=dict,
         description="Scores for specific dimensions like completeness, accuracy, etc."
     )
-
 
 class EvalRunner:
     """Uses LLM-as-a-judge to evaluate mission outcomes and deliverables (FR-45, FR-46)."""
@@ -62,7 +60,6 @@ Provide a JSON response strictly matching this schema:
         """Run an evaluation on a completed mission."""
         logger.info("Starting evaluation for mission %s", mission.id)
 
-        # Fetch all deliverables for the mission
         deliverables = await self.deliverable_repo.list_by_mission(mission_id=mission.id)
 
         if not deliverables:
@@ -73,7 +70,6 @@ Provide a JSON response strictly matching this schema:
                 dimension_scores={"completeness": 0.0, "accuracy": 0.0, "quality": 0.0}
             )
 
-        # Format deliverables for the prompt
         deliverables_text = ""
         for i, d in enumerate(deliverables):
             deliverables_text += f"\n--- Deliverable {i+1} [{d.type}] (Agent: {d.agent}) ---\n"
@@ -83,7 +79,6 @@ Provide a JSON response strictly matching this schema:
                 deliverables_text += str(d.content)
             deliverables_text += "\n"
 
-        # Construct the user prompt
         plan_text = "\n".join(mission.plan) if mission.plan else "No plan recorded."
         user_prompt = f"""
 MISSION GOAL:
@@ -104,14 +99,12 @@ Evaluate the success of this mission based on the provided deliverables.
         ]
 
         try:
-            # Force JSON output if the provider supports it, or parse it manually
             response_text = await self.model_provider.invoke(
                 model=self.eval_model,
                 messages=messages,
-                temperature=0.1,  # Low temperature for more deterministic evals
+                temperature=0.1,
             )
 
-            # Basic cleanup in case of markdown blocks
             clean_text = response_text.strip()
             if clean_text.startswith("```json"):
                 clean_text = clean_text[7:]

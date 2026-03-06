@@ -1,16 +1,16 @@
 """Synarch — CEO Agent (Tier 1): Mission planning and synthesis."""
 from domain.agents.base import AgentNode
+from domain.orchestrator.state import MissionState
 from domain.events.types import EventTypes
 from domain.models.agent_message import MissionPhase
-from domain.orchestrator.state import MissionState
 
 
 class SynarchAgent(AgentNode):
     """Supreme orchestrator. Decomposes God's goal into a plan."""
 
     async def process(self, state: MissionState) -> dict:
-        state["mission_id"]
-        state["goal"]
+        mission_id = state["mission_id"]
+        goal = state["goal"]
         phase = state.get("phase", MissionPhase.PLANNING)
 
         if phase == MissionPhase.SYNTHESIZING or state.get("review_verdict") == "PASS":

@@ -1,9 +1,8 @@
 """Domain model: Deliverable entity with provenance tracking."""
 from datetime import datetime
 from enum import Enum
-from uuid import UUID, uuid4
-
 from pydantic import BaseModel, Field
+from uuid import UUID, uuid4
 
 
 class DeliverableType(str, Enum):

@@ -1,0 +1,93 @@
+
+> synarch-web@0.1.0 dev
+> next dev
+
+   ▲ Next.js 14.1.0
+   - Local:        http://localhost:3000
+
+ ✓ Ready in 2.1s
+ ⚠ Your page app/dashboard/page.tsx did not have a root layout. We created app/layout.tsx for you.
+ ○ Compiling /dashboard ...
+ ⨯ ./app/dashboard/page.tsx:4:0
+Module not found: Can't resolve '../../components/ui/GlassCard'
+[0m [90m 2 |[39m[0m
+[0m [90m 3 |[39m [36mimport[39m [33mReact[39m[33m,[39m { useEffect[33m,[39m useState } [36mfrom[39m [32m'react'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { [33mGlassCard[39m } [36mfrom[39m [32m'../../components/ui/GlassCard'[39m[33m;[39m[0m
+[0m [90m 5 |[39m [36mimport[39m { [33mNeonBadge[39m } [36mfrom[39m [32m'../../components/ui/NeonBadge'[39m[33m;[39m[0m
+[0m [90m 6 |[39m [36mimport[39m { [33mLineChart[39m[33m,[39m [33mLine[39m[33m,[39m [33mXAxis[39m[33m,[39m [33mYAxis[39m[33m,[39m [33mTooltip[39m[33m,[39m [33mResponsiveContainer[39m[33m,[39m [33mCartesianGrid[39m } [36mfrom[39m [32m'recharts'[39m[33m;[39m[0m
+[0m [90m 7 |[39m [36mimport[39m { [33mActivity[39m[33m,[39m [33mCoins[39m[33m,[39m [33mFingerprint[39m[33m,[39m [33mZap[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m[0m
+
+https://nextjs.org/docs/messages/module-not-found
+ ⨯ ./app/dashboard/page.tsx:4:0
+Module not found: Can't resolve '../../components/ui/GlassCard'
+[0m [90m 2 |[39m[0m
+[0m [90m 3 |[39m [36mimport[39m [33mReact[39m[33m,[39m { useEffect[33m,[39m useState } [36mfrom[39m [32m'react'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { [33mGlassCard[39m } [36mfrom[39m [32m'../../components/ui/GlassCard'[39m[33m;[39m[0m
+[0m [90m 5 |[39m [36mimport[39m { [33mNeonBadge[39m } [36mfrom[39m [32m'../../components/ui/NeonBadge'[39m[33m;[39m[0m
+[0m [90m 6 |[39m [36mimport[39m { [33mLineChart[39m[33m,[39m [33mLine[39m[33m,[39m [33mXAxis[39m[33m,[39m [33mYAxis[39m[33m,[39m [33mTooltip[39m[33m,[39m [33mResponsiveContainer[39m[33m,[39m [33mCartesianGrid[39m } [36mfrom[39m [32m'recharts'[39m[33m;[39m[0m
+[0m [90m 7 |[39m [36mimport[39m { [33mActivity[39m[33m,[39m [33mCoins[39m[33m,[39m [33mFingerprint[39m[33m,[39m [33mZap[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m[0m
+
+https://nextjs.org/docs/messages/module-not-found
+ ⨯ ./app/dashboard/page.tsx:4:0
+Module not found: Can't resolve '../../components/ui/GlassCard'
+[0m [90m 2 |[39m[0m
+[0m [90m 3 |[39m [36mimport[39m [33mReact[39m[33m,[39m { useEffect[33m,[39m useState } [36mfrom[39m [32m'react'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { [33mGlassCard[39m } [36mfrom[39m [32m'../../components/ui/GlassCard'[39m[33m;[39m[0m
+[0m [90m 5 |[39m [36mimport[39m { [33mNeonBadge[39m } [36mfrom[39m [32m'../../components/ui/NeonBadge'[39m[33m;[39m[0m
+[0m [90m 6 |[39m [36mimport[39m { [33mLineChart[39m[33m,[39m [33mLine[39m[33m,[39m [33mXAxis[39m[33m,[39m [33mYAxis[39m[33m,[39m [33mTooltip[39m[33m,[39m [33mResponsiveContainer[39m[33m,[39m [33mCartesianGrid[39m } [36mfrom[39m [32m'recharts'[39m[33m;[39m[0m
+[0m [90m 7 |[39m [36mimport[39m { [33mActivity[39m[33m,[39m [33mCoins[39m[33m,[39m [33mFingerprint[39m[33m,[39m [33mZap[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m[0m
+
+https://nextjs.org/docs/messages/module-not-found
+ ⨯ ./app/dashboard/page.tsx:5:0
+Module not found: Can't resolve '../../components/ui/NeonBadge'
+[0m [90m 3 |[39m [36mimport[39m [33mReact[39m[33m,[39m { useEffect[33m,[39m useState } [36mfrom[39m [32m'react'[39m[33m;[39m[0m
+[0m [90m 4 |[39m [36mimport[39m { [33mGlassCard[39m } [36mfrom[39m [32m'../../components/ui/GlassCard'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { [33mNeonBadge[39m } [36mfrom[39m [32m'../../components/ui/NeonBadge'[39m[33m;[39m[0m
+[0m [90m 6 |[39m [36mimport[39m { [33mLineChart[39m[33m,[39m [33mLine[39m[33m,[39m [33mXAxis[39m[33m,[39m [33mYAxis[39m[33m,[39m [33mTooltip[39m[33m,[39m [33mResponsiveContainer[39m[33m,[39m [33mCartesianGrid[39m } [36mfrom[39m [32m'recharts'[39m[33m;[39m[0m
+[0m [90m 7 |[39m [36mimport[39m { [33mActivity[39m[33m,[39m [33mCoins[39m[33m,[39m [33mFingerprint[39m[33m,[39m [33mZap[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m[0m
+[0m [90m 8 |[39m[0m
+
+https://nextjs.org/docs/messages/module-not-found
+ ⨯ ./app/dashboard/page.tsx:6:0
+Module not found: Can't resolve 'recharts'
+[0m [90m 4 |[39m [36mimport[39m { [33mGlassCard[39m } [36mfrom[39m [32m'../../components/ui/GlassCard'[39m[33m;[39m[0m
+[0m [90m 5 |[39m [36mimport[39m { [33mNeonBadge[39m } [36mfrom[39m [32m'../../components/ui/NeonBadge'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 6 |[39m [36mimport[39m { [33mLineChart[39m[33m,[39m [33mLine[39m[33m,[39m [33mXAxis[39m[33m,[39m [33mYAxis[39m[33m,[39m [33mTooltip[39m[33m,[39m [33mResponsiveContainer[39m[33m,[39m [33mCartesianGrid[39m } [36mfrom[39m [32m'recharts'[39m[33m;[39m[0m
+[0m [90m 7 |[39m [36mimport[39m { [33mActivity[39m[33m,[39m [33mCoins[39m[33m,[39m [33mFingerprint[39m[33m,[39m [33mZap[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m[0m
+[0m [90m 8 |[39m[0m
+[0m [90m 9 |[39m [36minterface[39m [33mMetric[39m {[0m
+
+https://nextjs.org/docs/messages/module-not-found
+ ⨯ ./app/dashboard/page.tsx:6:0
+Module not found: Can't resolve 'recharts'
+[0m [90m 4 |[39m [36mimport[39m { [33mGlassCard[39m } [36mfrom[39m [32m'../../components/ui/GlassCard'[39m[33m;[39m[0m
+[0m [90m 5 |[39m [36mimport[39m { [33mNeonBadge[39m } [36mfrom[39m [32m'../../components/ui/NeonBadge'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 6 |[39m [36mimport[39m { [33mLineChart[39m[33m,[39m [33mLine[39m[33m,[39m [33mXAxis[39m[33m,[39m [33mYAxis[39m[33m,[39m [33mTooltip[39m[33m,[39m [33mResponsiveContainer[39m[33m,[39m [33mCartesianGrid[39m } [36mfrom[39m [32m'recharts'[39m[33m;[39m[0m
+[0m [90m 7 |[39m [36mimport[39m { [33mActivity[39m[33m,[39m [33mCoins[39m[33m,[39m [33mFingerprint[39m[33m,[39m [33mZap[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m[0m
+[0m [90m 8 |[39m[0m
+[0m [90m 9 |[39m [36minterface[39m [33mMetric[39m {[0m
+
+https://nextjs.org/docs/messages/module-not-found
+ ⨯ ./app/dashboard/page.tsx:6:0
+Module not found: Can't resolve 'recharts'
+[0m [90m 4 |[39m [36mimport[39m { [33mGlassCard[39m } [36mfrom[39m [32m'../../components/ui/GlassCard'[39m[33m;[39m[0m
+[0m [90m 5 |[39m [36mimport[39m { [33mNeonBadge[39m } [36mfrom[39m [32m'../../components/ui/NeonBadge'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 6 |[39m [36mimport[39m { [33mLineChart[39m[33m,[39m [33mLine[39m[33m,[39m [33mXAxis[39m[33m,[39m [33mYAxis[39m[33m,[39m [33mTooltip[39m[33m,[39m [33mResponsiveContainer[39m[33m,[39m [33mCartesianGrid[39m } [36mfrom[39m [32m'recharts'[39m[33m;[39m[0m
+[0m [90m 7 |[39m [36mimport[39m { [33mActivity[39m[33m,[39m [33mCoins[39m[33m,[39m [33mFingerprint[39m[33m,[39m [33mZap[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m[0m
+[0m [90m 8 |[39m[0m
+[0m [90m 9 |[39m [36minterface[39m [33mMetric[39m {[0m
+
+https://nextjs.org/docs/messages/module-not-found
+ ⨯ ./app/dashboard/page.tsx:6:0
+Module not found: Can't resolve 'recharts'
+[0m [90m 4 |[39m [36mimport[39m { [33mGlassCard[39m } [36mfrom[39m [32m'../../components/ui/GlassCard'[39m[33m;[39m[0m
+[0m [90m 5 |[39m [36mimport[39m { [33mNeonBadge[39m } [36mfrom[39m [32m'../../components/ui/NeonBadge'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 6 |[39m [36mimport[39m { [33mLineChart[39m[33m,[39m [33mLine[39m[33m,[39m [33mXAxis[39m[33m,[39m [33mYAxis[39m[33m,[39m [33mTooltip[39m[33m,[39m [33mResponsiveContainer[39m[33m,[39m [33mCartesianGrid[39m } [36mfrom[39m [32m'recharts'[39m[33m;[39m[0m
+[0m [90m 7 |[39m [36mimport[39m { [33mActivity[39m[33m,[39m [33mCoins[39m[33m,[39m [33mFingerprint[39m[33m,[39m [33mZap[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m[0m
+[0m [90m 8 |[39m[0m
+[0m [90m 9 |[39m [36minterface[39m [33mMetric[39m {[0m
+
+https://nextjs.org/docs/messages/module-not-found
+ ✓ Compiled /_error in 2.9s (853 modules)
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 2.4s (720 modules)

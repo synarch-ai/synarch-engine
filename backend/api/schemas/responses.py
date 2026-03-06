@@ -1,70 +1,64 @@
 """API response schemas."""
 from datetime import datetime
-from typing import Any, Dict, List, Optional
-from uuid import UUID
-
-from pydantic import BaseModel
-
-from domain.models.deliverable import DeliverableType, ReviewStatus
-from domain.models.mission import AuthorityMode, MissionStatus
-from domain.models.task import TaskStatus
+from pydantic import BaseModel, Field
 
 
-class TaskResponse(BaseModel):
-    id: UUID
-    mission_id: UUID
-    parent_task_id: Optional[UUID]
-    assigned_agent: str
-    description: str
-    status: TaskStatus
-    priority: int
-    inputs: Optional[Dict[str, Any]]
-    result: Optional[Dict[str, Any]]
-    created_at: datetime
-    completed_at: Optional[datetime]
-
-    model_config = {"from_attributes": True}
+class MissionStartResponse(BaseModel):
+    mission_id: str
+    status: str
+    stream_url: str
+    request_id: str
 
 
-class DeliverableResponse(BaseModel):
-    id: UUID
-    mission_id: UUID
-    task_id: Optional[UUID]
-    agent: str
-    type: DeliverableType
-    content: Dict[str, Any]
-    review_status: ReviewStatus
-    provenance_refs: List[str]
-    created_at: datetime
-
-    model_config = {"from_attributes": True}
-
-
-class MissionResponse(BaseModel):
-    id: UUID
+class MissionStateResponse(BaseModel):
+    mission_id: str
     goal: str
-    status: MissionStatus
-    authority_mode: AuthorityMode
-    plan: Optional[List[str]] = None
+    status: str
+    authority_mode: str
+    plan: list[str] | None = None
+    tasks: list[dict] = Field(default_factory=list)
+    deliverables: list[dict] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
-    completed_at: Optional[datetime] = None
-    error_context: Optional[Dict[str, Any]] = None
-    cost_usd: Optional[float] = None
-    total_tokens: Optional[int] = None
-    # Lightweight response, tasks/deliverables fetched separately or via expansion if needed
-
-    model_config = {"from_attributes": True}
+    completed_at: datetime | None = None
+    error_context: dict | None = None
+    request_id: str
 
 
-class EvalResponse(BaseModel):
-    score: float
-    reasoning: str
-    dimension_scores: Dict[str, float]
+class MissionSummary(BaseModel):
+    mission_id: str
+    goal: str
+    status: str
+    created_at: datetime
 
-    model_config = {"from_attributes": True}
+
+class MissionListResponse(BaseModel):
+    items: list[MissionSummary]
+    next_cursor: str | None = None
+    request_id: str
 
 
-# Retain existing schemas for compatibility if needed, or alias them
-MissionStartResponse = MissionResponse
-# Note: Cleaning up duplicative schemas from previous implementation if any
+class ApprovalResponse(BaseModel):
+    mission_id: str
+    approval_id: str
+    decision: str
+    resumed: bool
+    request_id: str
+
+
+class HealthResponse(BaseModel):
+    status: str
+    service: str
+    version: str
+    dependencies: dict
+
+
+class ErrorDetail(BaseModel):
+    code: str
+    message: str
+    details: dict = Field(default_factory=dict)
+    request_id: str = ""
+
+
+class ErrorResponse(BaseModel):
+    error: ErrorDetail
