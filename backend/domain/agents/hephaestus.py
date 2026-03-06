@@ -1,7 +1,7 @@
 """Hephaestus — Engineer Agent (Tier 3): Code generation."""
 from domain.agents.base import AgentNode
-from domain.events.types import EventTypes
 from domain.orchestrator.state import MissionState
+from domain.events.types import EventTypes
 
 
 class HephaestusAgent(AgentNode):

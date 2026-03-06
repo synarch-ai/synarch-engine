@@ -1,144 +1,108 @@
 """Dependency injection container — wires ports to adapters."""
+import asyncio
 import logging
 from dataclasses import dataclass
 from typing import Any
 
 from config import Settings
-from ports.checkpointer import CheckpointerPort
+from ports.persistence import MissionRepository, TaskRepository, ApprovalRepository, DeliverableRepository
 from ports.event_bus import EventBusPort
-from ports.idempotency import IdempotencyRepository
 from ports.model_provider import ModelProviderPort
-from ports.persistence import (
-    ApprovalRepository,
-    DeliverableRepository,
-    EventRepository,
-    MissionRepository,
-    TaskRepository,
-)
+from ports.checkpointer import CheckpointerPort
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class Container:
-    """Application dependency container."""
+    """Application dependency container.
+
+    Holds all port implementations (adapters) for dependency injection.
+    Created once at startup, passed to API routes via FastAPI dependencies.
+    """
     event_bus: EventBusPort
     model_provider: ModelProviderPort
     checkpointer: CheckpointerPort
-    db_pool: Any  # asyncpg.Pool
-
-    # Repositories
-    mission_repo: MissionRepository
-    task_repo: TaskRepository
-    approval_repo: ApprovalRepository
-    deliverable_repo: DeliverableRepository
-    event_repo: EventRepository
-    idempotency_repo: IdempotencyRepository
-
-    # Runtime
     mission_runtime: Any | None = None
     redis_client: Any | None = None
+    mission_repo: MissionRepository | None = None
+    task_repo: TaskRepository | None = None
+    approval_repo: ApprovalRepository | None = None
+    deliverable_repo: DeliverableRepository | None = None
+    db_pool: Any | None = None
 
 
 async def create_container(settings: Settings) -> Container:
     """Bootstrap all adapters and wire them into the container."""
 
-    # --- 1. Infrastructure: PostgreSQL Pool ---
-    from adapters.postgres.repositories import create_postgres_pool
-    db_pool = await create_postgres_pool(settings.database_url)
-    logger.info("PostgreSQL pool initialized.")
+    # --- Event Bus (NATS) ---
+    from adapters.nats.client import NATSEventBus
+    event_bus = NATSEventBus(url=settings.nats_url)
+    await event_bus.connect()
 
-    # --- 2. Adapters: Repositories ---
-    from adapters.postgres.idempotency_repo import PostgresIdempotencyRepository
-    from adapters.postgres.repositories import (
-        PostgresApprovalRepository,
-        PostgresDeliverableRepository,
-        PostgresEventRepository,
-        PostgresMissionRepository,
-        PostgresTaskRepository,
-    )
-    mission_repo = PostgresMissionRepository(db_pool)
-    task_repo = PostgresTaskRepository(db_pool)
-    approval_repo = PostgresApprovalRepository(db_pool)
-    deliverable_repo = PostgresDeliverableRepository(db_pool)
-    event_repo = PostgresEventRepository(db_pool)
-    idempotency_repo = PostgresIdempotencyRepository(db_pool)
+    # --- Model Provider (litellm) ---
+    from adapters.litellm.provider import LiteLLMProvider
+    model_provider = LiteLLMProvider()
 
-    # --- 3. Adapters: Event Bus (NATS) ---
-    # Assuming NATS client exists, if not we might need to stub or implement it.
-    # The original file had import from adapters.nats.client.
-    # Let's check if it exists. If not, we might need a stub or verify Phase 1 scope.
-    # Phase 1 is Persistence. Event Bus is Phase 2.
-    # But Container needs EventBusPort.
-    # I will use a stub if NATS adapter missing, or try to import it.
-
-    try:
-        from adapters.nats.client import NATSEventBus
-        event_bus = NATSEventBus(url=settings.nats_url)
-        await event_bus.connect()
-    except ImportError:
-        logger.warning("NATS adapter not found, using MockEventBus.")
-        from ports.event_bus import EventBusPort
-        class MockEventBus(EventBusPort):
-            async def connect(self): pass
-            async def close(self): pass
-            async def publish(self, *args, **kwargs): pass
-            async def subscribe(self, *args, **kwargs): pass
-        event_bus = MockEventBus()
-
-    # --- 4. Adapters: Model Provider (LiteLLM) ---
-    try:
-        from adapters.litellm.provider import LiteLLMProvider
-        model_provider = LiteLLMProvider()
-    except ImportError:
-         logger.warning("LiteLLM adapter not found, using MockModelProvider.")
-         from ports.model_provider import ModelProviderPort
-         class MockModelProvider(ModelProviderPort):
-             async def generate(self, *args, **kwargs): return "mock"
-         model_provider = MockModelProvider()
-
-    # --- 5. Adapters: Checkpointer (LangGraph) ---
+    # --- Checkpointer (LangGraph + PostgreSQL) ---
     from adapters.langgraph.checkpointer import LangGraphCheckpointer
     checkpointer = LangGraphCheckpointer(database_url=settings.database_url)
     await checkpointer.setup()
 
-    # --- 6. Runtime: Mission Orchestrator ---
-    mission_runtime = None
+    # --- Redis (Distributed budget guard / coordination) ---
+    from redis.asyncio import Redis
+
+    redis_client = Redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
+    await redis_client.ping()
+
+    # --- PostgreSQL Repositories ---
+    db_pool: Any | None = None
+    mission_repo: MissionRepository | None = None
+    mission_runtime: Any | None = None
     try:
+        from adapters.postgres.repositories import (
+            PostgresMissionRepository,
+            create_postgres_pool,
+        )
+
+        db_pool = await create_postgres_pool(settings.database_url)
+        mission_repo = PostgresMissionRepository(db_pool)
+        logger.info("PostgreSQL mission repository initialized.")
+    except Exception as e:
+        logger.warning("PostgreSQL repository setup failed: %s", e)
+
+    if mission_repo is not None:
         from domain.orchestrator.runtime import MissionOrchestratorRuntime
+
         mission_runtime = MissionOrchestratorRuntime(
             mission_repo=mission_repo,
             model_provider=model_provider,
             event_bus=event_bus,
             checkpointer=checkpointer,
-            redis_client=None,
+            redis_client=redis_client,
             settings=settings,
         )
+        await mission_runtime.resume_inflight_missions()
         logger.info("Mission runtime initialized.")
-    except ImportError as e:
-        logger.warning(f"Mission runtime could not be initialized: {e}")
 
+    logger.info("Container created with all adapters.")
     return Container(
         event_bus=event_bus,
         model_provider=model_provider,
         checkpointer=checkpointer,
-        db_pool=db_pool,
-        mission_repo=mission_repo,
-        task_repo=task_repo,
-        approval_repo=approval_repo,
-        deliverable_repo=deliverable_repo,
-        event_repo=event_repo,
-        idempotency_repo=idempotency_repo,
         mission_runtime=mission_runtime,
+        redis_client=redis_client,
+        mission_repo=mission_repo,
+        db_pool=db_pool,
     )
 
 
 async def shutdown_container(container: Container) -> None:
     """Gracefully shutdown all adapters."""
-    if container.event_bus:
-        await container.event_bus.close()
-    if container.checkpointer:
-        await container.checkpointer.close()
-    if container.db_pool:
-        await container.db_pool.close()
+    await asyncio.wait_for(container.event_bus.close(), timeout=10)
+    await asyncio.wait_for(container.checkpointer.close(), timeout=10)
+    if container.redis_client is not None:
+        await asyncio.wait_for(container.redis_client.aclose(), timeout=10)
+    if container.db_pool is not None:
+        await asyncio.wait_for(container.db_pool.close(), timeout=10)
     logger.info("Container shutdown complete.")

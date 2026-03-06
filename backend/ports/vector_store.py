@@ -1,5 +1,6 @@
 """Abstract vector store port — semantic search interface (Phase 2)."""
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class VectorStorePort(ABC):

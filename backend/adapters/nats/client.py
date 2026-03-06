@@ -6,13 +6,13 @@ Implements graceful degradation per ADR-005 Event Delivery Semantics:
 """
 import json
 import logging
-from typing import Any, Awaitable, Callable
+from typing import Any, Callable, Awaitable
 
 import nats
 from nats.aio.client import Client as NATSClient
 
-from domain.events.envelope import EventEnvelope
 from ports.event_bus import EventBusPort
+from domain.events.envelope import EventEnvelope
 
 logger = logging.getLogger(__name__)
 
@@ -61,14 +61,6 @@ class NATSEventBus(EventBusPort):
                 logger.error("Error handling NATS message: %s", e)
 
         return await self._nc.subscribe(subject, cb=_handler)
-
-    async def unsubscribe(self, subscription: Any) -> None:
-        """Unsubscribe from a NATS subject."""
-        if subscription:
-            try:
-                await subscription.unsubscribe()
-            except Exception as e:
-                logger.warning("Error unsubscribing: %s", e)
 
     async def close(self) -> None:
         if self._nc and self._connected:
