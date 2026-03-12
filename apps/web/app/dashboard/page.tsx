@@ -65,32 +65,46 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Cost Metric */}
-          <GlassCard className="p-6 flex flex-col justify-between">
+          <GlassCard className="p-6 flex flex-col justify-between" aria-busy={loading} aria-label="Total Spend over 30 days">
             <div className="flex items-center gap-2 text-gray-400 mb-4 font-mono text-xs uppercase">
-              <Coins size={16} className="text-green-400" /> Total Spend (30d)
+              <Coins size={16} className="text-green-400" aria-hidden="true" /> Total Spend (30d)
             </div>
             <div className="font-outfit text-5xl font-light">
-              ${totalCost.toFixed(2)}
+              {loading ? (
+                <div className="h-12 w-32 bg-white/5 rounded-md animate-pulse" role="status" aria-label="Loading total spend" />
+              ) : (
+                `$${totalCost.toFixed(2)}`
+              )}
             </div>
           </GlassCard>
 
           {/* Tokens Metric */}
-          <GlassCard className="p-6 flex flex-col justify-between">
+          <GlassCard className="p-6 flex flex-col justify-between" aria-busy={loading} aria-label="Total Tokens Consumed">
             <div className="flex items-center gap-2 text-gray-400 mb-4 font-mono text-xs uppercase">
-              <Zap size={16} className="text-yellow-400" /> Tokens Consumed
+              <Zap size={16} className="text-yellow-400" aria-hidden="true" /> Tokens Consumed
             </div>
             <div className="font-outfit text-5xl font-light">
-              {(totalTokens / 1000).toFixed(1)}k
+              {loading ? (
+                <div className="h-12 w-24 bg-white/5 rounded-md animate-pulse" role="status" aria-label="Loading tokens consumed" />
+              ) : (
+                `${(totalTokens / 1000).toFixed(1)}k`
+              )}
             </div>
           </GlassCard>
 
           {/* Quality Score Metric */}
-          <GlassCard className="p-6 flex flex-col justify-between">
+          <GlassCard className="p-6 flex flex-col justify-between" aria-busy={loading} aria-label="Average Evaluation Score">
             <div className="flex items-center gap-2 text-gray-400 mb-4 font-mono text-xs uppercase">
-              <Fingerprint size={16} className="text-fuchsia-400" /> Avg Eval Score
+              <Fingerprint size={16} className="text-fuchsia-400" aria-hidden="true" /> Avg Eval Score
             </div>
-            <div className="font-outfit text-5xl font-light text-fuchsia-100">
-              91.5<span className="text-2xl text-gray-500">/100</span>
+            <div className="font-outfit text-5xl font-light text-fuchsia-100 flex items-baseline">
+              {loading ? (
+                <div className="h-12 w-36 bg-white/5 rounded-md animate-pulse" role="status" aria-label="Loading average score" />
+              ) : (
+                <>
+                  91.5<span className="text-2xl text-gray-500 ml-1">/100</span>
+                </>
+              )}
             </div>
           </GlassCard>
         </div>
