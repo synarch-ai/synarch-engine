@@ -7,6 +7,7 @@ from domain.models.mission import Mission
 from domain.models.task import Task
 from domain.models.deliverable import Deliverable
 from domain.models.approval import Approval
+from domain.models.memory import Memory
 
 
 class MissionRepository(ABC):
@@ -72,3 +73,10 @@ class ApprovalRepository(ABC):
 
     @abstractmethod
     async def decide(self, approval_id: UUID, decision: str, decided_by: str, reason: str | None = None) -> Approval: ...
+
+class MemoryRepository(ABC):
+    @abstractmethod
+    async def create(self, memory: Memory) -> Memory: ...
+
+    @abstractmethod
+    async def search(self, agent: str, embedding: List[float], limit: int = 5, threshold: float = 0.7) -> List[Memory]: ...

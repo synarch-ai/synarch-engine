@@ -18,18 +18,31 @@ interface Metric {
 export default function DashboardPage() {
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Mocking for the static UI build as backend might not be seeded
-    setTimeout(() => {
-      setMetrics([
-        { metrics_date: '2026-02-20', authority_mode: 'supervised', total_missions: 12, daily_cost_usd: 1.25, daily_tokens: 12500, avg_confidence_score: 0.92 },
-        { metrics_date: '2026-02-21', authority_mode: 'supervised', total_missions: 18, daily_cost_usd: 2.10, daily_tokens: 21000, avg_confidence_score: 0.88 },
-        { metrics_date: '2026-02-22', authority_mode: 'free_rein', total_missions: 8, daily_cost_usd: 4.50, daily_tokens: 45000, avg_confidence_score: 0.95 },
-        { metrics_date: '2026-02-23', authority_mode: 'supervised', total_missions: 24, daily_cost_usd: 2.80, daily_tokens: 28000, avg_confidence_score: 0.91 },
-      ]);
-      setLoading(false);
-    }, 500);
+    const fetchMetrics = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/metrics/daily');
+        if (!response.ok) throw new Error('Failed to fetch metrics');
+        const data = await response.json();
+
+        // Map the backend dates appropriately to strings for Recharts
+        const formattedMetrics = data.metrics.map((m: any) => ({
+          ...m,
+          metrics_date: new Date(m.metrics_date).toISOString().split('T')[0]
+        }));
+
+        setMetrics(formattedMetrics);
+      } catch (err: any) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMetrics();
   }, []);
 
   const totalCost = useMemo(() => metrics.reduce((acc, curr) => acc + curr.daily_cost_usd, 0), [metrics]);
@@ -115,6 +128,10 @@ export default function DashboardPage() {
              <h3 className="font-mono text-sm text-gray-400 uppercase tracking-widest mb-6">Mission Throughput</h3>
              {loading ? (
                <div className="h-full flex items-center justify-center font-mono text-sm text-gray-500">Initializing telemetry...</div>
+             ) : error ? (
+               <div className="h-full flex items-center justify-center font-mono text-sm text-red-500">{error}</div>
+             ) : metrics.length === 0 ? (
+               <div className="h-full flex items-center justify-center font-mono text-sm text-gray-500">No telemetry data recorded yet.</div>
              ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={metrics}>
@@ -135,6 +152,10 @@ export default function DashboardPage() {
              <h3 className="font-mono text-sm text-gray-400 uppercase tracking-widest mb-6">Cost vs Context Length</h3>
              {loading ? (
                <div className="h-full flex items-center justify-center font-mono text-sm text-gray-500">Initializing telemetry...</div>
+             ) : error ? (
+               <div className="h-full flex items-center justify-center font-mono text-sm text-red-500">{error}</div>
+             ) : metrics.length === 0 ? (
+               <div className="h-full flex items-center justify-center font-mono text-sm text-gray-500">No telemetry data recorded yet.</div>
              ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={metrics}>
