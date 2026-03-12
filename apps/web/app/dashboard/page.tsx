@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { GlassCard } from '../../components/ui/GlassCard';
 import { NeonBadge } from '../../components/ui/NeonBadge';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
@@ -32,8 +32,8 @@ export default function DashboardPage() {
     }, 500);
   }, []);
 
-  const totalCost = metrics.reduce((acc, curr) => acc + curr.daily_cost_usd, 0);
-  const totalTokens = metrics.reduce((acc, curr) => acc + curr.daily_tokens, 0);
+  const totalCost = useMemo(() => metrics.reduce((acc, curr) => acc + curr.daily_cost_usd, 0), [metrics]);
+  const totalTokens = useMemo(() => metrics.reduce((acc, curr) => acc + curr.daily_tokens, 0), [metrics]);
 
   return (
     <main className="min-h-screen bg-[#030303] text-white p-8 relative overflow-hidden">
