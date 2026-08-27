@@ -52,10 +52,18 @@ else
 fi
 
 # --- Wait for PostgreSQL readiness ----------------------------------------
+pg_ready=false
 for _ in $(seq 1 30); do
-  pg_isready -h localhost -p 5432 -U synarch >/dev/null 2>&1 && break
+  if pg_isready -h localhost -p 5432 -U synarch >/dev/null 2>&1; then
+    pg_ready=true
+    break
+  fi
   sleep 1
 done
+if [ "$pg_ready" != true ]; then
+  log "ERROR: PostgreSQL did not become ready within 30s; aborting startup."
+  exit 1
+fi
 
 # --- Backend API (FastAPI / uvicorn, :8000) -------------------------------
 if ! curl -fsS http://localhost:8000/api/v1/health >/dev/null 2>&1; then
