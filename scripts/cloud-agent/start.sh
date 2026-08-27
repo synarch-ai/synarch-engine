@@ -2,12 +2,12 @@
 #
 # Synarch Engine — Cloud Agent start phase (per-boot, idempotent).
 #
-# Brings up the infrastructure daemons required by the backend:
-#   - PostgreSQL 16 (cluster)
-#   - Redis
-#   - NATS JetStream
+# Brings up everything an agent needs on each container start:
+#   - Infrastructure daemons: PostgreSQL 16, Redis, NATS JetStream
+#   - Application dev servers: FastAPI backend (:8000), Next.js Mission Control (:3000)
 #
-# Application dev servers (FastAPI, Next.js) run as visible `terminals`, not here.
+# All processes are launched in the background and logged under /tmp so the
+# command returns promptly. Safe to run repeatedly (guards on running services).
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -39,12 +39,28 @@ else
   log "NATS already running."
 fi
 
-# --- Readiness ------------------------------------------------------------
+# --- Wait for PostgreSQL readiness ----------------------------------------
 for _ in $(seq 1 30); do
-  if pg_isready -h localhost -p 5432 -U synarch >/dev/null 2>&1; then
-    break
-  fi
+  pg_isready -h localhost -p 5432 -U synarch >/dev/null 2>&1 && break
   sleep 1
 done
 
-log "Infrastructure ready (PostgreSQL:5432, Redis:6379, NATS:4222/8222)."
+# --- Backend API (FastAPI / uvicorn, :8000) -------------------------------
+if ! curl -fsS http://localhost:8000/api/v1/health >/dev/null 2>&1; then
+  log "Starting Synarch backend on :8000"
+  nohup bash -c "cd '${REPO_ROOT}/backend' && source .venv/bin/activate && exec uvicorn main:app --host 0.0.0.0 --port 8000" \
+    > /tmp/synarch-backend.log 2>&1 &
+else
+  log "Backend already running."
+fi
+
+# --- Web Mission Control (Next.js, :3000) ---------------------------------
+if ! curl -fsS http://localhost:3000 >/dev/null 2>&1; then
+  log "Starting Mission Control web on :3000"
+  nohup bash -c "cd '${REPO_ROOT}/apps/web' && exec npm run dev" \
+    > /tmp/synarch-web.log 2>&1 &
+else
+  log "Web already running."
+fi
+
+log "Startup dispatched (PostgreSQL:5432, Redis:6379, NATS:4222/8222, API:8000, Web:3000)."
