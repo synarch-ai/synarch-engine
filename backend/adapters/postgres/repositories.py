@@ -20,6 +20,17 @@ def _enum_value(value: object) -> str:
     return str(value)
 
 
+def _json_field(value: object) -> object:
+    """Decode a JSONB column that asyncpg returns as text.
+
+    Without a registered jsonb codec, asyncpg yields JSONB columns as raw
+    strings. Domain models expect dict/list, so decode text values here.
+    """
+    if isinstance(value, str):
+        return json.loads(value)
+    return value
+
+
 class PostgresMissionRepository(MissionRepository):
     """PostgreSQL-backed mission repository."""
 
@@ -185,11 +196,11 @@ class PostgresMissionRepository(MissionRepository):
                 status=row["status"],
                 authority_mode=row["authority_mode"],
                 version=row["version"],
-                plan=row["plan"],
+                plan=_json_field(row["plan"]),
                 created_at=row["created_at"],
                 updated_at=row["updated_at"],
                 completed_at=row["completed_at"],
-                error_context=row["error_context"],
+                error_context=_json_field(row["error_context"]),
                 thread_id=row["thread_id"],
             )
 
@@ -427,11 +438,11 @@ class PostgresMissionRepository(MissionRepository):
                     status=row["status"],
                     authority_mode=row["authority_mode"],
                     version=row["version"],
-                    plan=row["plan"],
+                    plan=_json_field(row["plan"]),
                     created_at=row["created_at"],
                     updated_at=row["updated_at"],
                     completed_at=row["completed_at"],
-                    error_context=row["error_context"],
+                    error_context=_json_field(row["error_context"]),
                     thread_id=row["thread_id"],
                 )
                 for row in rows

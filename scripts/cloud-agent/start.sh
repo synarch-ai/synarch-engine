@@ -15,6 +15,18 @@ PG_VERSION=16
 
 log() { printf '\033[1;33m[start]\033[0m %s\n' "$*"; }
 
+cd "$REPO_ROOT"
+
+# --- Restore install artifacts if a fresh checkout wiped them --------------
+# Cloud Agent boots re-checkout the repo, removing untracked files such as
+# backend/.venv, apps/web/node_modules, and the .env.local files. Recreate
+# them idempotently before launching anything.
+if [ ! -d backend/.venv ] || [ ! -d apps/web/node_modules ] \
+   || [ ! -f backend/.env.local ] || [ ! -f apps/web/.env.local ]; then
+  log "Install artifacts missing (fresh checkout) — running install.sh"
+  bash "$REPO_ROOT/scripts/cloud-agent/install.sh"
+fi
+
 # --- PostgreSQL -----------------------------------------------------------
 if ! sudo pg_lsclusters -h 2>/dev/null | awk '{print $4}' | grep -q online; then
   log "Starting PostgreSQL ${PG_VERSION}"
