@@ -1,6 +1,6 @@
 -- Migration 002: Add Materialized Views for Quality and Cost Dashboards (FR-49)
 
-CREATE MATERIALIZED VIEW daily_mission_metrics AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS daily_mission_metrics AS
 SELECT
     DATE_TRUNC('day', m.completed_at AT TIME ZONE 'UTC') AS metrics_date,
     m.authority_mode,
@@ -12,7 +12,7 @@ FROM missions m
 WHERE m.status = 'completed' AND m.completed_at IS NOT NULL
 GROUP BY 1, 2;
 
-CREATE UNIQUE INDEX ux_daily_mission_metrics_date_mode
+CREATE UNIQUE INDEX IF NOT EXISTS ux_daily_mission_metrics_date_mode
 ON daily_mission_metrics (metrics_date, authority_mode);
 
 CREATE OR REPLACE FUNCTION refresh_daily_mission_metrics()

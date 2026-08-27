@@ -49,14 +49,21 @@ SQL
 
 migration_already_applied() {
   local filename="$1"
+  object_exists() {
+    psql -h localhost -U "${DB_USER}" -d "${DB_NAME}" -tAc \
+      "SELECT to_regclass('public.${1}') IS NOT NULL" | grep -q t
+  }
   case "$filename" in
     001_initial.sql)
-      psql -h localhost -U "${DB_USER}" -d "${DB_NAME}" -tAc \
-        "SELECT to_regclass('public.missions')" | grep -q missions
+      object_exists missions \
+        && object_exists mission_events \
+        && object_exists agent_configs
       ;;
     002_metrics_views.sql)
-      psql -h localhost -U "${DB_USER}" -d "${DB_NAME}" -tAc \
-        "SELECT to_regclass('public.daily_mission_metrics')" | grep -q daily_mission_metrics
+      object_exists daily_mission_metrics \
+        && psql -h localhost -U "${DB_USER}" -d "${DB_NAME}" -tAc \
+          "SELECT EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'refresh_daily_mission_metrics')" \
+          | grep -q t
       ;;
     *)
       return 1
