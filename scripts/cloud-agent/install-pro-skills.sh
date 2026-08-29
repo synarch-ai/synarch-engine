@@ -21,6 +21,7 @@
 #     UI:        hallmark, impeccable
 #     NVIDIA:    rag-blueprint, cudaq-guide, nemo-retriever (nvidia- prefix)
 #     wshobson:  5 specialist skills (wsh- prefix; full repo documented-only)
+#     Personas:  praxstack/skills-and-personas (new-skills portfolio + extras)
 #
 set -euo pipefail
 
@@ -273,6 +274,18 @@ link_gstack_agents_aliases() {
   link_gstack_short_aliases "$SKILLS_DIR" "agents"
 }
 
+# praxstack/skills-and-personas: short names when free; prax-<name> on collision.
+link_praxstack_skill() {
+  local skill_dir="$1"
+  local name="$2"
+  local dest="$name"
+
+  if skill_exists "$name"; then
+    dest="prax-${name}"
+  fi
+  link_skill "$skill_dir" "$dest"
+}
+
 install_agent_browser_cli() {
   if command -v agent-browser >/dev/null 2>&1; then
     log "agent-browser CLI already installed"
@@ -312,6 +325,7 @@ clone_or_update "https://github.com/nutlope/hallmark.git" "${VENDOR_DIR}/hallmar
 clone_or_update "https://github.com/pbakaus/impeccable.git" "${VENDOR_DIR}/impeccable"
 clone_or_update "https://github.com/nvidia/skills.git" "${VENDOR_DIR}/nvidia-skills"
 clone_or_update "https://github.com/wshobson/agents.git" "${VENDOR_DIR}/wshobson-agents"
+clone_or_update "https://github.com/praxstack/skills-and-personas.git" "${VENDOR_DIR}/praxstack-skills-and-personas"
 
 # pstack: sparse checkout from cursor/plugins monorepo
 PSTACK_DIR="${VENDOR_DIR}/cursor-plugins"
@@ -552,6 +566,45 @@ for rel in "${WSHOBSON_SKILLS[@]}"; do
   link_skill_path "$skill_dir" "wshobson-${base}"
 done
 
+# --- PraxStack: skills-and-personas (canonical new-skills portfolio) ----------
+log "PraxStack: praxstack/skills-and-personas (new-skills portfolio)..."
+PRAXSTACK_DIR="${VENDOR_DIR}/praxstack-skills-and-personas"
+PRAX_NEW_SKILLS="${PRAXSTACK_DIR}/new-skills"
+if [ -d "$PRAX_NEW_SKILLS" ]; then
+  for skill_dir in "${PRAX_NEW_SKILLS}"/*/; do
+    [ -d "$skill_dir" ] || continue
+    base="$(basename "$skill_dir")"
+    [ "$base" = "_audit" ] && continue
+    [[ "$base" == .* ]] && continue
+    link_praxstack_skill "$skill_dir" "$base"
+  done
+else
+  warn "  praxstack new-skills/ missing; skip portfolio"
+fi
+
+# Public skills in skills/ not duplicated in new-skills/
+PRAX_EXTRA_SKILLS=(
+  teach-pro-max
+  superimprove
+  coding-agent-leadership-principles
+  cross-agent-handoff
+)
+for name in "${PRAX_EXTRA_SKILLS[@]}"; do
+  skill_dir="${PRAXSTACK_DIR}/skills/${name}"
+  if [ -d "$skill_dir" ]; then
+    link_praxstack_skill "$skill_dir" "$name"
+  else
+    warn "  skip (missing): praxstack skills/${name}"
+  fi
+done
+
+# teach-pro-max is skills.sh-discoverable; mirror short name to ~/.cursor/skills
+if [ -d "${PRAXSTACK_DIR}/skills/teach-pro-max" ] && [ -L "${SKILLS_DIR}/teach-pro-max" ]; then
+  cursor_skills="${HOME}/.cursor/skills"
+  [ -d "$cursor_skills" ] || mkdir -p "$cursor_skills"
+  ln -sfn "${PRAXSTACK_DIR}/skills/teach-pro-max" "${cursor_skills}/teach-pro-max"
+fi
+
 # --- Compound Engineering -----------------------------------------------------
 log "Compound: EveryInc/compound-engineering-plugin (ce- prefix)..."
 for skills_root in "${VENDOR_DIR}/compound-engineering/skills" "${VENDOR_DIR}/compound-engineering/.agents/skills"; do
@@ -602,6 +655,7 @@ repos = {
     "impeccable": vendor / "impeccable",
     "nvidia-skills": vendor / "nvidia-skills",
     "wshobson-agents": vendor / "wshobson-agents",
+    "praxstack-skills-and-personas": vendor / "praxstack-skills-and-personas",
 }
 
 def git_sha(path: Path) -> str | None:
@@ -662,6 +716,12 @@ tier_counts = {
     ),
     "praxstack_nvidia": count_vendor_prefix("nvidia-skills", "nvidia-"),
     "praxstack_wshobson": sum(1 for n in linked if n.startswith("wshobson-")),
+    "praxstack_personas": sum(
+        1 for n in linked
+        if str((skills_dir / n).resolve()).startswith(
+            str(repos["praxstack-skills-and-personas"].resolve())
+        )
+    ),
     "core": sum(
         1 for n in linked
         if any(

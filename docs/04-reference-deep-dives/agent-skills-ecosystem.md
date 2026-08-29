@@ -178,6 +178,47 @@ Pinned SHAs and per-tier counts: `vendor/skills-sources/manifest.json`.
 |--------|----------------|-------|
 | [EveryInc/compound-engineering-plugin](https://github.com/EveryInc/compound-engineering-plugin) | `ce-*` | Full spec→ship→learn pipeline |
 
+### PraxStack personas & skills portfolio
+
+| Source | Symlink | Notes |
+|--------|---------|-------|
+| [praxstack/skills-and-personas](https://github.com/praxstack/skills-and-personas) | short names + `prax-*` on collision | 38 canonical skills in `new-skills/`; 4 extras in `skills/` |
+
+Installed selectively from the audited `new-skills/` portfolio (not the legacy
+`skills/` tree wholesale). Collision-safe: short names when free; `prax-<name>`
+when another pack or a committed repo skill already owns the name (for example
+`prax-constellation-team` vs the committed `constellation-team/` directory).
+
+**Canonical portfolio (38 skills):** backend orchestrator + language variants
+(`backend-pe`, `backend-pe-python`, …), cross-functional roles (`principal-engineer`,
+`product-manager`, `frontend-uiux-designer`, `qa-security-engineer`,
+`devops-sre-engineer`, `backend-system-design-expert`), orchestrators (`kingmode`,
+`super-mode-core`, `apex-autonomous-mode`, `autonomous-orchestrion`,
+`orchestrion-universal-agent-router`), design (`frontend-design-excellence`,
+`ultrathink-frontend`, `svg-logo-designer`), documents (`blueprint-creator`,
+`spec-creator`, `transcript-pipeline`, `transcribe-refiner`), learning
+(`techtutor`, `gabriel-petersson-topdown-mentor`, `lecture-alchemist`,
+`professor-alex-interview`), personal intelligence (`chronicle`, `idea-capturer`,
+`concept-cartographer`, `baron-von-markup`), standards packs, Obsidian CLI,
+mental-health screening companion, and consolidated `constellation-team`.
+
+**Extra public skills (4):** `teach-pro-max`, `superimprove`,
+`coding-agent-leadership-principles`, `cross-agent-handoff` from `skills/`.
+
+**Workflow prompts (documented, not symlinked):** paste prompts under
+`vendor/skills-sources/praxstack-skills-and-personas/prompts/high-end-operator/`
+(Think → Plan → Build → Review → Test → Ship → Reflect) and
+`prompts/project-alignment/` (reconstruct project, install packs, report-only QA).
+These invoke installed skills by name — they do not copy skill bodies. Routing
+block: `prompts/high-end-operator/00-router/CLAUDE-ROUTING.md`.
+
+**Personas:** role skills above replace the legacy `team-personas/constellation-team/`
+markdown files. Original persona packs remain in the vendor clone for lineage.
+
+```bash
+npx skills add praxstack/skills-and-personas --skill teach-pro-max
+```
+
 **Cursor native install (optional):** `/add-plugin compound-engineering`
 
 ## Documented only (not installed wholesale)

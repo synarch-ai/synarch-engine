@@ -132,8 +132,46 @@ discover → interrogate/spec → plan → implement → review → security →
 | `ce-plan`, `ce-work`, `ce-compound` | Compound engineering pipeline |
 | `nvidia-rag-blueprint`, `nvidia-cudaq-guide` | NVIDIA RAG/CUDA (on-demand) |
 | `wshobson-api-design-principles` | API design patterns (on-demand) |
+| `kingmode`, `super-mode-core` | Deep reasoning / multi-mode orchestrators (praxstack) |
+| `constellation-team` / `prax-constellation-team` | Cross-functional star-team workflow |
+| `principal-engineer`, `product-manager`, `qa-security-engineer` | Role personas (praxstack) |
+| `teach-pro-max` | Adaptive evidence-oriented tutoring |
+| `transcript-pipeline`, `blueprint-creator`, `spec-creator` | Document production (praxstack) |
 
 **One-time setup per repo:** `/pstack-setup-pstack`, `/mp-setup-matt-pocock-skills`.
+
+### PraxStack personas, goals, and workflow prompts
+
+The [praxstack/skills-and-personas](https://github.com/praxstack/skills-and-personas)
+portfolio installs via `install-pro-skills.sh`. After install, read workflow
+prompts from the vendor clone (not copied into the repo):
+
+| Path (under vendor clone) | Purpose |
+|---------------------------|---------|
+| `prompts/high-end-operator/CATALOG.md` | Full paste-prompt inventory |
+| `prompts/high-end-operator/00-router/CLAUDE-ROUTING.md` | Short always-on routing block for AGENTS.md |
+| `prompts/project-alignment/ALIGN-INSTALL-QA.md` | Reconstruct project + install packs + report-only QA |
+| `prompts/project-alignment/INSTALL-SKILLS.md` | Install named packs only |
+
+**Steady loop** (one prompt per turn — do not load every skill every session):
+
+`/spec` → writing-plans → TDD slice → `/review` → `/ship` → `/retro`
+
+| Stage | Invoke | When |
+|-------|--------|------|
+| Think | `/office-hours`, `brainstorming`, project-alignment prompts | New idea, lost thread |
+| Plan | `/spec`, `writing-plans`, `openspec-propose` | Spec and implementation plan |
+| Build | `test-driven-development`, `executing-plans` | One failing test per slice |
+| Review | `/review`, `/design-review`, `/cso`, `/plan-eng-review` | Pre-landing review |
+| Test | `/qa-only`, `/qa`, `/health` | Report-only or fix-and-verify QA |
+| Ship | `/ship`, `/land-and-deploy` | PR and deploy |
+| Reflect | `/retro`, `/learn` | End-of-week retrospective |
+| Research | `last30days`, `research-deep-research` | Trends and deep research |
+
+**Constellation team:** use `constellation-team` (committed Synarch variant) or
+`prax-constellation-team` (canonical praxstack audited skill). Role skills:
+`principal-engineer`, `product-manager`, `frontend-uiux-designer`,
+`backend-system-design-expert`, `qa-security-engineer`, `devops-sre-engineer`.
 
 **Optional repo-specific tools** (not run by installer — see ecosystem doc):
 
