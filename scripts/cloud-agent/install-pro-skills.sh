@@ -124,6 +124,7 @@ link_skills_recursive() {
 link_skills_flat() {
   local root="$1"
   local prefix="$2"
+  local replace="${3:-0}"
   local count=0
 
   for skill_dir in "${root}"/*/; do
@@ -131,6 +132,52 @@ link_skills_flat() {
     local base dest
     base="$(basename "$skill_dir")"
     dest="${prefix}${base}"
+    link_skill "$skill_dir" "$dest"
+    count=$((count + 1))
+  done
+  echo "$count"
+}
+
+# Map upstream folder names to canonical skill names used in docs/rules.
+link_vercel_agent_skills() {
+  local root="${VENDOR_DIR}/vercel-agent-skills/skills"
+  local count=0
+  declare -A ALIASES=(
+    [react-best-practices]=vercel-react-best-practices
+    [composition-patterns]=vercel-composition-patterns
+    [deploy-to-vercel]=vercel-deploy-to-vercel
+  )
+
+  for skill_dir in "${root}"/*/; do
+    [ -d "$skill_dir" ] || continue
+    local base dest
+    base="$(basename "$skill_dir")"
+    if [ -n "${ALIASES[$base]:-}" ]; then
+      dest="${ALIASES[$base]}"
+    elif [[ "$base" == vercel-* ]]; then
+      dest="$base"
+    else
+      dest="vercel-${base}"
+    fi
+    link_skill "$skill_dir" "$dest"
+    count=$((count + 1))
+  done
+  echo "$count"
+}
+
+link_supabase_agent_skills() {
+  local root="${VENDOR_DIR}/supabase-agent-skills/skills"
+  local count=0
+
+  for skill_dir in "${root}"/*/; do
+    [ -d "$skill_dir" ] || continue
+    local base dest
+    base="$(basename "$skill_dir")"
+    if [[ "$base" == supabase-* ]]; then
+      dest="$base"
+    else
+      dest="supabase-${base}"
+    fi
     link_skill "$skill_dir" "$dest"
     count=$((count + 1))
   done
@@ -287,8 +334,13 @@ install_agent_browser_cli
 link_skill "${VENDOR_DIR}/vercel-agent-browser/skills/agent-browser" "agent-browser"
 
 # --- Tier S: Vercel agent-skills ----------------------------------------------
-log "Tier S: vercel-labs/agent-skills (vercel- prefix)..."
-link_skills_flat "${VENDOR_DIR}/vercel-agent-skills/skills" "vercel-" >/dev/null
+log "Tier S: vercel-labs/agent-skills (canonical vercel-* names)..."
+# Remove legacy double-prefix symlinks from older installer runs
+rm -rf "${SKILLS_DIR}/vercel-vercel-optimize" \
+  "${SKILLS_DIR}/vercel-vercel-cli-with-tokens" \
+  "${SKILLS_DIR}/supabase-supabase-postgres-best-practices" \
+  "${SKILLS_DIR}/vercel-deploy" 2>/dev/null || true
+link_vercel_agent_skills >/dev/null
 
 # --- Tier S: Anthropic reference (dev subset) ---------------------------------
 log "Tier S: anthropics/skills (dev subset, anthropic- prefix)..."
@@ -342,8 +394,8 @@ if [ -d "${VENDOR_DIR}/awesome-copilot/.github/skills/agentic-workflows" ]; then
 fi
 
 # --- Stack: Supabase ----------------------------------------------------------
-log "Stack: supabase/agent-skills (supabase- prefix)..."
-link_skills_flat "${VENDOR_DIR}/supabase-agent-skills/skills" "supabase-" >/dev/null
+log "Stack: supabase/agent-skills (canonical supabase-* names)..."
+link_supabase_agent_skills >/dev/null
 
 # --- Compound Engineering -----------------------------------------------------
 log "Compound: EveryInc/compound-engineering-plugin (ce- prefix)..."
