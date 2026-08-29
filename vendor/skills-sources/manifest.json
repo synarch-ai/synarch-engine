@@ -1,0 +1,68 @@
+{
+  "installed_at": "2026-08-29T11:47:34.937628+00:00",
+  "repos": {
+    "shadcn-improve": {
+      "path": "vendor/skills-sources/shadcn-improve",
+      "sha": "03369ee6d7cafbfcecc4346539b05b3dc0a603bb"
+    },
+    "garrytan-gstack": {
+      "path": "vendor/skills-sources/garrytan-gstack",
+      "sha": "b5a951e62398abc8aea5beed429cc2617184fcc1"
+    },
+    "mattpocock-skills": {
+      "path": "vendor/skills-sources/mattpocock-skills",
+      "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76"
+    },
+    "obra-superpowers": {
+      "path": "vendor/skills-sources/obra-superpowers",
+      "sha": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797"
+    },
+    "cursor-plugins-pstack": {
+      "path": "vendor/skills-sources/cursor-plugins",
+      "sha": "68836ddaf5697224520f1847d90cdb90ca8babaa"
+    }
+  },
+  "linked_skill_count": 138,
+  "linked_skills_sample": [
+    "dispatching-parallel-agents",
+    "executing-plans",
+    "finishing-a-development-branch",
+    "gstack-autoplan",
+    "gstack-benchmark",
+    "gstack-benchmark-models",
+    "gstack-browse",
+    "gstack-canary",
+    "gstack-careful",
+    "gstack-claude",
+    "gstack-context-restore",
+    "gstack-context-save",
+    "gstack-cso",
+    "gstack-design-consultation",
+    "gstack-design-html",
+    "gstack-design-review",
+    "gstack-design-shotgun",
+    "gstack-devex-review",
+    "gstack-diagram",
+    "gstack-document-generate",
+    "gstack-document-release",
+    "gstack-freeze",
+    "gstack-gstack",
+    "gstack-guard",
+    "gstack-health",
+    "gstack-investigate",
+    "gstack-ios-clean",
+    "gstack-ios-design-review",
+    "gstack-ios-fix",
+    "gstack-ios-qa"
+  ],
+  "cursor_plugins_recommended": [
+    {
+      "name": "pstack",
+      "install": "/add-plugin pstack"
+    },
+    {
+      "name": "superpowers",
+      "install": "/add-plugin superpowers"
+    }
+  ]
+}

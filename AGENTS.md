@@ -78,3 +78,27 @@ Integration tests require a running PostgreSQL with the migrations applied
   mission transitions to `failed` with a structured `error_context` — expected,
   not an environment defect. Persistence, API, and UI paths do not need
   credentials.
+
+## Pro developer skills
+
+Installed idempotently by `scripts/cloud-agent/install-pro-skills.sh` (also runs
+at the end of `install.sh` unless `INSTALL_PRO_SKILLS=0`). Skills symlink into
+`.agents/skills/` from pinned upstream repos under `vendor/skills-sources/`
+(gitignored except `manifest.json`).
+
+| Skill / command | When to use |
+|-----------------|-------------|
+| `/improve` | Read-only codebase audit → prioritized plans in `plans/` |
+| `/pstack-poteto-mode` | Rigorous engineering playbooks (bug fix, perf, ship, etc.) |
+| `/mp-triage`, `/mp-implement`, `/mp-tdd` | Matt Pocock engineering workflows |
+| `/gstack-review`, `/gstack-qa`, `/gstack-investigate` | Garry Tan gstack review + browser QA |
+| `brainstorming`, `test-driven-development`, `writing-plans` | Obra superpowers methodology |
+
+**One-time setup per repo:** run `/pstack-setup-pstack` and
+`/mp-setup-matt-pocock-skills` after install.
+
+**Optional Cursor marketplace plugins** (hooks + auto-invocation):
+`/add-plugin pstack`, `/add-plugin superpowers`.
+
+See `docs/04-reference-deep-dives/agent-skills-ecosystem.md` for the full
+ecosystem map and additional credible sources.

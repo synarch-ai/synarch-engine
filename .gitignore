@@ -48,3 +48,7 @@ yarn-error.log
 !/.vscode/
 !/.idea/
 AI_REVIEW.md
+
+# Cloned skill sources (reproduced by scripts/cloud-agent/install-pro-skills.sh)
+vendor/skills-sources/*
+!vendor/skills-sources/manifest.json

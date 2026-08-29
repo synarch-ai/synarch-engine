@@ -98,4 +98,10 @@ log "Installing web dependencies"
 log "Bootstrapping PostgreSQL database"
 "$REPO_ROOT/scripts/cloud-agent/db-bootstrap.sh"
 
+# --- 7. Pro developer skills (idempotent; skip with INSTALL_PRO_SKILLS=0) ---
+if [ "${INSTALL_PRO_SKILLS:-1}" != "0" ]; then
+  log "Installing pro developer skills"
+  bash "$REPO_ROOT/scripts/cloud-agent/install-pro-skills.sh" -q
+fi
+
 log "Install complete."
