@@ -1,15 +1,15 @@
 {
-  "installed_at": "2026-08-29T11:53:50.646026+00:00",
+  "installed_at": "2026-08-29T11:56:35.461292+00:00",
   "pipeline": "discover \u2192 interrogate/spec \u2192 plan \u2192 implement \u2192 review \u2192 security \u2192 browser QA \u2192 ship \u2192 learn",
   "tier_counts": {
     "tier0": 1,
-    "tier_s_plus_security": 81,
+    "tier_s_plus_security": 83,
     "tier_s_plus_browser": 1,
-    "tier_s_web": 7,
-    "tier_s_reference": 6,
-    "tier_a_toolbox": 15,
-    "stack_supabase": 2,
-    "compound_engineering": 33,
+    "tier_s_web": 9,
+    "tier_s_reference": 13,
+    "tier_a_toolbox": 26,
+    "stack_supabase": 3,
+    "compound_engineering": 34,
     "core": 183
   },
   "repos": {
@@ -66,15 +66,22 @@
       "sha": "a1f601f17137f648be439965f8fdd9123303de5d"
     }
   },
-  "linked_skill_count": 329,
+  "linked_skill_count": 353,
   "linked_skills_sample": [
     "agent-browser",
     "anthropic-claude-api",
+    "anthropic-doc-coauthoring",
+    "anthropic-docx",
     "anthropic-frontend-design",
+    "anthropic-internal-comms",
     "anthropic-mcp-builder",
+    "anthropic-pdf",
+    "anthropic-pptx",
     "anthropic-skill-creator",
+    "anthropic-theme-factory",
     "anthropic-web-artifacts-builder",
     "anthropic-webapp-testing",
+    "anthropic-xlsx",
     "ce-babysit-pr",
     "ce-brainstorm",
     "ce-code-review",
@@ -100,14 +107,7 @@
     "ce-resolve-pr-feedback",
     "ce-retune",
     "ce-riffrec-feedback-analysis",
-    "ce-setup",
-    "ce-simplify-code",
-    "ce-strategy",
-    "ce-sweep",
-    "ce-test-browser",
-    "ce-test-xcode",
-    "ce-work",
-    "ce-worktree"
+    "ce-setup"
   ],
   "cursor_plugins_recommended": [
     {

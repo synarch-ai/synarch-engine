@@ -109,10 +109,6 @@ link_skills_recursive() {
     skill_dir="$(dirname "$skill_md")"
     base="$(basename "$skill_dir")"
     dest="${prefix}${base}"
-    if skill_exists "$dest"; then
-      warn "  skip collision: ${dest}"
-      continue
-    fi
     link_skill "$skill_dir" "$dest"
     count=$((count + 1))
   done < <(
@@ -135,10 +131,6 @@ link_skills_flat() {
     local base dest
     base="$(basename "$skill_dir")"
     dest="${prefix}${base}"
-    if skill_exists "$dest"; then
-      warn "  skip collision: ${dest}"
-      continue
-    fi
     link_skill "$skill_dir" "$dest"
     count=$((count + 1))
   done
@@ -307,6 +299,13 @@ ANTHROPIC_DEV_SKILLS=(
   web-artifacts-builder
   skill-creator
   claude-api
+  doc-coauthoring
+  internal-comms
+  docx
+  pdf
+  pptx
+  xlsx
+  theme-factory
 )
 link_named_skills "${VENDOR_DIR}/anthropics-skills/skills" "anthropic-" "${ANTHROPIC_DEV_SKILLS[@]}" >/dev/null
 
@@ -348,19 +347,18 @@ link_skills_flat "${VENDOR_DIR}/supabase-agent-skills/skills" "supabase-" >/dev/
 
 # --- Compound Engineering -----------------------------------------------------
 log "Compound: EveryInc/compound-engineering-plugin (ce- prefix)..."
-for skill_dir in "${VENDOR_DIR}/compound-engineering/skills"/*/; do
-  [ -d "$skill_dir" ] || continue
-  base="$(basename "$skill_dir")"
-  if [[ "$base" == ce-* ]]; then
-    dest="$base"
-  else
-    dest="ce-${base}"
-  fi
-  if skill_exists "$dest"; then
-    warn "  skip collision: ${dest}"
-    continue
-  fi
-  link_skill "$skill_dir" "$dest"
+for skills_root in "${VENDOR_DIR}/compound-engineering/skills" "${VENDOR_DIR}/compound-engineering/.agents/skills"; do
+  [ -d "$skills_root" ] || continue
+  for skill_dir in "${skills_root}"/*/; do
+    [ -d "$skill_dir" ] || continue
+    base="$(basename "$skill_dir")"
+    if [[ "$base" == ce-* ]]; then
+      dest="$base"
+    else
+      dest="ce-${base}"
+    fi
+    link_skill "$skill_dir" "$dest"
+  done
 done
 
 # --- Write manifest -----------------------------------------------------------
