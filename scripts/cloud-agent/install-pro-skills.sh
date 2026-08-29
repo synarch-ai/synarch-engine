@@ -5,12 +5,17 @@
 # Clones upstream skill/plugin sources, symlinks into .agents/skills/,
 # and runs host-specific setup (gstack browse binary + Cursor skills).
 #
-# Sources:
-#   - shadcn/improve          (codebase audit → plans/)
-#   - garrytan/gstack         (review, QA, browser automation)
-#   - mattpocock/skills       (engineering + productivity workflows)
-#   - cursor/plugins pstack   (poteto-mode rigorous engineering)
-#   - obra/superpowers        (TDD, planning, subagent development)
+# Layered pipeline: discover → interrogate/spec → plan → implement → review →
+# security → browser QA → ship → learn
+#
+# Sources (see docs/04-reference-deep-dives/agent-skills-ecosystem.md):
+#   Tier 0:  vercel-labs/skills (find-skills)
+#   Core:    shadcn/improve, garrytan/gstack, mattpocock/skills, pstack, superpowers
+#   Tier S+: trailofbits/skills, vercel-labs/agent-browser
+#   Tier S:  vercel-labs/agent-skills, anthropics/skills (dev subset)
+#   Tier A+: github/awesome-copilot (curated subset)
+#   Stack:   supabase/agent-skills
+#   CE:      EveryInc/compound-engineering-plugin
 #
 set -euo pipefail
 
@@ -25,6 +30,12 @@ QUIET=0
 log() {
   if [ "$QUIET" -eq 0 ]; then
     printf '\033[1;36m[pro-skills]\033[0m %s\n' "$*"
+  fi
+}
+
+warn() {
+  if [ "$QUIET" -eq 0 ]; then
+    printf '\033[1;33m[pro-skills]\033[0m %s\n' "$*" >&2
   fi
 }
 
@@ -87,11 +98,110 @@ skill_exists() {
   [ -e "${SKILLS_DIR}/${name}" ]
 }
 
-# --- 1. Clone upstream sources -----------------------------------------------
+# Link all SKILL.md dirs under root with prefix; skip tests/fixtures.
+link_skills_recursive() {
+  local root="$1"
+  local prefix="$2"
+  local count=0
+
+  while IFS= read -r skill_md; do
+    local skill_dir base dest
+    skill_dir="$(dirname "$skill_md")"
+    base="$(basename "$skill_dir")"
+    dest="${prefix}${base}"
+    if skill_exists "$dest"; then
+      warn "  skip collision: ${dest}"
+      continue
+    fi
+    link_skill "$skill_dir" "$dest"
+    count=$((count + 1))
+  done < <(
+    find "$root" -name 'SKILL.md' \
+      ! -path '*/tests/*' \
+      ! -path '*/test/*' \
+      ! -path '*/fixtures/*' \
+      2>/dev/null | sort
+  )
+  echo "$count"
+}
+
+link_skills_flat() {
+  local root="$1"
+  local prefix="$2"
+  local count=0
+
+  for skill_dir in "${root}"/*/; do
+    [ -d "$skill_dir" ] || continue
+    local base dest
+    base="$(basename "$skill_dir")"
+    dest="${prefix}${base}"
+    if skill_exists "$dest"; then
+      warn "  skip collision: ${dest}"
+      continue
+    fi
+    link_skill "$skill_dir" "$dest"
+    count=$((count + 1))
+  done
+  echo "$count"
+}
+
+link_named_skills() {
+  local root="$1"
+  local prefix="$2"
+  shift 2
+  local count=0
+
+  for name in "$@"; do
+    local skill_dir dest
+    skill_dir="${root}/${name}"
+    dest="${prefix}${name}"
+    if [ ! -d "$skill_dir" ]; then
+      warn "  skip (missing): ${name}"
+      continue
+    fi
+    if skill_exists "$dest"; then
+      warn "  skip collision: ${dest}"
+      continue
+    fi
+    link_skill "$skill_dir" "$dest"
+    count=$((count + 1))
+  done
+  echo "$count"
+}
+
+install_agent_browser_cli() {
+  if command -v agent-browser >/dev/null 2>&1; then
+    log "agent-browser CLI already installed"
+  else
+    log "Installing agent-browser CLI globally..."
+    if ! npm install -g agent-browser 2>/dev/null; then
+      warn "Global npm install failed; will use npx fallback"
+    fi
+  fi
+
+  if command -v agent-browser >/dev/null 2>&1; then
+    log "Running agent-browser install..."
+    agent-browser install 2>/dev/null || warn "agent-browser install step failed (non-fatal)"
+  else
+    log "Trying npx agent-browser install..."
+    npx --yes agent-browser install 2>/dev/null || warn "agent-browser CLI unavailable (browser QA skill still linked)"
+  fi
+}
+
+# --- Clone all upstream sources -----------------------------------------------
+log "Cloning/updating skill sources..."
+clone_or_update "https://github.com/vercel-labs/skills.git" "${VENDOR_DIR}/vercel-labs-skills"
 clone_or_update "https://github.com/shadcn/improve.git" "${VENDOR_DIR}/shadcn-improve"
 clone_or_update "https://github.com/garrytan/gstack.git" "${VENDOR_DIR}/garrytan-gstack"
 clone_or_update "https://github.com/mattpocock/skills.git" "${VENDOR_DIR}/mattpocock-skills"
 clone_or_update "https://github.com/obra/superpowers.git" "${VENDOR_DIR}/obra-superpowers"
+clone_or_update "https://github.com/trailofbits/skills.git" "${VENDOR_DIR}/trailofbits-skills"
+clone_or_update "https://github.com/vercel-labs/agent-browser.git" "${VENDOR_DIR}/vercel-agent-browser"
+clone_or_update "https://github.com/vercel-labs/agent-skills.git" "${VENDOR_DIR}/vercel-agent-skills"
+clone_or_update "https://github.com/anthropics/skills.git" "${VENDOR_DIR}/anthropics-skills"
+clone_or_update "https://github.com/github/awesome-copilot.git" "${VENDOR_DIR}/awesome-copilot"
+clone_or_update "https://github.com/supabase/agent-skills.git" "${VENDOR_DIR}/supabase-agent-skills"
+clone_or_update "https://github.com/EveryInc/compound-engineering-plugin.git" "${VENDOR_DIR}/compound-engineering"
 
 # pstack: sparse checkout from cursor/plugins monorepo
 PSTACK_DIR="${VENDOR_DIR}/cursor-plugins"
@@ -104,12 +214,20 @@ else
   git -C "$PSTACK_DIR" pull --ff-only origin main 2>/dev/null || true
 fi
 
-# --- 2. shadcn/improve -------------------------------------------------------
-log "Linking shadcn/improve..."
+TIER_COUNTS=()
+
+# --- Tier 0: Discovery (install FIRST) ----------------------------------------
+log "Tier 0: find-skills (discovery)..."
+TIER_COUNTS+=("tier0:$(
+  link_named_skills "${VENDOR_DIR}/vercel-labs-skills/skills" "" find-skills
+)")
+
+# --- Core: shadcn/improve -----------------------------------------------------
+log "Core: shadcn/improve..."
 link_skill "${VENDOR_DIR}/shadcn-improve/skills/improve" "improve"
 
-# --- 3. obra/superpowers (skip name collisions) ------------------------------
-log "Linking obra/superpowers..."
+# --- Core: obra/superpowers (skip name collisions) ---------------------------
+log "Core: obra/superpowers..."
 for skill_dir in "${VENDOR_DIR}/obra-superpowers/skills"/*/; do
   [ -d "$skill_dir" ] || continue
   base="$(basename "$skill_dir")"
@@ -120,8 +238,8 @@ for skill_dir in "${VENDOR_DIR}/obra-superpowers/skills"/*/; do
   fi
 done
 
-# --- 4. cursor/plugins pstack (namespaced) -----------------------------------
-log "Linking cursor/plugins pstack..."
+# --- Core: cursor/plugins pstack (namespaced) --------------------------------
+log "Core: cursor/plugins pstack..."
 for skill_dir in "${PSTACK_DIR}/pstack/skills"/*/; do
   [ -d "$skill_dir" ] || continue
   base="$(basename "$skill_dir")"
@@ -129,8 +247,8 @@ for skill_dir in "${PSTACK_DIR}/pstack/skills"/*/; do
   link_skill "$skill_dir" "$dest"
 done
 
-# --- 5. mattpocock/skills (engineering + productivity + misc) ---------------
-log "Linking mattpocock/skills..."
+# --- Core: mattpocock/skills -------------------------------------------------
+log "Core: mattpocock/skills..."
 for category in engineering productivity misc; do
   cat_dir="${VENDOR_DIR}/mattpocock-skills/skills/${category}"
   [ -d "$cat_dir" ] || continue
@@ -145,7 +263,7 @@ for category in engineering productivity misc; do
   done
 done
 
-# --- 6. garrytan/gstack (requires bun) ---------------------------------------
+# --- Core: garrytan/gstack (requires bun) ------------------------------------
 ensure_bun() {
   if command -v bun >/dev/null 2>&1; then
     return 0
@@ -159,7 +277,7 @@ ensure_bun() {
 ensure_bun
 export PATH="${BUN_INSTALL:-$HOME/.bun}/bin:$PATH"
 
-log "Running gstack setup (cursor, prefixed)..."
+log "Core: gstack setup (cursor, prefixed)..."
 GSTACK_QUIET=()
 [ "$QUIET" -eq 1 ] && GSTACK_QUIET=(--quiet)
 (
@@ -167,9 +285,7 @@ GSTACK_QUIET=()
   ./setup --host cursor --prefix "${GSTACK_QUIET[@]}"
 )
 
-# Also expose gstack skills in project .agents/skills for cloud agents
 if [ -d "${VENDOR_DIR}/garrytan-gstack/.agents/skills" ]; then
-  mkdir -p "${SKILLS_DIR}/gstack"
   for skill_dir in "${VENDOR_DIR}/garrytan-gstack/.agents/skills"/*/; do
     [ -d "$skill_dir" ] || continue
     base="$(basename "$skill_dir")"
@@ -177,9 +293,108 @@ if [ -d "${VENDOR_DIR}/garrytan-gstack/.agents/skills" ]; then
   done
 fi
 
-# --- 7. Write manifest -------------------------------------------------------
+# --- Tier S+: Security (Trail of Bits) --------------------------------------
+log "Tier S+: trailofbits/skills (tob- prefix, on-demand)..."
+TIER_COUNTS+=("tier_s_plus_security:$(
+  link_skills_recursive "${VENDOR_DIR}/trailofbits-skills/plugins" "tob-"
+)")
+
+# --- Tier S+: Browser QA ------------------------------------------------------
+log "Tier S+: agent-browser CLI + skill..."
+install_agent_browser_cli
+TIER_COUNTS+=("tier_s_plus_browser:$(
+  link_skill "${VENDOR_DIR}/vercel-agent-browser/skills/agent-browser" "agent-browser" >/dev/null
+  echo 1
+)")
+
+# --- Tier S: Vercel agent-skills ----------------------------------------------
+log "Tier S: vercel-labs/agent-skills (vercel- prefix)..."
+TIER_COUNTS+=("tier_s_web:$(
+  link_skills_flat "${VENDOR_DIR}/vercel-agent-skills/skills" "vercel-"
+)")
+
+# --- Tier S: Anthropic reference (dev subset) ---------------------------------
+log "Tier S: anthropics/skills (dev subset, anthropic- prefix)..."
+ANTHROPIC_DEV_SKILLS=(
+  mcp-builder
+  frontend-design
+  webapp-testing
+  web-artifacts-builder
+  skill-creator
+  claude-api
+)
+TIER_COUNTS+=("tier_s_reference:$(
+  link_named_skills "${VENDOR_DIR}/anthropics-skills/skills" "anthropic-" "${ANTHROPIC_DEV_SKILLS[@]}"
+)")
+
+# --- Tier A+: awesome-copilot (curated engineering subset) --------------------
+log "Tier A+: github/awesome-copilot (gh-copilot- prefix, curated)..."
+GH_COPILOT_SKILLS=(
+  acquire-codebase-knowledge
+  breakdown-feature-implementation
+  breakdown-feature-prd
+  breakdown-plan
+  breakdown-test
+  create-implementation-plan
+  structured-autonomy-implement
+  playwright-explore-website
+  bug-reproduction-brief
+  create-github-action-workflow-specification
+  create-github-issue-feature-from-specification
+  codebase-memory-mcp
+  finalize-agent-prompt
+  copilot-pr-autopilot
+)
+TIER_A_COUNT=0
+for name in "${GH_COPILOT_SKILLS[@]}"; do
+  skill_dir="${VENDOR_DIR}/awesome-copilot/skills/${name}"
+  if [ ! -d "$skill_dir" ]; then
+    skill_dir="${VENDOR_DIR}/awesome-copilot/.github/skills/${name}"
+  fi
+  dest="gh-copilot-${name}"
+  if [ -d "$skill_dir" ] && ! skill_exists "$dest"; then
+    link_skill "$skill_dir" "$dest"
+    TIER_A_COUNT=$((TIER_A_COUNT + 1))
+  fi
+done
+# agentic-workflows lives under .github/skills
+if [ -d "${VENDOR_DIR}/awesome-copilot/.github/skills/agentic-workflows" ] && ! skill_exists "gh-copilot-agentic-workflows"; then
+  link_skill "${VENDOR_DIR}/awesome-copilot/.github/skills/agentic-workflows" "gh-copilot-agentic-workflows"
+  TIER_A_COUNT=$((TIER_A_COUNT + 1))
+fi
+TIER_COUNTS+=("tier_a_toolbox:${TIER_A_COUNT}")
+
+# --- Stack: Supabase ----------------------------------------------------------
+log "Stack: supabase/agent-skills (supabase- prefix)..."
+TIER_COUNTS+=("stack_supabase:$(
+  link_skills_flat "${VENDOR_DIR}/supabase-agent-skills/skills" "supabase-"
+)")
+
+# --- Compound Engineering -----------------------------------------------------
+log "Compound: EveryInc/compound-engineering-plugin (ce- prefix)..."
+CE_COUNT=0
+for skill_dir in "${VENDOR_DIR}/compound-engineering/skills"/*/; do
+  [ -d "$skill_dir" ] || continue
+  base="$(basename "$skill_dir")"
+  if [[ "$base" == ce-* ]]; then
+    dest="$base"
+  else
+    dest="ce-${base}"
+  fi
+  if skill_exists "$dest"; then
+    warn "  skip collision: ${dest}"
+    continue
+  fi
+  link_skill "$skill_dir" "$dest"
+  CE_COUNT=$((CE_COUNT + 1))
+done
+TIER_COUNTS+=("compound_engineering:${CE_COUNT}")
+
+# --- Write manifest -----------------------------------------------------------
 log "Writing manifest..."
-python3 - "$REPO_ROOT" <<'PY'
+TIER_COUNTS_JSON="$(printf '%s\n' "${TIER_COUNTS[@]}" | python3 -c 'import json,sys; d={}; [d.__setitem__(k,int(v)) for line in sys.stdin for k,v in [line.strip().split(":",1)]]; print(json.dumps(d))')"
+
+python3 - "$REPO_ROOT" "$TIER_COUNTS_JSON" <<'PY'
 import json
 import subprocess
 import sys
@@ -187,15 +402,24 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 repo_root = Path(sys.argv[1])
+tier_counts = json.loads(sys.argv[2])
 vendor = repo_root / "vendor" / "skills-sources"
 manifest_path = vendor / "manifest.json"
 
 repos = {
+    "vercel-labs-skills": vendor / "vercel-labs-skills",
     "shadcn-improve": vendor / "shadcn-improve",
     "garrytan-gstack": vendor / "garrytan-gstack",
     "mattpocock-skills": vendor / "mattpocock-skills",
     "obra-superpowers": vendor / "obra-superpowers",
     "cursor-plugins-pstack": vendor / "cursor-plugins",
+    "trailofbits-skills": vendor / "trailofbits-skills",
+    "vercel-agent-browser": vendor / "vercel-agent-browser",
+    "vercel-agent-skills": vendor / "vercel-agent-skills",
+    "anthropics-skills": vendor / "anthropics-skills",
+    "awesome-copilot": vendor / "awesome-copilot",
+    "supabase-agent-skills": vendor / "supabase-agent-skills",
+    "compound-engineering": vendor / "compound-engineering",
 }
 
 def git_sha(path: Path) -> str | None:
@@ -210,30 +434,50 @@ def git_sha(path: Path) -> str | None:
         return None
 
 skills_dir = repo_root / ".agents" / "skills"
-linked = sorted(
-    p.name for p in skills_dir.iterdir()
-    if p.is_symlink() and any(
-        str(p.resolve()).startswith(str(vendor / name))
-        for name in repos
-    )
-)
+vendor_prefix = str(vendor)
+
+def is_pro_skill(p: Path) -> bool:
+    if not p.is_symlink():
+        return False
+    try:
+        resolved = str(p.resolve())
+    except OSError:
+        return False
+    return resolved.startswith(vendor_prefix)
+
+linked = sorted(p.name for p in skills_dir.iterdir() if is_pro_skill(p))
 
 data = {
     "installed_at": datetime.now(timezone.utc).isoformat(),
-    "repos": {name: {"path": str(path.relative_to(repo_root)), "sha": git_sha(path)} for name, path in repos.items()},
+    "pipeline": "discover → interrogate/spec → plan → implement → review → security → browser QA → ship → learn",
+    "tier_counts": tier_counts,
+    "repos": {
+        name: {"path": str(path.relative_to(repo_root)), "sha": git_sha(path)}
+        for name, path in repos.items()
+    },
     "linked_skill_count": len(linked),
-    "linked_skills_sample": linked[:30],
+    "linked_skills_sample": linked[:40],
     "cursor_plugins_recommended": [
         {"name": "pstack", "install": "/add-plugin pstack"},
         {"name": "superpowers", "install": "/add-plugin superpowers"},
+        {"name": "compound-engineering", "install": "/add-plugin compound-engineering"},
+    ],
+    "documented_only": [
+        {"name": "microsoft/skills", "install": "npx skills add microsoft/skills"},
+        {"name": "aws/agent-toolkit-for-aws", "note": "Install when AWS agent tooling is needed"},
+        {"name": "cloudflare/skills", "note": "Documented in ecosystem guide only"},
+        {"name": "github/spec-kit", "note": "Do not run specify init in-repo; see ecosystem doc"},
     ],
 }
 
 manifest_path.parent.mkdir(parents=True, exist_ok=True)
 manifest_path.write_text(json.dumps(data, indent=2) + "\n")
 print(f"manifest: {manifest_path} ({len(linked)} pro skills linked)")
+for tier, count in sorted(tier_counts.items()):
+    print(f"  {tier}: {count}")
 PY
 
 log "Pro skills install complete."
-log "Optional Cursor marketplace plugins: /add-plugin pstack, /add-plugin superpowers"
-log "Run once per repo: /setup-pstack, /setup-matt-pocock-skills (via mp-setup-matt-pocock-skills)"
+log "Optional Cursor marketplace plugins: /add-plugin pstack, /add-plugin superpowers, /add-plugin compound-engineering"
+log "Run once per repo: /pstack-setup-pstack, /mp-setup-matt-pocock-skills (via mp-setup-matt-pocock-skills)"
+log "Discovery: use find-skills or npx skills find <query> before adding more skills"

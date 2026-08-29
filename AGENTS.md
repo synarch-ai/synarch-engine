@@ -86,19 +86,56 @@ at the end of `install.sh` unless `INSTALL_PRO_SKILLS=0`). Skills symlink into
 `.agents/skills/` from pinned upstream repos under `vendor/skills-sources/`
 (gitignored except `manifest.json`).
 
+### Layered workflow
+
+Use **one methodology per task** — do not combine superpowers + pstack +
+compound-engineering on the same feature (context rot).
+
+```
+discover → interrogate/spec → plan → implement → review → security → browser QA → ship → learn
+```
+
+| Stage | Skills | When to use |
+|-------|--------|-------------|
+| discover | `find-skills`, `npx skills find` | Need a capability; search before inventing |
+| spec | `brainstorming`, `ce-brainstorm` | Clarify requirements |
+| plan | `writing-plans`, `ce-plan`, `improve`, `/pstack-poteto-mode` | Implementation plans |
+| implement | `test-driven-development`, `/mp-implement`, `ce-work` | Write code |
+| review | `/gstack-review`, `ce-code-review`, CodeRabbit | Pre-merge review |
+| security | `tob-*` (on-demand) | Security audit — invoke specific skill only |
+| browser QA | `agent-browser`, `/gstack-qa` | UI verification |
+| ship | `ce-commit-push-pr`, `vercel-deploy-to-vercel` | Land and deploy |
+| learn | `ce-compound` | Capture learnings |
+
+### Core commands
+
 | Skill / command | When to use |
 |-----------------|-------------|
+| `find-skills` | Discover/install skills from the open ecosystem |
 | `/improve` | Read-only codebase audit → prioritized plans in `plans/` |
-| `/pstack-poteto-mode` | Rigorous engineering playbooks (bug fix, perf, ship, etc.) |
+| `/pstack-poteto-mode` | Rigorous engineering playbooks (bug fix, perf, ship) |
 | `/mp-triage`, `/mp-implement`, `/mp-tdd` | Matt Pocock engineering workflows |
 | `/gstack-review`, `/gstack-qa`, `/gstack-investigate` | Garry Tan gstack review + browser QA |
-| `brainstorming`, `test-driven-development`, `writing-plans` | Obra superpowers methodology |
+| `agent-browser` | Vercel browser automation CLI + skill |
+| `tob-semgrep`, `tob-codeql`, `tob-sharp-edges` | Trail of Bits security (examples) |
+| `vercel-react-best-practices` | Next.js/React performance patterns |
+| `supabase-postgres-best-practices` | Postgres query/schema optimization |
+| `ce-plan`, `ce-work`, `ce-compound` | Compound engineering pipeline |
 
-**One-time setup per repo:** run `/pstack-setup-pstack` and
-`/mp-setup-matt-pocock-skills` after install.
+**One-time setup per repo:** `/pstack-setup-pstack`, `/mp-setup-matt-pocock-skills`.
 
 **Optional Cursor marketplace plugins** (hooks + auto-invocation):
-`/add-plugin pstack`, `/add-plugin superpowers`.
+`/add-plugin pstack`, `/add-plugin superpowers`, `/add-plugin compound-engineering`.
+
+**gstack note:** symlinked skills are preferred for Cloud Agents; native
+`/add-plugin gstack` has known issues (gstack#2361).
+
+**Spec Kit:** do not run `specify init` in this repo — see ecosystem doc.
+
+```bash
+bash scripts/cloud-agent/install-pro-skills.sh   # refresh all tiers
+cat vendor/skills-sources/manifest.json          # pinned SHAs + tier counts
+```
 
 See `docs/04-reference-deep-dives/agent-skills-ecosystem.md` for the full
-ecosystem map and additional credible sources.
+ecosystem map, documented-only sources, and Spec Kit install steps.

@@ -4,55 +4,175 @@ Curated map of credible skill/plugin systems for pro developer workflows in
 Cursor, Claude Code, Codex, and other agents. Synarch installs the **Installed
 in this repo** set via `scripts/cloud-agent/install-pro-skills.sh`.
 
-## Installed in this repo
+## Layered pipeline
 
-| Source | Install path | Primary commands |
-|--------|--------------|------------------|
-| [shadcn/improve](https://github.com/shadcn/improve) | `.agents/skills/improve` | `/improve` — read-only audit → `plans/` |
-| [garrytan/gstack](https://github.com/garrytan/gstack) | `.agents/skills/gstack-*` + `~/.cursor/skills` | `/gstack-review`, `/gstack-qa`, `/gstack-investigate` |
-| [mattpocock/skills](https://github.com/mattpocock/skills) | `.agents/skills/mp-*` | `/mp-triage`, `/mp-implement`, `/mp-tdd` |
-| [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) | `.agents/skills/pstack-*` | `/pstack-poteto-mode`, `/pstack-setup-pstack` |
-| [obra/superpowers](https://github.com/obra/superpowers) | `.agents/skills/*` (namespaced on collision) | TDD, planning, subagent-driven development |
+Use one layer at a time per task — do not stack competing methodologies
+(superpowers + pstack + compound-engineering on the same feature causes context
+rot and conflicting instructions).
 
-Pinned SHAs: `vendor/skills-sources/manifest.json`.
+```mermaid
+flowchart LR
+  D[discover] --> I[interrogate / spec]
+  I --> P[plan]
+  P --> M[implement]
+  M --> R[review]
+  R --> S[security]
+  S --> B[browser QA]
+  B --> H[ship]
+  H --> L[learn]
+```
 
-**Marketplace plugins** (optional; add hooks + auto-invocation in Cursor UI):
+| Stage | Installed skills | When |
+|-------|------------------|------|
+| **discover** | `find-skills` | User needs a capability; search skills.sh before inventing workflows |
+| **interrogate / spec** | `brainstorming`, `ce-brainstorm`, `gh-copilot-breakdown-feature-prd` | Clarify requirements, write specs |
+| **plan** | `writing-plans`, `ce-plan`, `mp-triage`, `pstack-poteto-mode`, `improve` | Produce implementation plans |
+| **implement** | `test-driven-development`, `mp-implement`, `mp-tdd`, `ce-work` | Write code with TDD or structured execution |
+| **review** | `gstack-review`, `ce-code-review`, `pstack-*`, CodeRabbit | Code review before merge |
+| **security** | `tob-*` (Trail of Bits, on-demand) | Security audit, static analysis, fuzzing — invoke explicitly |
+| **browser QA** | `agent-browser`, `gstack-qa`, `ce-test-browser` | Manual/automated UI verification |
+| **ship** | `gstack-*`, `ce-commit-push-pr`, `vercel-deploy-to-vercel` | Land PRs, deploy |
+| **learn** | `ce-compound`, `ce-compound-refresh` | Capture learnings for next iteration |
 
-- `/add-plugin pstack`
-- `/add-plugin superpowers`
+## Core 10
 
-## Universal distribution (install anything)
+High-signal skills every Synarch agent should know about (all installed):
+
+| # | Source | Symlink prefix | Primary use |
+|---|--------|----------------|-------------|
+| 1 | [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) | `pstack-*` | Rigorous engineering playbooks |
+| 2 | [obra/superpowers](https://github.com/obra/superpowers) | (root or `superpowers-*`) | TDD, planning, subagent development |
+| 3 | [mattpocock/skills](https://github.com/mattpocock/skills) | `mp-*` | Composable engineering workflows |
+| 4 | [garrytan/gstack](https://github.com/garrytan/gstack) | `gstack-*` | Review, QA, browser automation |
+| 5 | [shadcn/improve](https://github.com/shadcn/improve) | `improve` | Read-only audit → `plans/` |
+| 6 | [trailofbits/skills](https://github.com/trailofbits/skills) | `tob-*` | Security analysis (on-demand) |
+| 7 | [vercel-labs/agent-browser](https://github.com/vercel-labs/agent-browser) | `agent-browser` | CLI + skill for browser QA |
+| 8 | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | `vercel-*` | React/Next.js performance, deploy |
+| 9 | [vercel-labs/skills](https://github.com/vercel-labs/skills) | `find-skills` | Discover skills from the ecosystem |
+| 10 | [EveryInc/compound-engineering-plugin](https://github.com/EveryInc/compound-engineering-plugin) | `ce-*` | Spec → plan → implement → compound learnings |
+
+Pinned SHAs and per-tier counts: `vendor/skills-sources/manifest.json`.
+
+## Installed in this repo (by tier)
+
+### Tier 0 — Discovery
+
+| Source | Symlink | Command |
+|--------|---------|---------|
+| [vercel-labs/skills](https://github.com/vercel-labs/skills) | `find-skills` | Search/install via `npx skills find` |
+
+### Core (original installer)
+
+| Source | Symlink prefix | Primary commands |
+|--------|----------------|------------------|
+| [shadcn/improve](https://github.com/shadcn/improve) | `improve` | `/improve` — read-only audit → `plans/` |
+| [garrytan/gstack](https://github.com/garrytan/gstack) | `gstack-*` + `~/.cursor/skills` | `/gstack-review`, `/gstack-qa`, `/gstack-investigate` |
+| [mattpocock/skills](https://github.com/mattpocock/skills) | `mp-*` | `/mp-triage`, `/mp-implement`, `/mp-tdd` |
+| [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) | `pstack-*` | `/pstack-poteto-mode`, `/pstack-setup-pstack` |
+| [obra/superpowers](https://github.com/obra/superpowers) | root / `superpowers-*` | TDD, planning, subagent-driven development |
+
+### Tier S+ — Security
+
+| Source | Symlink prefix | Notes |
+|--------|----------------|-------|
+| [trailofbits/skills](https://github.com/trailofbits/skills) | `tob-*` | ~80 skills; **on-demand only** — do not load all into context |
+
+### Tier S+ — Browser QA
+
+| Source | Install | Notes |
+|--------|---------|-------|
+| `agent-browser` CLI | `npm install -g agent-browser && agent-browser install` | Installed by installer; falls back to `npx` |
+| [vercel-labs/agent-browser](https://github.com/vercel-labs/agent-browser) | `agent-browser` | Skill for browser automation workflows |
+
+### Tier S — Web & reference
+
+| Source | Symlink prefix | Notes |
+|--------|----------------|-------|
+| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | `vercel-*` | React best practices, composition patterns, deploy |
+| [anthropics/skills](https://github.com/anthropics/skills) | `anthropic-*` | Dev subset only: mcp-builder, frontend-design, webapp-testing, web-artifacts-builder, skill-creator, claude-api |
+
+### Tier A+ — Toolbox (curated)
+
+| Source | Symlink prefix | Notes |
+|--------|----------------|-------|
+| [github/awesome-copilot](https://github.com/github/awesome-copilot) | `gh-copilot-*` | ~15 high-signal engineering skills (not full 100+ dump) |
+
+Curated subset: codebase knowledge, feature breakdown, implementation plans,
+Playwright exploration, bug reproduction, GitHub issue/PR workflows, agentic
+workflows.
+
+### Stack-specific (Synarch)
+
+| Source | Symlink prefix | Notes |
+|--------|----------------|-------|
+| [supabase/agent-skills](https://github.com/supabase/agent-skills) | `supabase-*` | Postgres best practices, database design |
+
+### Compound Engineering
+
+| Source | Symlink prefix | Notes |
+|--------|----------------|-------|
+| [EveryInc/compound-engineering-plugin](https://github.com/EveryInc/compound-engineering-plugin) | `ce-*` | Full spec→ship→learn pipeline |
+
+**Cursor native install (optional):** `/add-plugin compound-engineering`
+
+## Documented only (not installed wholesale)
+
+These are referenced for optional manual install — installing entire repos causes
+context rot.
+
+| Source | Why documented-only | How to add |
+|--------|---------------------|------------|
+| [microsoft/skills](https://github.com/microsoft/skills) | 100+ skills; too broad for always-on context | `npx skills add microsoft/skills --skill <name>` |
+| [aws/agent-toolkit-for-aws](https://github.com/aws/agent-toolkit-for-aws) | AWS-specific; Synarch uses Bedrock via litellm | Install when AWS agent tooling is needed |
+| [cloudflare/skills](https://github.com/cloudflare/skills) | Edge/workers-specific | `npx skills add cloudflare/skills` |
+| [github/spec-kit](https://github.com/github/spec-kit) | `specify init` mutates repo heavily | See Spec Kit section below |
+
+## Cursor marketplace (native plugins)
+
+Optional; adds hooks + auto-invocation in Cursor UI beyond symlinked skills:
+
+| Plugin | Install |
+|--------|---------|
+| pstack | `/add-plugin pstack` |
+| superpowers | `/add-plugin superpowers` |
+| compound-engineering | `/add-plugin compound-engineering` |
+
+### gstack Cursor caveat
+
+We symlink gstack skills into `.agents/skills/gstack-*` and run `./setup --host
+cursor`. The native Cursor plugin path has known issues
+([gstack#2361](https://github.com/garrytan/gstack/issues/2361)) — prefer
+symlinked skills for Cloud Agents; use `/add-plugin gstack` only if you need
+native hooks and accept potential breakage.
+
+## Spec Kit
+
+Do **not** run `specify init` in the Synarch repo — it rewrites project
+structure. For greenfield projects:
+
+```bash
+# Outside this repo only
+uv tool install specify-cli
+specify init my-project --ai claude
+```
+
+## Universal distribution
 
 | System | URL | Notes |
 |--------|-----|-------|
-| **skills.sh** | https://skills.sh | Vercel-maintained registry + `npx skills add owner/repo`. Supports 50+ agents. The npm for agent skills. |
-| **Agent Skills open standard** | https://agentskills.io | Vendor-neutral `SKILL.md` format (YAML frontmatter + instructions). |
-| **Anthropic skills** | https://github.com/anthropics/skills | Official examples: frontend-design, docx, pdf, mcp-builder, etc. |
-| **Vercel skills** | https://github.com/vercel-labs/agent-skills | React/Next.js performance, composition patterns, deploy. |
-| **Microsoft azure-skills** | https://github.com/microsoft/azure-skills | Azure AI, infra, and enterprise patterns. |
-| **Cursor plugins** | https://github.com/cursor/plugins | Official plugin monorepo (pstack, superpowers, CodeRabbit, etc.). |
+| **skills.sh** | https://skills.sh | Vercel-maintained registry + `npx skills add owner/repo` |
+| **Agent Skills open standard** | https://agentskills.io | Vendor-neutral `SKILL.md` format |
+| **Cursor plugins** | https://github.com/cursor/plugins | Official plugin monorepo |
 
 ```bash
-# Install any public skill repo into detected agents
+npx skills@latest find "postgres"
 npx skills@latest add anthropics/skills --skill frontend-design
 npx skills@latest add vercel-labs/agent-skills
-npx skills@latest add mattpocock/skills
 ```
-
-## Methodology & workflow systems
-
-| System | URL | Best for |
-|--------|-----|----------|
-| **Superpowers** (obra) | https://github.com/obra/superpowers | Spec → plan → TDD → subagent execution pipeline |
-| **pstack** (poteto) | https://github.com/cursor/plugins/tree/main/pstack | Rigorous engineering playbooks, multi-model parallelism |
-| **gstack** (Garry Tan) | https://github.com/garrytan/gstack | Browser QA, design review, ship/land workflows |
-| **improve** (shadcn) | https://github.com/shadcn/improve | Advisor audits; executor-friendly implementation plans |
-| **mattpocock/skills** | https://github.com/mattpocock/skills | Composable engineering skills (triage, TDD, grill-me) |
-| **GSD / BMAD / Spec-Kit** | Various | Full process ownership (heavier than composable skills) |
 
 ## MCP & tool ecosystems (complementary)
 
-Skills teach *how* agents work; MCP servers give *tools*. High-value pairs:
+Skills teach *how* agents work; MCP servers give *tools*.
 
 | MCP / tool plane | Examples |
 |------------------|----------|
@@ -64,16 +184,21 @@ Skills teach *how* agents work; MCP servers give *tools*. High-value pairs:
 
 ## Synarch-specific recommendations
 
-1. **Audit before big refactors:** `/improve quick` → review `plans/README.md`.
-2. **Feature work:** superpowers brainstorming → writing-plans → TDD, or `/pstack-poteto-mode`.
-3. **UI changes:** `/gstack-qa` + manual recording per `AGENTS.md`.
-4. **Credential plane gap:** improve + principal audit both flag litellm-only keys — track as P0.
-5. **Avoid duplicate installs:** pick skills.sh *or* symlink installer for mattpocock; not both.
+1. **Start with discovery:** `find-skills` or `npx skills find` before adding skills.
+2. **Audit before big refactors:** `/improve quick` → review `plans/README.md`.
+3. **Feature work:** pick *one* methodology — superpowers *or* pstack *or* compound-engineering.
+4. **UI changes:** `agent-browser` or `/gstack-qa` + manual recording per `AGENTS.md`.
+5. **Security review:** invoke specific `tob-*` skills (semgrep, codeql, sharp-edges) on demand.
+6. **Postgres/RLS:** `supabase-postgres-best-practices` for query and schema work.
+7. **Avoid duplicate installs:** pick skills.sh *or* symlink installer for the same source.
 
 ## Updating pro skills
 
 ```bash
 bash scripts/cloud-agent/install-pro-skills.sh
+# Inspect counts
+cat vendor/skills-sources/manifest.json | python3 -m json.tool
+ls .agents/skills | wc -l
 ```
 
 Re-clones/pulls upstream and refreshes symlinks. Set `INSTALL_PRO_SKILLS=0` to
