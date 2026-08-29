@@ -1,0 +1,144 @@
+{
+  "installed_at": "2026-08-29T11:56:35.461292+00:00",
+  "pipeline": "discover \u2192 interrogate/spec \u2192 plan \u2192 implement \u2192 review \u2192 security \u2192 browser QA \u2192 ship \u2192 learn",
+  "tier_counts": {
+    "tier0": 1,
+    "tier_s_plus_security": 83,
+    "tier_s_plus_browser": 1,
+    "tier_s_web": 9,
+    "tier_s_reference": 13,
+    "tier_a_toolbox": 26,
+    "stack_supabase": 3,
+    "compound_engineering": 34,
+    "core": 183
+  },
+  "repos": {
+    "vercel-labs-skills": {
+      "path": "vendor/skills-sources/vercel-labs-skills",
+      "sha": "435076e78988e1e6ec40d00b0b1d76bdbbc5419a"
+    },
+    "shadcn-improve": {
+      "path": "vendor/skills-sources/shadcn-improve",
+      "sha": "03369ee6d7cafbfcecc4346539b05b3dc0a603bb"
+    },
+    "garrytan-gstack": {
+      "path": "vendor/skills-sources/garrytan-gstack",
+      "sha": "b5a951e62398abc8aea5beed429cc2617184fcc1"
+    },
+    "mattpocock-skills": {
+      "path": "vendor/skills-sources/mattpocock-skills",
+      "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76"
+    },
+    "obra-superpowers": {
+      "path": "vendor/skills-sources/obra-superpowers",
+      "sha": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797"
+    },
+    "cursor-plugins-pstack": {
+      "path": "vendor/skills-sources/cursor-plugins",
+      "sha": "68836ddaf5697224520f1847d90cdb90ca8babaa"
+    },
+    "trailofbits-skills": {
+      "path": "vendor/skills-sources/trailofbits-skills",
+      "sha": "d1f1575cff97816e5cc08af66cd2506099c681d3"
+    },
+    "vercel-agent-browser": {
+      "path": "vendor/skills-sources/vercel-agent-browser",
+      "sha": "fbd046c23a2c1156891bda294aaaee715c23b3f1"
+    },
+    "vercel-agent-skills": {
+      "path": "vendor/skills-sources/vercel-agent-skills",
+      "sha": "063bee94c3f4df8453406c830b0a7df0f2860278"
+    },
+    "anthropics-skills": {
+      "path": "vendor/skills-sources/anthropics-skills",
+      "sha": "3b3fad96af16a10759d930941b4520ba0c40edae"
+    },
+    "awesome-copilot": {
+      "path": "vendor/skills-sources/awesome-copilot",
+      "sha": "f11a4e441c5ff061b4f8ae37952be8c602e4034e"
+    },
+    "supabase-agent-skills": {
+      "path": "vendor/skills-sources/supabase-agent-skills",
+      "sha": "8331f910845103c08d51f6ca1d86ebb7d1f745e3"
+    },
+    "compound-engineering": {
+      "path": "vendor/skills-sources/compound-engineering",
+      "sha": "a1f601f17137f648be439965f8fdd9123303de5d"
+    }
+  },
+  "linked_skill_count": 353,
+  "linked_skills_sample": [
+    "agent-browser",
+    "anthropic-claude-api",
+    "anthropic-doc-coauthoring",
+    "anthropic-docx",
+    "anthropic-frontend-design",
+    "anthropic-internal-comms",
+    "anthropic-mcp-builder",
+    "anthropic-pdf",
+    "anthropic-pptx",
+    "anthropic-skill-creator",
+    "anthropic-theme-factory",
+    "anthropic-web-artifacts-builder",
+    "anthropic-webapp-testing",
+    "anthropic-xlsx",
+    "ce-babysit-pr",
+    "ce-brainstorm",
+    "ce-code-review",
+    "ce-commit",
+    "ce-commit-push-pr",
+    "ce-compound",
+    "ce-compound-refresh",
+    "ce-debug",
+    "ce-doc-review",
+    "ce-dogfood",
+    "ce-explain",
+    "ce-handoff",
+    "ce-ideate",
+    "ce-lfg",
+    "ce-optimize",
+    "ce-plan",
+    "ce-polish",
+    "ce-pov",
+    "ce-product-pulse",
+    "ce-promote",
+    "ce-proof",
+    "ce-prototype",
+    "ce-resolve-pr-feedback",
+    "ce-retune",
+    "ce-riffrec-feedback-analysis",
+    "ce-setup"
+  ],
+  "cursor_plugins_recommended": [
+    {
+      "name": "pstack",
+      "install": "/add-plugin pstack"
+    },
+    {
+      "name": "superpowers",
+      "install": "/add-plugin superpowers"
+    },
+    {
+      "name": "compound-engineering",
+      "install": "/add-plugin compound-engineering"
+    }
+  ],
+  "documented_only": [
+    {
+      "name": "microsoft/skills",
+      "install": "npx skills add microsoft/skills"
+    },
+    {
+      "name": "aws/agent-toolkit-for-aws",
+      "note": "Install when AWS agent tooling is needed"
+    },
+    {
+      "name": "cloudflare/skills",
+      "note": "Documented in ecosystem guide only"
+    },
+    {
+      "name": "github/spec-kit",
+      "note": "Do not run specify init in-repo; see ecosystem doc"
+    }
+  ]
+}
