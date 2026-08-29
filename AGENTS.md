@@ -101,9 +101,9 @@ discover → interrogate/spec → plan → implement → review → security →
 | spec | `brainstorming`, `ce-brainstorm` | Clarify requirements |
 | plan | `writing-plans`, `ce-plan`, `improve`, `/pstack-poteto-mode` | Implementation plans |
 | implement | `test-driven-development`, `/mp-implement`, `ce-work` | Write code |
-| review | `/gstack-review`, `ce-code-review`, CodeRabbit | Pre-merge review |
+| review | `/review`, `ce-code-review`, CodeRabbit | Pre-merge review |
 | security | `tob-*` (on-demand) | Security audit — invoke specific skill only |
-| browser QA | `agent-browser`, `/gstack-qa` | UI verification |
+| browser QA | `agent-browser`, `/qa` | UI verification |
 | ship | `ce-commit-push-pr`, `vercel-deploy-to-vercel` | Land and deploy |
 | learn | `ce-compound` | Capture learnings |
 
@@ -115,7 +115,7 @@ discover → interrogate/spec → plan → implement → review → security →
 | `/improve` | Read-only codebase audit → prioritized plans in `plans/` |
 | `/pstack-poteto-mode` | Rigorous engineering playbooks (bug fix, perf, ship) |
 | `/mp-triage`, `/mp-implement`, `/mp-tdd` | Matt Pocock engineering workflows |
-| `/gstack-review`, `/gstack-qa`, `/gstack-investigate` | Garry Tan gstack review + browser QA |
+| `/review`, `/qa`, `/investigate`, `/plan-ceo-review` | Garry Tan gstack review + planning |
 | `agent-browser` | Vercel browser automation CLI + skill |
 | `tob-semgrep`, `tob-codeql`, `tob-sharp-edges` | Trail of Bits security (examples) |
 | `vercel-react-best-practices` | Next.js/React performance patterns |
@@ -127,8 +127,10 @@ discover → interrogate/spec → plan → implement → review → security →
 **Optional Cursor marketplace plugins** (hooks + auto-invocation):
 `/add-plugin pstack`, `/add-plugin superpowers`, `/add-plugin compound-engineering`.
 
-**gstack note:** symlinked skills are preferred for Cloud Agents; native
-`/add-plugin gstack` has known issues (gstack#2361).
+**gstack note:** installed with short slash-command names (`/plan-ceo-review`,
+`/review`, `/ship`). Symlinked skills are preferred for Cloud Agents; native
+`/add-plugin gstack` has known issues (gstack#2361). On name collisions with
+other packs, the installer keeps the `gstack-*` variant.
 
 **Spec Kit:** do not run `specify init` in this repo — see ecosystem doc.
 
