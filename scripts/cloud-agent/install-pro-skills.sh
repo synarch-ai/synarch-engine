@@ -159,10 +159,6 @@ link_named_skills() {
       warn "  skip (missing): ${name}"
       continue
     fi
-    if skill_exists "$dest"; then
-      warn "  skip collision: ${dest}"
-      continue
-    fi
     link_skill "$skill_dir" "$dest"
     count=$((count + 1))
   done
@@ -214,13 +210,9 @@ else
   git -C "$PSTACK_DIR" pull --ff-only origin main 2>/dev/null || true
 fi
 
-TIER_COUNTS=()
-
 # --- Tier 0: Discovery (install FIRST) ----------------------------------------
 log "Tier 0: find-skills (discovery)..."
-TIER_COUNTS+=("tier0:$(
-  link_named_skills "${VENDOR_DIR}/vercel-labs-skills/skills" "" find-skills
-)")
+link_named_skills "${VENDOR_DIR}/vercel-labs-skills/skills" "" find-skills >/dev/null
 
 # --- Core: shadcn/improve -----------------------------------------------------
 log "Core: shadcn/improve..."
@@ -295,23 +287,16 @@ fi
 
 # --- Tier S+: Security (Trail of Bits) --------------------------------------
 log "Tier S+: trailofbits/skills (tob- prefix, on-demand)..."
-TIER_COUNTS+=("tier_s_plus_security:$(
-  link_skills_recursive "${VENDOR_DIR}/trailofbits-skills/plugins" "tob-"
-)")
+link_skills_recursive "${VENDOR_DIR}/trailofbits-skills/plugins" "tob-" >/dev/null
 
 # --- Tier S+: Browser QA ------------------------------------------------------
 log "Tier S+: agent-browser CLI + skill..."
 install_agent_browser_cli
-TIER_COUNTS+=("tier_s_plus_browser:$(
-  link_skill "${VENDOR_DIR}/vercel-agent-browser/skills/agent-browser" "agent-browser" >/dev/null
-  echo 1
-)")
+link_skill "${VENDOR_DIR}/vercel-agent-browser/skills/agent-browser" "agent-browser"
 
 # --- Tier S: Vercel agent-skills ----------------------------------------------
 log "Tier S: vercel-labs/agent-skills (vercel- prefix)..."
-TIER_COUNTS+=("tier_s_web:$(
-  link_skills_flat "${VENDOR_DIR}/vercel-agent-skills/skills" "vercel-"
-)")
+link_skills_flat "${VENDOR_DIR}/vercel-agent-skills/skills" "vercel-" >/dev/null
 
 # --- Tier S: Anthropic reference (dev subset) ---------------------------------
 log "Tier S: anthropics/skills (dev subset, anthropic- prefix)..."
@@ -323,9 +308,7 @@ ANTHROPIC_DEV_SKILLS=(
   skill-creator
   claude-api
 )
-TIER_COUNTS+=("tier_s_reference:$(
-  link_named_skills "${VENDOR_DIR}/anthropics-skills/skills" "anthropic-" "${ANTHROPIC_DEV_SKILLS[@]}"
-)")
+link_named_skills "${VENDOR_DIR}/anthropics-skills/skills" "anthropic-" "${ANTHROPIC_DEV_SKILLS[@]}" >/dev/null
 
 # --- Tier A+: awesome-copilot (curated engineering subset) --------------------
 log "Tier A+: github/awesome-copilot (gh-copilot- prefix, curated)..."
@@ -345,34 +328,26 @@ GH_COPILOT_SKILLS=(
   finalize-agent-prompt
   copilot-pr-autopilot
 )
-TIER_A_COUNT=0
 for name in "${GH_COPILOT_SKILLS[@]}"; do
   skill_dir="${VENDOR_DIR}/awesome-copilot/skills/${name}"
   if [ ! -d "$skill_dir" ]; then
     skill_dir="${VENDOR_DIR}/awesome-copilot/.github/skills/${name}"
   fi
   dest="gh-copilot-${name}"
-  if [ -d "$skill_dir" ] && ! skill_exists "$dest"; then
+  if [ -d "$skill_dir" ]; then
     link_skill "$skill_dir" "$dest"
-    TIER_A_COUNT=$((TIER_A_COUNT + 1))
   fi
 done
-# agentic-workflows lives under .github/skills
-if [ -d "${VENDOR_DIR}/awesome-copilot/.github/skills/agentic-workflows" ] && ! skill_exists "gh-copilot-agentic-workflows"; then
+if [ -d "${VENDOR_DIR}/awesome-copilot/.github/skills/agentic-workflows" ]; then
   link_skill "${VENDOR_DIR}/awesome-copilot/.github/skills/agentic-workflows" "gh-copilot-agentic-workflows"
-  TIER_A_COUNT=$((TIER_A_COUNT + 1))
 fi
-TIER_COUNTS+=("tier_a_toolbox:${TIER_A_COUNT}")
 
 # --- Stack: Supabase ----------------------------------------------------------
 log "Stack: supabase/agent-skills (supabase- prefix)..."
-TIER_COUNTS+=("stack_supabase:$(
-  link_skills_flat "${VENDOR_DIR}/supabase-agent-skills/skills" "supabase-"
-)")
+link_skills_flat "${VENDOR_DIR}/supabase-agent-skills/skills" "supabase-" >/dev/null
 
 # --- Compound Engineering -----------------------------------------------------
 log "Compound: EveryInc/compound-engineering-plugin (ce- prefix)..."
-CE_COUNT=0
 for skill_dir in "${VENDOR_DIR}/compound-engineering/skills"/*/; do
   [ -d "$skill_dir" ] || continue
   base="$(basename "$skill_dir")"
@@ -386,15 +361,12 @@ for skill_dir in "${VENDOR_DIR}/compound-engineering/skills"/*/; do
     continue
   fi
   link_skill "$skill_dir" "$dest"
-  CE_COUNT=$((CE_COUNT + 1))
 done
-TIER_COUNTS+=("compound_engineering:${CE_COUNT}")
 
 # --- Write manifest -----------------------------------------------------------
 log "Writing manifest..."
-TIER_COUNTS_JSON="$(printf '%s\n' "${TIER_COUNTS[@]}" | python3 -c 'import json,sys; d={}; [d.__setitem__(k,int(v)) for line in sys.stdin for k,v in [line.strip().split(":",1)]]; print(json.dumps(d))')"
 
-python3 - "$REPO_ROOT" "$TIER_COUNTS_JSON" <<'PY'
+python3 - "$REPO_ROOT" <<'PY'
 import json
 import subprocess
 import sys
@@ -402,7 +374,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 repo_root = Path(sys.argv[1])
-tier_counts = json.loads(sys.argv[2])
 vendor = repo_root / "vendor" / "skills-sources"
 manifest_path = vendor / "manifest.json"
 
@@ -446,6 +417,46 @@ def is_pro_skill(p: Path) -> bool:
     return resolved.startswith(vendor_prefix)
 
 linked = sorted(p.name for p in skills_dir.iterdir() if is_pro_skill(p))
+
+def count_vendor_prefix(repo_key: str, prefix: str = "") -> int:
+    repo_path = str(repos[repo_key].resolve())
+    n = 0
+    for name in linked:
+        target = skills_dir / name
+        try:
+            resolved = str(target.resolve())
+        except OSError:
+            continue
+        if not resolved.startswith(repo_path):
+            continue
+        if prefix and not name.startswith(prefix):
+            continue
+        n += 1
+    return n
+
+tier_counts = {
+    "tier0": sum(1 for n in linked if n == "find-skills"),
+    "tier_s_plus_security": count_vendor_prefix("trailofbits-skills", "tob-"),
+    "tier_s_plus_browser": sum(1 for n in linked if n == "agent-browser"),
+    "tier_s_web": count_vendor_prefix("vercel-agent-skills", "vercel-"),
+    "tier_s_reference": count_vendor_prefix("anthropics-skills", "anthropic-"),
+    "tier_a_toolbox": sum(1 for n in linked if n.startswith("gh-copilot-")),
+    "stack_supabase": count_vendor_prefix("supabase-agent-skills", "supabase-"),
+    "compound_engineering": count_vendor_prefix("compound-engineering"),
+    "core": sum(
+        1 for n in linked
+        if any(
+            str((skills_dir / n).resolve()).startswith(str(repos[k].resolve()))
+            for k in (
+                "shadcn-improve",
+                "garrytan-gstack",
+                "mattpocock-skills",
+                "obra-superpowers",
+                "cursor-plugins-pstack",
+            )
+        )
+    ),
+}
 
 data = {
     "installed_at": datetime.now(timezone.utc).isoformat(),
