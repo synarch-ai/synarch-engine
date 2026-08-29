@@ -28,10 +28,10 @@ flowchart LR
 | **interrogate / spec** | `brainstorming`, `ce-brainstorm`, `gh-copilot-breakdown-feature-prd` | Clarify requirements, write specs |
 | **plan** | `writing-plans`, `ce-plan`, `mp-triage`, `pstack-poteto-mode`, `improve` | Produce implementation plans |
 | **implement** | `test-driven-development`, `mp-implement`, `mp-tdd`, `ce-work` | Write code with TDD or structured execution |
-| **review** | `gstack-review`, `ce-code-review`, `pstack-*`, CodeRabbit | Code review before merge |
+| **review** | `review`, `ce-code-review`, `pstack-*`, CodeRabbit | Code review before merge |
 | **security** | `tob-*` (Trail of Bits, on-demand) | Security audit, static analysis, fuzzing — invoke explicitly |
-| **browser QA** | `agent-browser`, `gstack-qa`, `ce-test-browser` | Manual/automated UI verification |
-| **ship** | `gstack-*`, `ce-commit-push-pr`, `vercel-deploy-to-vercel` | Land PRs, deploy |
+| **browser QA** | `agent-browser`, `qa`, `ce-test-browser` | Manual/automated UI verification |
+| **ship** | `ship`, `ce-commit-push-pr`, `vercel-deploy-to-vercel` | Land PRs, deploy |
 | **learn** | `ce-compound`, `ce-compound-refresh` | Capture learnings for next iteration |
 
 ## Core 10
@@ -43,7 +43,7 @@ High-signal skills every Synarch agent should know about (all installed):
 | 1 | [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) | `pstack-*` | Rigorous engineering playbooks |
 | 2 | [obra/superpowers](https://github.com/obra/superpowers) | (root or `superpowers-*`) | TDD, planning, subagent development |
 | 3 | [mattpocock/skills](https://github.com/mattpocock/skills) | `mp-*` | Composable engineering workflows |
-| 4 | [garrytan/gstack](https://github.com/garrytan/gstack) | `gstack-*` | Review, QA, browser automation |
+| 4 | [garrytan/gstack](https://github.com/garrytan/gstack) | short names (`review`, `plan-ceo-review`; `gstack-*` on collision) | Review, QA, browser automation |
 | 5 | [shadcn/improve](https://github.com/shadcn/improve) | `improve` | Read-only audit → `plans/` |
 | 6 | [trailofbits/skills](https://github.com/trailofbits/skills) | `tob-*` | Security analysis (on-demand) |
 | 7 | [vercel-labs/agent-browser](https://github.com/vercel-labs/agent-browser) | `agent-browser` | CLI + skill for browser QA |
@@ -66,7 +66,7 @@ Pinned SHAs and per-tier counts: `vendor/skills-sources/manifest.json`.
 | Source | Symlink prefix | Primary commands |
 |--------|----------------|------------------|
 | [shadcn/improve](https://github.com/shadcn/improve) | `improve` | `/improve` — read-only audit → `plans/` |
-| [garrytan/gstack](https://github.com/garrytan/gstack) | `gstack-*` + `~/.cursor/skills` | `/gstack-review`, `/gstack-qa`, `/gstack-investigate` |
+| [garrytan/gstack](https://github.com/garrytan/gstack) | short names + `~/.cursor/skills` | `/review`, `/qa`, `/plan-ceo-review`, `/ship` |
 | [mattpocock/skills](https://github.com/mattpocock/skills) | `mp-*` | `/mp-triage`, `/mp-implement`, `/mp-tdd` |
 | [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) | `pstack-*` | `/pstack-poteto-mode`, `/pstack-setup-pstack` |
 | [obra/superpowers](https://github.com/obra/superpowers) | root / `superpowers-*` | TDD, planning, subagent-driven development |
@@ -139,8 +139,10 @@ Optional; adds hooks + auto-invocation in Cursor UI beyond symlinked skills:
 
 ### gstack Cursor caveat
 
-We symlink gstack skills into `.agents/skills/gstack-*` and run `./setup --host
-cursor`. The native Cursor plugin path has known issues
+We symlink gstack skills into `.agents/skills/` with gstack's default short names
+(`/plan-ceo-review`, `/review`) and run `./setup --host cursor --no-prefix` for
+`~/.cursor/skills`. On name collisions with other packs, the installer keeps the
+`gstack-*` variant. The native Cursor plugin path has known issues
 ([gstack#2361](https://github.com/garrytan/gstack/issues/2361)) — prefer
 symlinked skills for Cloud Agents; use `/add-plugin gstack` only if you need
 native hooks and accept potential breakage.

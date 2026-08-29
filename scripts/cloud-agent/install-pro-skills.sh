@@ -204,6 +204,35 @@ link_named_skills() {
   echo "$count"
 }
 
+# gstack's Cursor host always links gstack-* directory names into ~/.cursor/skills.
+# SKILL.md frontmatter uses short names (/plan-ceo-review). Add alias symlinks so
+# slash-command discovery matches gstack's documented command names.
+link_gstack_cursor_aliases() {
+  local cursor_skills="${HOME}/.cursor/skills"
+  local count=0
+
+  [ -d "$cursor_skills" ] || return 0
+
+  for prefixed in "$cursor_skills"/gstack-*/; do
+    [ -d "$prefixed" ] || continue
+    local base short dest
+    base="$(basename "$prefixed")"
+    [ "$base" = "gstack" ] && continue
+    short="${base#gstack-}"
+    [ "$short" = "$base" ] && continue
+    dest="${cursor_skills}/${short}"
+    if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+      continue
+    fi
+    ln -sfn "$prefixed" "$dest"
+    count=$((count + 1))
+  done
+
+  if [ "$count" -gt 0 ] && [ "$QUIET" -eq 0 ]; then
+    log "  gstack cursor aliases: ${count} short-name symlinks"
+  fi
+}
+
 install_agent_browser_cli() {
   if command -v agent-browser >/dev/null 2>&1; then
     log "agent-browser CLI already installed"
@@ -308,19 +337,30 @@ ensure_bun() {
 ensure_bun
 export PATH="${BUN_INSTALL:-$HOME/.bun}/bin:$PATH"
 
-log "Core: gstack setup (cursor, prefixed)..."
+log "Core: gstack setup (cursor, short slash-command names)..."
 GSTACK_QUIET=()
 [ "$QUIET" -eq 1 ] && GSTACK_QUIET=(--quiet)
 (
   cd "${VENDOR_DIR}/garrytan-gstack"
-  ./setup --host cursor --prefix "${GSTACK_QUIET[@]}"
+  ./setup --host cursor --no-prefix "${GSTACK_QUIET[@]}"
 )
+link_gstack_cursor_aliases
 
+# Link into .agents/skills/ with gstack's default short names (/plan-ceo-review).
+# Fall back to gstack-* when another pack already owns the name.
 if [ -d "${VENDOR_DIR}/garrytan-gstack/.agents/skills" ]; then
   for skill_dir in "${VENDOR_DIR}/garrytan-gstack/.agents/skills"/*/; do
     [ -d "$skill_dir" ] || continue
     base="$(basename "$skill_dir")"
-    link_skill "$skill_dir" "gstack-${base#gstack-}"
+    short="${base#gstack-}"
+    if [ "$short" = "$base" ]; then
+      short="$base"
+    fi
+    if skill_exists "$short"; then
+      link_skill "$skill_dir" "gstack-${short}"
+    else
+      link_skill "$skill_dir" "$short"
+    fi
   done
 fi
 
