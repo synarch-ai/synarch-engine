@@ -1,16 +1,20 @@
 {
-  "installed_at": "2026-08-29T11:56:35.461292+00:00",
+  "installed_at": "2026-08-29T18:15:28.286632+00:00",
   "pipeline": "discover \u2192 interrogate/spec \u2192 plan \u2192 implement \u2192 review \u2192 security \u2192 browser QA \u2192 ship \u2192 learn",
   "tier_counts": {
     "tier0": 1,
-    "tier_s_plus_security": 83,
+    "tier_s_plus_security": 81,
     "tier_s_plus_browser": 1,
     "tier_s_web": 9,
     "tier_s_reference": 13,
-    "tier_a_toolbox": 26,
-    "stack_supabase": 3,
+    "tier_a_toolbox": 15,
+    "stack_supabase": 2,
     "compound_engineering": 34,
-    "core": 183
+    "praxstack_discovery": 2,
+    "praxstack_ui": 2,
+    "praxstack_nvidia": 7,
+    "praxstack_wshobson": 3,
+    "core": 237
   },
   "repos": {
     "vercel-labs-skills": {
@@ -23,7 +27,7 @@
     },
     "garrytan-gstack": {
       "path": "vendor/skills-sources/garrytan-gstack",
-      "sha": "b5a951e62398abc8aea5beed429cc2617184fcc1"
+      "sha": "07b59e396c6be5a86619a43151cb9ed62a15ae69"
     },
     "mattpocock-skills": {
       "path": "vendor/skills-sources/mattpocock-skills",
@@ -64,9 +68,33 @@
     "compound-engineering": {
       "path": "vendor/skills-sources/compound-engineering",
       "sha": "a1f601f17137f648be439965f8fdd9123303de5d"
+    },
+    "last30days-skill": {
+      "path": "vendor/skills-sources/last30days-skill",
+      "sha": "a218edadbc3361672f5e5e2cd72a8212b0b3fbb8"
+    },
+    "agent-deep-research": {
+      "path": "vendor/skills-sources/agent-deep-research",
+      "sha": "1b90f0df29b3053b9599ff0c9ffe1a3ababe321c"
+    },
+    "hallmark": {
+      "path": "vendor/skills-sources/hallmark",
+      "sha": "13ac0ec7e148655948100b6396439e481361d690"
+    },
+    "impeccable": {
+      "path": "vendor/skills-sources/impeccable",
+      "sha": "b0594c72d18006b5865c70eb3a97e8b04064e600"
+    },
+    "nvidia-skills": {
+      "path": "vendor/skills-sources/nvidia-skills",
+      "sha": "73a7813441fe714f9cfcb84755cf9ad4bb8e8cae"
+    },
+    "wshobson-agents": {
+      "path": "vendor/skills-sources/wshobson-agents",
+      "sha": "38e19c20d2b154510b0e624a2e3e186b19b5c527"
     }
   },
-  "linked_skill_count": 353,
+  "linked_skill_count": 407,
   "linked_skills_sample": [
     "agent-browser",
     "anthropic-claude-api",
@@ -82,6 +110,12 @@
     "anthropic-web-artifacts-builder",
     "anthropic-webapp-testing",
     "anthropic-xlsx",
+    "autoplan",
+    "benchmark",
+    "benchmark-models",
+    "browse",
+    "canary",
+    "careful",
     "ce-babysit-pr",
     "ce-brainstorm",
     "ce-code-review",
@@ -101,13 +135,7 @@
     "ce-polish",
     "ce-pov",
     "ce-product-pulse",
-    "ce-promote",
-    "ce-proof",
-    "ce-prototype",
-    "ce-resolve-pr-feedback",
-    "ce-retune",
-    "ce-riffrec-feedback-analysis",
-    "ce-setup"
+    "ce-promote"
   ],
   "cursor_plugins_recommended": [
     {
@@ -126,7 +154,8 @@
   "documented_only": [
     {
       "name": "microsoft/skills",
-      "install": "npx skills add microsoft/skills"
+      "install": "npx skills add microsoft/skills --skill <name>",
+      "note": "Context rot if installed wholesale"
     },
     {
       "name": "aws/agent-toolkit-for-aws",
@@ -134,11 +163,55 @@
     },
     {
       "name": "cloudflare/skills",
-      "note": "Documented in ecosystem guide only"
+      "note": "Edge/workers-specific; see ecosystem doc"
     },
     {
       "name": "github/spec-kit",
-      "note": "Do not run specify init in-repo; see ecosystem doc"
+      "note": "Do not run specify init in-repo; see OpenSpec section"
+    },
+    {
+      "name": "wshobson/agents (full)",
+      "note": "94 plugins; only 5 wsh-* specialists installed"
+    },
+    {
+      "name": "remotion-dev/skills",
+      "note": "Video in React; install on demand"
+    },
+    {
+      "name": "entireio/entire",
+      "note": "Agent memory layer; evaluate separately"
+    },
+    {
+      "name": "beads",
+      "note": "Task beads for agents; optional"
+    },
+    {
+      "name": "affaan-m/everything-claude-code",
+      "note": "Claude Code config dump; not for Synarch"
+    },
+    {
+      "name": "openai/plugins",
+      "note": "OpenAI plugin format; not deprecated openai/skills"
+    }
+  ],
+  "repo_specific_tools": [
+    {
+      "name": "OpenSpec",
+      "install": "npm install -g @fission-ai/openspec",
+      "init": "openspec init (greenfield only; do not run in synarch-engine)"
+    },
+    {
+      "name": "Graphify",
+      "install": "uv tool install graphifyy",
+      "init": "graphify install --project (see ecosystem doc for MCP)"
+    },
+    {
+      "name": "Serena",
+      "note": "MCP semantic code retrieval; see ecosystem doc"
+    },
+    {
+      "name": "Context7",
+      "note": "Up-to-date library docs MCP; see ecosystem doc"
     }
   ]
 }

@@ -52,3 +52,6 @@ AI_REVIEW.md
 # Cloned skill sources (reproduced by scripts/cloud-agent/install-pro-skills.sh)
 vendor/skills-sources/*
 !vendor/skills-sources/manifest.json
+
+# Pro skill symlinks (reproduced by scripts/cloud-agent/install-pro-skills.sh)
+.agents/skills/*

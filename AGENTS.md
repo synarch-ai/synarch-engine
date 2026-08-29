@@ -86,9 +86,13 @@ at the end of `install.sh` unless `INSTALL_PRO_SKILLS=0`). Skills symlink into
 `.agents/skills/` from pinned upstream repos under `vendor/skills-sources/`
 (gitignored except `manifest.json`).
 
+See `docs/04-reference-deep-dives/agent-skills-ecosystem.md` for the full
+**PraxStack 2026** architecture diagram, curated tiers, and optional repo
+intelligence tools (OpenSpec, Graphify, Serena MCP, Context7 MCP).
+
 ### Layered workflow
 
-Use **one methodology per task** — do not combine superpowers + pstack +
+Use **one methodology per task** — do not combine gstack + superpowers + pstack +
 compound-engineering on the same feature (context rot).
 
 ```
@@ -97,21 +101,26 @@ discover → interrogate/spec → plan → implement → review → security →
 
 | Stage | Skills | When to use |
 |-------|--------|-------------|
-| discover | `find-skills`, `npx skills find` | Need a capability; search before inventing |
-| spec | `brainstorming`, `ce-brainstorm` | Clarify requirements |
+| discover | `find-skills`, `last30days`, `npx skills find` | Need a capability; search before inventing |
+| spec | `brainstorming`, `ce-brainstorm`, `hallmark audit` | Clarify requirements |
 | plan | `writing-plans`, `ce-plan`, `improve`, `/pstack-poteto-mode` | Implementation plans |
 | implement | `test-driven-development`, `/mp-implement`, `ce-work` | Write code |
-| review | `/review`, `ce-code-review`, CodeRabbit | Pre-merge review |
+| review | `/review`, `ce-code-review`, `impeccable`, CodeRabbit | Pre-merge review |
 | security | `tob-*` (on-demand) | Security audit — invoke specific skill only |
 | browser QA | `agent-browser`, `/qa` | UI verification |
-| ship | `ce-commit-push-pr`, `vercel-deploy-to-vercel` | Land and deploy |
+| ship | `ce-commit-push-pr`, `/ship`, `vercel-deploy-to-vercel` | Land and deploy |
 | learn | `ce-compound` | Capture learnings |
+| research | `last30days`, `research-deep-research` | Trend scan, deep research |
 
 ### Core commands
 
 | Skill / command | When to use |
 |-----------------|-------------|
 | `find-skills` | Discover/install skills from the open ecosystem |
+| `last30days` | 30-day social/web trend research |
+| `research-deep-research` | Async Gemini deep research |
+| `hallmark` | Anti-slop UI design (audit/redesign/study) |
+| `impeccable` | Design QA and polish |
 | `/improve` | Read-only codebase audit → prioritized plans in `plans/` |
 | `/pstack-poteto-mode` | Rigorous engineering playbooks (bug fix, perf, ship) |
 | `/mp-triage`, `/mp-implement`, `/mp-tdd` | Matt Pocock engineering workflows |
@@ -121,8 +130,29 @@ discover → interrogate/spec → plan → implement → review → security →
 | `vercel-react-best-practices` | Next.js/React performance patterns |
 | `supabase-postgres-best-practices` | Postgres query/schema optimization |
 | `ce-plan`, `ce-work`, `ce-compound` | Compound engineering pipeline |
+| `nvidia-rag-blueprint`, `nvidia-cudaq-guide` | NVIDIA RAG/CUDA (on-demand) |
+| `wshobson-api-design-principles` | API design patterns (on-demand) |
 
 **One-time setup per repo:** `/pstack-setup-pstack`, `/mp-setup-matt-pocock-skills`.
+
+**Optional repo-specific tools** (not run by installer — see ecosystem doc):
+
+```bash
+# OpenSpec (greenfield only — do NOT run openspec init in this repo)
+npm install -g @fission-ai/openspec@latest
+
+# Graphify codebase graph + MCP
+uv tool install graphifyy && graphify cursor install --project
+
+# Context7 live library docs MCP
+npx ctx7 setup --cursor
+
+# Serena semantic code retrieval
+uv tool install -p 3.13 serena-agent@latest --prerelease=allow && serena init
+
+# Impeccable hooks (skill symlinked by installer; hooks optional)
+npx impeccable skills install --providers=cursor --no-hooks
+```
 
 **Optional Cursor marketplace plugins** (hooks + auto-invocation):
 `/add-plugin pstack`, `/add-plugin superpowers`, `/add-plugin compound-engineering`.
@@ -136,6 +166,8 @@ other packs, the installer keeps the `gstack-*` variant.
 
 ```bash
 bash scripts/cloud-agent/install-pro-skills.sh   # refresh all tiers
+INSTALL_PRO_SKILLS=1 bash scripts/cloud-agent/install.sh  # full cloud bootstrap
+INSTALL_PRO_SKILLS=0 bash scripts/cloud-agent/install.sh  # skip skills (faster)
 cat vendor/skills-sources/manifest.json          # pinned SHAs + tier counts
 ```
 

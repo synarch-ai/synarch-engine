@@ -16,6 +16,11 @@
 #   Tier A+: github/awesome-copilot (curated subset)
 #   Stack:   supabase/agent-skills
 #   CE:      EveryInc/compound-engineering-plugin
+#   PraxStack 2026 (curated):
+#     Discovery: last30days, deep-research
+#     UI:        hallmark, impeccable
+#     NVIDIA:    rag-blueprint, cudaq-guide, nemo-retriever (nvidia- prefix)
+#     wshobson:  5 specialist skills (wsh- prefix; full repo documented-only)
 #
 set -euo pipefail
 
@@ -204,23 +209,50 @@ link_named_skills() {
   echo "$count"
 }
 
-# gstack's Cursor host always links gstack-* directory names into ~/.cursor/skills.
-# SKILL.md frontmatter uses short names (/plan-ceo-review). Add alias symlinks so
-# slash-command discovery matches gstack's documented command names.
-link_gstack_cursor_aliases() {
+# Link into .agents/skills and ~/.cursor/skills for global discovery/research skills.
+link_global_skill() {
+  local src="$1"
+  local dest_name="$2"
   local cursor_skills="${HOME}/.cursor/skills"
+  local dest
+
+  link_skill "$src" "$dest_name"
+
+  [ -d "$cursor_skills" ] || mkdir -p "$cursor_skills"
+  dest="${cursor_skills}/${dest_name}"
+  if [ -L "$dest" ] || [ -d "$dest" ]; then
+    rm -rf "$dest"
+  fi
+  ln -sfn "$src" "$dest"
+}
+
+link_skill_path() {
+  local skill_dir="$1"
+  local dest_name="$2"
+  if [ ! -f "${skill_dir}/SKILL.md" ]; then
+    warn "  skip (no SKILL.md): ${dest_name}"
+    return 0
+  fi
+  link_skill "$skill_dir" "$dest_name"
+}
+
+# gstack's Cursor host links gstack-* names; SKILL.md uses short names (/plan-ceo-review).
+# Add alias symlinks in a skills directory so slash-command discovery matches gstack docs.
+link_gstack_short_aliases() {
+  local skills_root="$1"
+  local label="${2:-gstack}"
   local count=0
 
-  [ -d "$cursor_skills" ] || return 0
+  [ -d "$skills_root" ] || return 0
 
-  for prefixed in "$cursor_skills"/gstack-*/; do
+  for prefixed in "$skills_root"/gstack-*/; do
     [ -d "$prefixed" ] || continue
     local base short dest
     base="$(basename "$prefixed")"
     [ "$base" = "gstack" ] && continue
     short="${base#gstack-}"
     [ "$short" = "$base" ] && continue
-    dest="${cursor_skills}/${short}"
+    dest="${skills_root}/${short}"
     if [ -e "$dest" ] && [ ! -L "$dest" ]; then
       continue
     fi
@@ -229,8 +261,16 @@ link_gstack_cursor_aliases() {
   done
 
   if [ "$count" -gt 0 ] && [ "$QUIET" -eq 0 ]; then
-    log "  gstack cursor aliases: ${count} short-name symlinks"
+    log "  gstack ${label} aliases: ${count} short-name symlinks"
   fi
+}
+
+link_gstack_cursor_aliases() {
+  link_gstack_short_aliases "${HOME}/.cursor/skills" "cursor"
+}
+
+link_gstack_agents_aliases() {
+  link_gstack_short_aliases "$SKILLS_DIR" "agents"
 }
 
 install_agent_browser_cli() {
@@ -266,6 +306,12 @@ clone_or_update "https://github.com/anthropics/skills.git" "${VENDOR_DIR}/anthro
 clone_or_update "https://github.com/github/awesome-copilot.git" "${VENDOR_DIR}/awesome-copilot"
 clone_or_update "https://github.com/supabase/agent-skills.git" "${VENDOR_DIR}/supabase-agent-skills"
 clone_or_update "https://github.com/EveryInc/compound-engineering-plugin.git" "${VENDOR_DIR}/compound-engineering"
+clone_or_update "https://github.com/mvanhorn/last30days-skill.git" "${VENDOR_DIR}/last30days-skill"
+clone_or_update "https://github.com/24601/agent-deep-research.git" "${VENDOR_DIR}/agent-deep-research"
+clone_or_update "https://github.com/nutlope/hallmark.git" "${VENDOR_DIR}/hallmark"
+clone_or_update "https://github.com/pbakaus/impeccable.git" "${VENDOR_DIR}/impeccable"
+clone_or_update "https://github.com/nvidia/skills.git" "${VENDOR_DIR}/nvidia-skills"
+clone_or_update "https://github.com/wshobson/agents.git" "${VENDOR_DIR}/wshobson-agents"
 
 # pstack: sparse checkout from cursor/plugins monorepo
 PSTACK_DIR="${VENDOR_DIR}/cursor-plugins"
@@ -363,6 +409,7 @@ if [ -d "${VENDOR_DIR}/garrytan-gstack/.agents/skills" ]; then
     fi
   done
 fi
+link_gstack_agents_aliases
 
 # --- Tier S+: Security (Trail of Bits) --------------------------------------
 log "Tier S+: trailofbits/skills (tob- prefix, on-demand)..."
@@ -437,6 +484,74 @@ fi
 log "Stack: supabase/agent-skills (canonical supabase-* names)..."
 link_supabase_agent_skills >/dev/null
 
+# --- PraxStack 2026: Discovery / Research ------------------------------------
+log "PraxStack: discovery/research (global .agents + ~/.cursor/skills)..."
+rm -f "${SKILLS_DIR}/deep-research" "${SKILLS_DIR}/research-deep-research" \
+  "${HOME}/.cursor/skills/deep-research" \
+  "${HOME}/.cursor/skills/research-deep-research" 2>/dev/null || true
+for stale in "${SKILLS_DIR}"/wshobson-* "${SKILLS_DIR}"/wsh-*; do
+  [ -e "$stale" ] || continue
+  rm -rf "$stale"
+done
+link_global_skill \
+  "${VENDOR_DIR}/last30days-skill/skills/last30days" \
+  "last30days"
+link_global_skill \
+  "${VENDOR_DIR}/agent-deep-research" \
+  "research-deep-research"
+
+# --- PraxStack 2026: UI -------------------------------------------------------
+log "PraxStack: UI (hallmark, impeccable)..."
+link_skill_path "${VENDOR_DIR}/hallmark/skills/hallmark" "hallmark"
+IMPECCABLE_SKILL="${VENDOR_DIR}/impeccable/.agents/skills/impeccable"
+if [ ! -d "$IMPECCABLE_SKILL" ]; then
+  IMPECCABLE_SKILL="${VENDOR_DIR}/impeccable/plugin/skills/impeccable"
+fi
+if [ ! -d "$IMPECCABLE_SKILL" ]; then
+  IMPECCABLE_SKILL="${VENDOR_DIR}/impeccable/.cursor/skills/impeccable"
+fi
+if [ -d "$IMPECCABLE_SKILL" ]; then
+  link_skill "$IMPECCABLE_SKILL" "impeccable"
+else
+  warn "  impeccable skill dir missing; see ecosystem doc for npx fallback"
+fi
+if command -v npx >/dev/null 2>&1; then
+  log "  optional: npx impeccable skills install --providers=cursor --no-hooks (for hooks)"
+fi
+
+# --- PraxStack 2026: NVIDIA (curated dev subset) ------------------------------
+log "PraxStack: nvidia/skills (nvidia- prefix, curated subset)..."
+for stale in "${SKILLS_DIR}"/nvidia-*; do
+  [ -e "$stale" ] || continue
+  rm -rf "$stale"
+done
+NVIDIA_SKILLS=(
+  cudaq-guide
+  rag-blueprint
+  rag-eval
+  rag-perf
+  nemo-retriever
+  nvidia-skill-finder
+  aiq-research
+)
+for name in "${NVIDIA_SKILLS[@]}"; do
+  skill_dir="${VENDOR_DIR}/nvidia-skills/skills/${name}"
+  link_skill_path "$skill_dir" "nvidia-${name}"
+done
+
+# --- PraxStack 2026: wshobson/agents (3 specialist skills only) ---------------
+log "PraxStack: wshobson/agents (3 specialist skills, wshobson- prefix)..."
+WSHOBSON_SKILLS=(
+  "plugins/backend-development/skills/api-design-principles"
+  "plugins/backend-development/skills/architecture-patterns"
+  "plugins/developer-essentials/skills/debugging-strategies"
+)
+for rel in "${WSHOBSON_SKILLS[@]}"; do
+  skill_dir="${VENDOR_DIR}/wshobson-agents/${rel}"
+  base="$(basename "$rel")"
+  link_skill_path "$skill_dir" "wshobson-${base}"
+done
+
 # --- Compound Engineering -----------------------------------------------------
 log "Compound: EveryInc/compound-engineering-plugin (ce- prefix)..."
 for skills_root in "${VENDOR_DIR}/compound-engineering/skills" "${VENDOR_DIR}/compound-engineering/.agents/skills"; do
@@ -481,6 +596,12 @@ repos = {
     "awesome-copilot": vendor / "awesome-copilot",
     "supabase-agent-skills": vendor / "supabase-agent-skills",
     "compound-engineering": vendor / "compound-engineering",
+    "last30days-skill": vendor / "last30days-skill",
+    "agent-deep-research": vendor / "agent-deep-research",
+    "hallmark": vendor / "hallmark",
+    "impeccable": vendor / "impeccable",
+    "nvidia-skills": vendor / "nvidia-skills",
+    "wshobson-agents": vendor / "wshobson-agents",
 }
 
 def git_sha(path: Path) -> str | None:
@@ -533,6 +654,14 @@ tier_counts = {
     "tier_a_toolbox": sum(1 for n in linked if n.startswith("gh-copilot-")),
     "stack_supabase": count_vendor_prefix("supabase-agent-skills", "supabase-"),
     "compound_engineering": count_vendor_prefix("compound-engineering"),
+    "praxstack_discovery": sum(
+        1 for n in linked if n in ("last30days", "research-deep-research")
+    ),
+    "praxstack_ui": sum(
+        1 for n in linked if n in ("hallmark", "impeccable")
+    ),
+    "praxstack_nvidia": count_vendor_prefix("nvidia-skills", "nvidia-"),
+    "praxstack_wshobson": sum(1 for n in linked if n.startswith("wshobson-")),
     "core": sum(
         1 for n in linked
         if any(
@@ -564,10 +693,22 @@ data = {
         {"name": "compound-engineering", "install": "/add-plugin compound-engineering"},
     ],
     "documented_only": [
-        {"name": "microsoft/skills", "install": "npx skills add microsoft/skills"},
+        {"name": "microsoft/skills", "install": "npx skills add microsoft/skills --skill <name>", "note": "Context rot if installed wholesale"},
         {"name": "aws/agent-toolkit-for-aws", "note": "Install when AWS agent tooling is needed"},
-        {"name": "cloudflare/skills", "note": "Documented in ecosystem guide only"},
-        {"name": "github/spec-kit", "note": "Do not run specify init in-repo; see ecosystem doc"},
+        {"name": "cloudflare/skills", "note": "Edge/workers-specific; see ecosystem doc"},
+        {"name": "github/spec-kit", "note": "Do not run specify init in-repo; see OpenSpec section"},
+        {"name": "wshobson/agents (full)", "note": "94 plugins; only 5 wsh-* specialists installed"},
+        {"name": "remotion-dev/skills", "note": "Video in React; install on demand"},
+        {"name": "entireio/entire", "note": "Agent memory layer; evaluate separately"},
+        {"name": "beads", "note": "Task beads for agents; optional"},
+        {"name": "affaan-m/everything-claude-code", "note": "Claude Code config dump; not for Synarch"},
+        {"name": "openai/plugins", "note": "OpenAI plugin format; not deprecated openai/skills"},
+    ],
+    "repo_specific_tools": [
+        {"name": "OpenSpec", "install": "npm install -g @fission-ai/openspec", "init": "openspec init (greenfield only; do not run in synarch-engine)"},
+        {"name": "Graphify", "install": "uv tool install graphifyy", "init": "graphify install --project (see ecosystem doc for MCP)"},
+        {"name": "Serena", "note": "MCP semantic code retrieval; see ecosystem doc"},
+        {"name": "Context7", "note": "Up-to-date library docs MCP; see ecosystem doc"},
     ],
 }
 
