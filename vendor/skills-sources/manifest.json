@@ -1,5 +1,5 @@
 {
-  "installed_at": "2026-08-29T18:14:51.745459+00:00",
+  "installed_at": "2026-08-29T18:15:28.286632+00:00",
   "pipeline": "discover \u2192 interrogate/spec \u2192 plan \u2192 implement \u2192 review \u2192 security \u2192 browser QA \u2192 ship \u2192 learn",
   "tier_counts": {
     "tier0": 1,
@@ -12,8 +12,8 @@
     "compound_engineering": 34,
     "praxstack_discovery": 2,
     "praxstack_ui": 2,
-    "praxstack_nvidia": 3,
-    "praxstack_wshobson": 5,
+    "praxstack_nvidia": 7,
+    "praxstack_wshobson": 3,
     "core": 237
   },
   "repos": {
@@ -94,7 +94,7 @@
       "sha": "38e19c20d2b154510b0e624a2e3e186b19b5c527"
     }
   },
-  "linked_skill_count": 405,
+  "linked_skill_count": 407,
   "linked_skills_sample": [
     "agent-browser",
     "anthropic-claude-api",
