@@ -274,15 +274,42 @@ link_gstack_agents_aliases() {
   link_gstack_short_aliases "$SKILLS_DIR" "agents"
 }
 
-# praxstack/skills-and-personas: short names when free; prax-<name> on collision.
+# praxstack/skills-and-personas: prax-<name> by default; short names for public slugs.
 link_praxstack_skill() {
   local skill_dir="$1"
   local name="$2"
-  local dest="$name"
+  local dest="prax-${name}"
+  local skill_target stale target
 
-  if skill_exists "$name"; then
-    dest="prax-${name}"
-  fi
+  # skills.sh public slugs: prefer short name when the slot is free or already ours
+  case "$name" in
+    teach-pro-max|superimprove|coding-agent-leadership-principles|cross-agent-handoff)
+      dest="$name"
+      if skill_exists "$name"; then
+        if [ -L "${SKILLS_DIR}/${name}" ]; then
+          target="$(readlink -f "${SKILLS_DIR}/${name}" 2>/dev/null || true)"
+          skill_target="$(readlink -f "$skill_dir" 2>/dev/null || true)"
+          if [ -z "$target" ] || [ "$target" != "$skill_target" ]; then
+            dest="prax-${name}"
+          fi
+        else
+          dest="prax-${name}"
+        fi
+      fi
+      ;;
+  esac
+
+  skill_target="$(readlink -f "$skill_dir" 2>/dev/null || true)"
+  for stale in "$name" "prax-${name}"; do
+    [ "$stale" = "$dest" ] && continue
+    if [ -L "${SKILLS_DIR}/${stale}" ]; then
+      target="$(readlink -f "${SKILLS_DIR}/${stale}" 2>/dev/null || true)"
+      if [ -n "$target" ] && [ -n "$skill_target" ] && [ "$target" = "$skill_target" ]; then
+        rm -f "${SKILLS_DIR}/${stale}"
+      fi
+    fi
+  done
+
   link_skill "$skill_dir" "$dest"
 }
 

@@ -185,9 +185,11 @@ Pinned SHAs and per-tier counts: `vendor/skills-sources/manifest.json`.
 | [praxstack/skills-and-personas](https://github.com/praxstack/skills-and-personas) | short names + `prax-*` on collision | 38 canonical skills in `new-skills/`; 4 extras in `skills/` |
 
 Installed selectively from the audited `new-skills/` portfolio (not the legacy
-`skills/` tree wholesale). Collision-safe: short names when free; `prax-<name>`
-when another pack or a committed repo skill already owns the name (for example
-`prax-constellation-team` vs the committed `constellation-team/` directory).
+`skills/` tree wholesale). Naming: `prax-<name>` for portfolio skills; four
+public skills.sh slugs keep short names when the slot is free (`teach-pro-max`,
+`superimprove`, `coding-agent-leadership-principles`, `cross-agent-handoff`).
+The committed `constellation-team/` directory remains the Synarch variant;
+canonical praxstack skill is `prax-constellation-team`.
 
 **Canonical portfolio (38 skills):** backend orchestrator + language variants
 (`backend-pe`, `backend-pe-python`, …), cross-functional roles (`principal-engineer`,

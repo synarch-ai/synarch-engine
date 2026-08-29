@@ -1,5 +1,5 @@
 {
-  "installed_at": "2026-08-29T18:24:09.018203+00:00",
+  "installed_at": "2026-08-29T18:25:18.747108+00:00",
   "pipeline": "discover \u2192 interrogate/spec \u2192 plan \u2192 implement \u2192 review \u2192 security \u2192 browser QA \u2192 ship \u2192 learn",
   "tier_counts": {
     "tier0": 1,
@@ -14,7 +14,7 @@
     "praxstack_ui": 2,
     "praxstack_nvidia": 7,
     "praxstack_wshobson": 3,
-    "praxstack_personas": 80,
+    "praxstack_personas": 45,
     "core": 237
   },
   "repos": {
@@ -99,7 +99,7 @@
       "sha": "78a7ee914ae96a56e7e1ad5c27c4dca4b603dc24"
     }
   },
-  "linked_skill_count": 487,
+  "linked_skill_count": 452,
   "linked_skills_sample": [
     "agent-browser",
     "anthropic-claude-api",
@@ -115,22 +115,9 @@
     "anthropic-web-artifacts-builder",
     "anthropic-webapp-testing",
     "anthropic-xlsx",
-    "apex-autonomous-mode",
-    "autonomous-orchestrion",
     "autoplan",
-    "backend-architecture-standards",
-    "backend-pe-cpp",
-    "backend-pe-java",
-    "backend-pe-javascript",
-    "backend-pe-nodejs",
-    "backend-pe-python",
-    "backend-pe-python-ml",
-    "backend-pe-typescript",
-    "backend-system-design-expert",
-    "baron-von-markup",
     "benchmark",
     "benchmark-models",
-    "blueprint-creator",
     "browse",
     "canary",
     "careful",
@@ -140,7 +127,20 @@
     "ce-commit",
     "ce-commit-push-pr",
     "ce-compound",
-    "ce-compound-refresh"
+    "ce-compound-refresh",
+    "ce-debug",
+    "ce-doc-review",
+    "ce-dogfood",
+    "ce-explain",
+    "ce-handoff",
+    "ce-ideate",
+    "ce-lfg",
+    "ce-optimize",
+    "ce-plan",
+    "ce-polish",
+    "ce-pov",
+    "ce-product-pulse",
+    "ce-promote"
   ],
   "cursor_plugins_recommended": [
     {

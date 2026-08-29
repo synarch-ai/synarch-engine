@@ -132,9 +132,9 @@ discover → interrogate/spec → plan → implement → review → security →
 | `ce-plan`, `ce-work`, `ce-compound` | Compound engineering pipeline |
 | `nvidia-rag-blueprint`, `nvidia-cudaq-guide` | NVIDIA RAG/CUDA (on-demand) |
 | `wshobson-api-design-principles` | API design patterns (on-demand) |
-| `kingmode`, `super-mode-core` | Deep reasoning / multi-mode orchestrators (praxstack) |
+| `kingmode`, `prax-kingmode`, `super-mode-core` | Deep reasoning orchestrators (praxstack) |
 | `constellation-team` / `prax-constellation-team` | Cross-functional star-team workflow |
-| `principal-engineer`, `product-manager`, `qa-security-engineer` | Role personas (praxstack) |
+| `prax-principal-engineer`, `prax-product-manager`, `prax-qa-security-engineer` | Role personas (praxstack) |
 | `teach-pro-max` | Adaptive evidence-oriented tutoring |
 | `transcript-pipeline`, `blueprint-creator`, `spec-creator` | Document production (praxstack) |
 
@@ -170,8 +170,9 @@ prompts from the vendor clone (not copied into the repo):
 
 **Constellation team:** use `constellation-team` (committed Synarch variant) or
 `prax-constellation-team` (canonical praxstack audited skill). Role skills:
-`principal-engineer`, `product-manager`, `frontend-uiux-designer`,
-`backend-system-design-expert`, `qa-security-engineer`, `devops-sre-engineer`.
+`prax-principal-engineer`, `prax-product-manager`, `prax-frontend-uiux-designer`,
+`prax-backend-system-design-expert`, `prax-qa-security-engineer`,
+`prax-devops-sre-engineer`.
 
 **Optional repo-specific tools** (not run by installer — see ecosystem doc):
 
