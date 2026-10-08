@@ -23,7 +23,8 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/metrics/daily');
+        // Same-origin server route: it adds the backend API key server-side (codex P2).
+        const response = await fetch('/api/metrics/daily', { cache: 'no-store' });
         if (!response.ok) throw new Error('Failed to fetch metrics');
         const data = await response.json();
 

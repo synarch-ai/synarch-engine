@@ -76,6 +76,10 @@ if [ ! -f apps/web/.env.local ]; then
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 NEXT_PUBLIC_SSE_BASE_URL=http://localhost:8000
 NEXT_PUBLIC_ENABLE_MISSION_STREAM=true
+# Server-only (read by app/api routes, never sent to the browser). Set SYNARCH_API_KEY
+# to the backend's API_KEY when it is configured; never use a NEXT_PUBLIC_ name for it.
+SYNARCH_API_URL=http://localhost:8000
+SYNARCH_API_KEY=
 ENV
 fi
 
