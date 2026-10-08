@@ -115,6 +115,9 @@ class NoopMissionRuntime:
     async def launch_mission(self, mission_id: UUID) -> None:
         return None
 
+    async def stop_mission(self, mission_id: UUID) -> bool:
+        return False
+
 
 @dataclass
 class _TestContainer:

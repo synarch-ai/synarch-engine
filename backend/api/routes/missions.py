@@ -142,6 +142,7 @@ async def cancel_mission(
     mission_id: str,
     request: Request,
     mission_repo: MissionRepository = Depends(get_mission_repository),
+    mission_runtime=Depends(get_mission_runtime),
 ):
     """Cancel a running mission (FR-3)."""
     mission_uuid = _parse_mission_id(mission_id)
@@ -153,6 +154,7 @@ async def cancel_mission(
         MissionStatus.CANCELLED.value,
         expected_version=mission.version,
     )
+    await mission_runtime.stop_mission(mission_uuid)
     return {
         "mission_id": mission_id,
         "status": MissionStatus.CANCELLED.value,
@@ -165,6 +167,7 @@ async def pause_mission(
     mission_id: str,
     request: Request,
     mission_repo: MissionRepository = Depends(get_mission_repository),
+    mission_runtime=Depends(get_mission_runtime),
 ):
     """Pause a running mission (FR-3)."""
     mission_uuid = _parse_mission_id(mission_id)
@@ -176,6 +179,7 @@ async def pause_mission(
         MissionStatus.PAUSED.value,
         expected_version=mission.version,
     )
+    await mission_runtime.stop_mission(mission_uuid)
     return {
         "mission_id": mission_id,
         "status": MissionStatus.PAUSED.value,
@@ -188,6 +192,7 @@ async def resume_mission(
     mission_id: str,
     request: Request,
     mission_repo: MissionRepository = Depends(get_mission_repository),
+    mission_runtime=Depends(get_mission_runtime),
 ):
     """Resume a paused mission (FR-3)."""
     mission_uuid = _parse_mission_id(mission_id)
@@ -199,6 +204,7 @@ async def resume_mission(
         MissionStatus.EXECUTING.value,
         expected_version=mission.version,
     )
+    await mission_runtime.launch_mission(mission_uuid)
     return {
         "mission_id": mission_id,
         "status": MissionStatus.EXECUTING.value,

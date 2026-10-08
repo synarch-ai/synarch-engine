@@ -184,6 +184,35 @@ class MissionOrchestratorRuntime:
                 raise
         raise RuntimeError(f"Failed to transition mission '{mission_id}' to '{status.value}' due to conflicts.")
 
+    async def stop_mission(self, mission_id: UUID) -> bool:
+        """Cancel the in-process task running a mission (pause/cancel support, SYN-005)."""
+        task = self._running_tasks.get(str(mission_id))
+        if task is None or task.done():
+            return False
+        task.cancel()
+        try:
+            await task
+        except BaseException:  # noqa: BLE001 - CancelledError or task's own error
+            pass
+        return True
+
+    async def _finish(self, mission_id: UUID, status: MissionStatus) -> None:
+        """Terminal transition that never overrides an externally-set status."""
+        mission = await self.mission_repo.get(mission_id)
+        if mission is None or _enum_value(mission.status) != MissionStatus.EXECUTING.value:
+            logger.info(
+                "Mission %s left executing state (%s); skipping transition to %s.",
+                mission_id, _enum_value(mission.status) if mission else None, status.value,
+            )
+            return
+        try:
+            await self._transition(mission_id, status)
+        except Exception as exc:
+            if getattr(exc, "code", None) == "MISSION_INVALID_TRANSITION":
+                logger.info("Mission %s transition to %s no longer valid: %s", mission_id, status.value, exc)
+                return
+            raise
+
     async def launch_mission(self, mission_id: UUID) -> None:
         mission_key = str(mission_id)
         existing = self._running_tasks.get(mission_key)
@@ -194,7 +223,8 @@ class MissionOrchestratorRuntime:
         self._running_tasks[mission_key] = task
 
         def _cleanup(completed: asyncio.Task[Any]) -> None:
-            self._running_tasks.pop(mission_key, None)
+            if self._running_tasks.get(mission_key) is completed:
+                self._running_tasks.pop(mission_key, None)
             if completed.cancelled():
                 return
             error = completed.exception()
@@ -221,7 +251,16 @@ class MissionOrchestratorRuntime:
             logger.warning("Mission %s disappeared before orchestration start.", mission_id)
             return
 
+        if _enum_value(mission.status) not in {
+            MissionStatus.CREATED.value,
+            MissionStatus.PLANNING.value,
+            MissionStatus.EXECUTING.value,
+        }:
+            logger.info("Mission %s in status %s is not runnable; skipping.", mission_id, _enum_value(mission.status))
+            return
+
         mission_id_str = str(mission.id)
+        cancelled = False
         try:
             if _enum_value(mission.status) == MissionStatus.CREATED.value:
                 planning = await self._transition(mission.id, MissionStatus.PLANNING)
@@ -270,10 +309,13 @@ class MissionOrchestratorRuntime:
                         "message": str(final_state["error"]),
                     },
                 )
-                await self._transition(mission.id, MissionStatus.FAILED)
+                await self._finish(mission.id, MissionStatus.FAILED)
                 return
 
-            await self._transition(mission.id, MissionStatus.COMPLETED)
+            await self._finish(mission.id, MissionStatus.COMPLETED)
+        except asyncio.CancelledError:
+            cancelled = True
+            raise
         except BudgetExceededError as exc:
             await self.mission_repo.patch_payload(
                 mission.id,
@@ -282,7 +324,7 @@ class MissionOrchestratorRuntime:
                     "message": str(exc),
                 },
             )
-            await self._transition(mission.id, MissionStatus.PAUSED_AWAITING_RESOURCES)
+            await self._finish(mission.id, MissionStatus.PAUSED_AWAITING_RESOURCES)
         except Exception as exc:
             logger.exception("Mission orchestration failed for %s: %s", mission.id, exc)
             await self.mission_repo.patch_payload(
@@ -292,6 +334,7 @@ class MissionOrchestratorRuntime:
                     "message": str(exc),
                 },
             )
-            await self._transition(mission.id, MissionStatus.FAILED)
+            await self._finish(mission.id, MissionStatus.FAILED)
         finally:
-            await self.budget_guard.clear(mission_id_str)
+            if not cancelled:
+                await self.budget_guard.clear(mission_id_str)
