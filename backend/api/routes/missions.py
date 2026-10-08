@@ -101,14 +101,17 @@ async def get_mission_state(
     if not mission:
         raise MissionNotFoundError(mission_id)
 
+    result = mission.result or {}
     return MissionStateResponse(
         mission_id=str(mission.id),
         goal=mission.goal,
         status=_value(mission.status),
         authority_mode=_value(mission.authority_mode),
         plan=mission.plan,
-        tasks=[],
-        deliverables=[],
+        tasks=result.get("tasks") or [],
+        deliverables=result.get("deliverables") or [],
+        messages=result.get("messages") or [],
+        final_output=result.get("final_output"),
         created_at=mission.created_at,
         updated_at=mission.updated_at,
         completed_at=mission.completed_at,

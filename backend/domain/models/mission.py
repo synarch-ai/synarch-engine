@@ -39,3 +39,4 @@ class Mission(BaseModel):
     completed_at: datetime | None = None
     error_context: dict | None = None
     thread_id: str | None = None
+    result: dict | None = None  # final_output, deliverables, messages, tasks (SYN-054)

@@ -101,10 +101,13 @@ class InMemoryMissionRepository(MissionRepository):
         *,
         plan: list[str] | None = None,
         error_context: dict | None = None,
+        result: dict | None = None,
     ) -> None:
         mission = self._missions.get(mission_id)
         if mission is None:
             return
+        if result is not None:
+            mission.result = result
         if plan is not None:
             mission.plan = plan
         if error_context is not None:

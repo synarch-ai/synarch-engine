@@ -345,6 +345,18 @@ class MissionOrchestratorRuntime:
                 mission.id,
                 plan=final_state.get("plan") or [],
             )
+            try:
+                await self.mission_repo.patch_payload(
+                    mission.id,
+                    result={
+                        "final_output": final_state.get("final_output"),
+                        "deliverables": final_state.get("deliverables") or [],
+                        "messages": final_state.get("messages") or [],
+                        "tasks": final_state.get("tasks") or [],
+                    },
+                )
+            except Exception:
+                logger.exception("Failed to persist result for mission %s (is migration 003 applied?)", mission.id)
 
             if final_state.get("error"):
                 await self.mission_repo.patch_payload(

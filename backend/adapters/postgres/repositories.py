@@ -180,7 +180,8 @@ class PostgresMissionRepository(MissionRepository):
                     m.completed_at,
                     m.thread_id,
                     mp.plan,
-                    mp.error_context
+                    mp.error_context,
+                    to_jsonb(mp) -> 'result' AS result
                 FROM missions m
                 LEFT JOIN mission_payloads mp ON mp.mission_id = m.id
                 WHERE m.id = $1::uuid
@@ -202,6 +203,7 @@ class PostgresMissionRepository(MissionRepository):
                 completed_at=row["completed_at"],
                 error_context=_json_field(row["error_context"]),
                 thread_id=row["thread_id"],
+                result=_json_field(row["result"]),
             )
 
     async def update_status(self, mission_id: UUID, status: str, **kwargs) -> None:
@@ -454,26 +456,30 @@ class PostgresMissionRepository(MissionRepository):
         *,
         plan: list[str] | None = None,
         error_context: dict | None = None,
+        result: dict | None = None,
     ) -> None:
         plan_json = json.dumps(plan) if plan is not None else None
         error_context_json = json.dumps(error_context) if error_context is not None else None
-        if plan_json is None and error_context_json is None:
+        result_json = json.dumps(result, default=str) if result is not None else None
+        if plan_json is None and error_context_json is None and result_json is None:
             return
 
         async with self.pool.acquire() as conn:
             async with conn.transaction():
                 await conn.execute(
                     """
-                    INSERT INTO mission_payloads (mission_id, plan, error_context)
-                    VALUES ($1::uuid, $2::jsonb, $3::jsonb)
+                    INSERT INTO mission_payloads (mission_id, plan, error_context, result)
+                    VALUES ($1::uuid, $2::jsonb, $3::jsonb, $4::jsonb)
                     ON CONFLICT (mission_id) DO UPDATE
                     SET
                         plan = COALESCE(EXCLUDED.plan, mission_payloads.plan),
-                        error_context = COALESCE(EXCLUDED.error_context, mission_payloads.error_context)
+                        error_context = COALESCE(EXCLUDED.error_context, mission_payloads.error_context),
+                        result = COALESCE(EXCLUDED.result, mission_payloads.result)
                     """,
                     mission_id,
                     plan_json,
                     error_context_json,
+                    result_json,
                 )
                 await conn.execute(
                     """
