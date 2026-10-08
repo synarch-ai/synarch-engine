@@ -13,6 +13,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse, Response
 
 
+_NEVER_STORE = {401, 403}
+
+
 def _error(request_id: str, code: str, message: str, status_code: int, details: dict | None = None) -> JSONResponse:
     return JSONResponse(
         status_code=status_code,
@@ -92,6 +95,10 @@ class IdempotencyMiddleware(BaseHTTPMiddleware):
             return replay
 
         response = await call_next(request)
+        if response.status_code in _NEVER_STORE:
+            # Auth failures must not occupy the key: a retry with valid credentials
+            # has to execute, not replay the 401/403 (review M1).
+            return response
         raw_body = b""
         if hasattr(response, "body_iterator"):
             async for chunk in response.body_iterator:
