@@ -1,7 +1,19 @@
 """Janus — Reviewer Agent (Tier 3): Quality gate."""
+import re
+
 from domain.agents.base import AgentNode
 from domain.orchestrator.state import MissionState
 from domain.events.types import EventTypes
+
+
+_VERDICT_LINE = re.compile(r"^[\s>*#_`\-]*verdict[\s*_`]*[:=\-][\s*_`]*(PASS|REVISE|FAIL)\b", re.I | re.M)
+_LEADING_TOKEN = re.compile(r"^[\s>*#_`\-]*(PASS|REVISE|FAIL)\b", re.I | re.M)
+
+
+def parse_verdict(response: str) -> str:
+    """Anchored verdict extraction. Unparseable output -> REVISE (never a silent PASS)."""
+    match = _VERDICT_LINE.search(response or "") or _LEADING_TOKEN.search(response or "")
+    return match.group(1).upper() if match else "REVISE"
 
 
 class JanusAgent(AgentNode):
@@ -18,7 +30,8 @@ class JanusAgent(AgentNode):
             f"REVISION COUNT: {revision_count}/3\n\n"
             f"Review each deliverable for quality, completeness, and correctness.\n"
             f"Issue a verdict: PASS (ready for synthesis), REVISE (needs improvement), or FAIL (unsalvageable).\n"
-            f"Provide specific feedback."
+            f"Begin your reply with a line of exactly the form 'VERDICT: PASS', 'VERDICT: REVISE' or 'VERDICT: FAIL', "
+            f"then provide specific feedback."
         )
 
         response = await self.invoke_llm(
@@ -26,12 +39,7 @@ class JanusAgent(AgentNode):
             mission_id=mission_id,
         )
 
-        # Extract verdict (simplified — will use structured output)
-        verdict = "PASS"
-        if "REVISE" in response.upper():
-            verdict = "REVISE"
-        elif "FAIL" in response.upper():
-            verdict = "FAIL"
+        verdict = parse_verdict(response)
 
         await self.emit_event(
             EventTypes.DELIVERABLE_REVIEWED,
