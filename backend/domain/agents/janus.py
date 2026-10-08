@@ -6,20 +6,19 @@ from domain.orchestrator.state import MissionState
 from domain.events.types import EventTypes
 
 
-_VERDICT_LINE = re.compile(r"^[\s>*#_`\-]*verdict[\s*_`]*[:=\-][\s*_`]*(PASS|REVISE|FAIL)\b", re.I | re.M)
-# Fallback: a bare verdict token, only on the first non-empty line, and only when it is
+# Janus must open its reply with its verdict, so only the first non-empty line is parsed:
+# verdict-looking text quoted from a deliverable further down is never read (codex P2).
+_VERDICT_LINE = re.compile(r"^[\s>*#_`\-]*verdict[\s*_`]*[:=\-][\s*_`]*(PASS|REVISE|FAIL)\b", re.I)
+# Or a bare verdict token on that same line, only when it is
 # the whole statement ("PASS", "FAIL: ...", "REVISE - ..."), never a word such as
 # "Pass rate ..." or "Fail-safe ..." (review m2).
 _LEADING_TOKEN = re.compile(r"^[\s>*#_`\-]*(PASS|REVISE|FAIL)[*_`]*(?:\s*[:.!]|\s+[-\u2013\u2014]\s|\s*$)", re.I)
 
 
 def parse_verdict(response: str) -> str:
-    """Anchored verdict extraction. Unparseable output -> REVISE (never a silent PASS)."""
-    text = response or ""
-    match = _VERDICT_LINE.search(text)
-    if match is None:
-        first_line = next((line for line in text.splitlines() if line.strip()), "")
-        match = _LEADING_TOKEN.match(first_line)
+    """Verdict from the reply's first non-empty line only. Unparseable -> REVISE (never a silent PASS)."""
+    first_line = next((line for line in (response or "").splitlines() if line.strip()), "")
+    match = _VERDICT_LINE.match(first_line) or _LEADING_TOKEN.match(first_line)
     return match.group(1).upper() if match else "REVISE"
 
 
