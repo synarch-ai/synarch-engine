@@ -24,7 +24,7 @@ from domain.agents.thoth import ThothAgent
 from domain.agents.zeus import ZeusAgent
 from domain.models.agent_message import MissionPhase
 from domain.models.mission import Mission, MissionStatus
-from domain.orchestrator.exceptions import BudgetExceededError
+from domain.orchestrator.exceptions import BudgetExceededError, ResultPersistError
 from domain.orchestrator.graph import build_graph
 from ports.checkpointer import CheckpointerPort
 from ports.event_bus import EventBusPort
@@ -215,6 +215,23 @@ class MissionOrchestratorRuntime:
             logger.warning("Could not load checkpoint: %s", exc)
             return None
         return snapshot if snapshot is not None and snapshot.values else None
+
+    async def _persist_result(self, mission_id: UUID, result: dict[str, Any]) -> None:
+        attempts = max(1, self.settings.persist_retry_attempts)
+        for attempt in range(1, attempts + 1):
+            try:
+                await self.mission_repo.patch_payload(mission_id, result=result)
+                return
+            except Exception as exc:  # noqa: BLE001 - retried, then surfaced as ResultPersistError
+                logger.warning(
+                    "Result write for mission %s failed (attempt %d/%d): %s", mission_id, attempt, attempts, exc,
+                )
+                if attempt == attempts:
+                    raise ResultPersistError(
+                        f"result could not be stored after {attempts} attempts "
+                        f"(is migration 003 applied?): {exc}"
+                    ) from exc
+                await asyncio.sleep(self.settings.persist_retry_delay_seconds * attempt)
 
     def _lease_key(self, mission_id: UUID) -> str:
         return f"synarch:mission:{mission_id}:lease"
@@ -440,18 +457,16 @@ class MissionOrchestratorRuntime:
                 mission.id,
                 plan=final_state.get("plan") or [],
             )
-            try:
-                await self.mission_repo.patch_payload(
-                    mission.id,
-                    result={
-                        "final_output": final_state.get("final_output"),
-                        "deliverables": final_state.get("deliverables") or [],
-                        "messages": final_state.get("messages") or [],
-                        "tasks": final_state.get("tasks") or [],
-                    },
-                )
-            except Exception:
-                logger.exception("Failed to persist result for mission %s (is migration 003 applied?)", mission.id)
+            # Never report COMPLETED without a stored result (codex P1): retry, then fail.
+            await self._persist_result(
+                mission.id,
+                {
+                    "final_output": final_state.get("final_output"),
+                    "deliverables": final_state.get("deliverables") or [],
+                    "messages": final_state.get("messages") or [],
+                    "tasks": final_state.get("tasks") or [],
+                },
+            )
 
             if final_state.get("error"):
                 await self.mission_repo.patch_payload(
@@ -468,6 +483,13 @@ class MissionOrchestratorRuntime:
         except asyncio.CancelledError:
             cancelled = True
             raise
+        except ResultPersistError as exc:
+            logger.error("Mission %s failed: %s", mission.id, exc)
+            await self.mission_repo.patch_payload(
+                mission.id,
+                error_context={"code": "RESULT_PERSIST_FAILED", "message": str(exc)},
+            )
+            await self._finish(mission.id, MissionStatus.FAILED)
         except BudgetExceededError as exc:
             await self.mission_repo.patch_payload(
                 mission.id,

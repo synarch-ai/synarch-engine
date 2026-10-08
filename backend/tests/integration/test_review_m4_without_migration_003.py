@@ -108,9 +108,13 @@ async def test_payload_writes_and_mission_run_work_without_003(repo_without_003)
     runtime = MissionOrchestratorRuntime(
         mission_repo=repo, model_provider=FakeModelProvider(), event_bus=FakeEventBus(),
         checkpointer=FakeCheckpointer(), redis_client=FakeRedis(),
-        settings=Settings(model_call_budget_cap=40, require_durable_checkpointer=False),
+        settings=Settings(
+            model_call_budget_cap=40, require_durable_checkpointer=False, persist_retry_delay_seconds=0,
+        ),
     )
     await runtime.run_mission(m2.id)
     done = await repo.get(m2.id)
-    assert str(getattr(done.status, "value", done.status)) == "completed"  # not stuck in executing
+    # Not stuck in executing, and never COMPLETED without a stored result (codex P1).
+    assert str(getattr(done.status, "value", done.status)) == "failed"
+    assert done.error_context["code"] == "RESULT_PERSIST_FAILED"
     assert done.plan

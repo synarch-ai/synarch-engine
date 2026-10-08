@@ -47,6 +47,10 @@ class Settings(BaseSettings):
     budget_counter_ttl_seconds: int = 86400
     require_durable_checkpointer: bool = True
     mission_lease_seconds: int = 120
+    # Bounded retries for the durable reads/writes a mission's outcome depends on
+    # (result write, checkpoint read) before the run fails instead of guessing.
+    persist_retry_attempts: int = 3
+    persist_retry_delay_seconds: float = 0.5
 
     # --- HITL ---
     approval_timeout_seconds: int = 300
