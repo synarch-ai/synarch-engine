@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 from datetime import datetime
+from pathlib import Path
 from uuid import UUID, uuid4
 
 import asyncpg
@@ -12,6 +13,9 @@ import asyncpg
 from api.middleware.errors import SynarchError
 from domain.models.mission import Mission
 from ports.persistence import MissionRepository
+
+
+MIGRATIONS_DIR = Path(__file__).parent / "migrations"
 
 
 def _enum_value(value: object) -> str:
@@ -511,3 +515,28 @@ async def create_postgres_pool(database_url: str) -> asyncpg.Pool:
             if attempts >= max_attempts:
                 raise
             await asyncio.sleep(min(2**attempts, 10))
+
+
+async def ensure_mission_result_column(pool: asyncpg.Pool) -> bool:
+    """Apply migration 003 to databases created before it existed. Returns True if applied.
+
+    docker-compose only runs ``docker-entrypoint-initdb.d`` scripts on a fresh volume,
+    so an existing ``postgres_data`` volume never receives 003 (codex P1). 003 is
+    idempotent; it is only executed when the column is actually missing, so no
+    ALTER privilege is needed on an up-to-date schema.
+    """
+    async with pool.acquire() as conn:
+        present = await conn.fetchval(
+            """
+            SELECT EXISTS (
+                SELECT 1 FROM pg_attribute
+                WHERE attrelid = to_regclass('mission_payloads')
+                  AND attname = 'result'
+                  AND NOT attisdropped
+            )
+            """
+        )
+        if present:
+            return False
+        await conn.execute((MIGRATIONS_DIR / "003_mission_result.sql").read_text())
+        return True

@@ -63,9 +63,12 @@ async def create_container(settings: Settings) -> Container:
         from adapters.postgres.repositories import (
             PostgresMissionRepository,
             create_postgres_pool,
+            ensure_mission_result_column,
         )
 
         db_pool = await create_postgres_pool(settings.database_url)
+        if await ensure_mission_result_column(db_pool):
+            logger.info("Applied migration 003 (mission_payloads.result) to an existing database.")
         mission_repo = PostgresMissionRepository(db_pool)
         logger.info("PostgreSQL mission repository initialized.")
     except Exception as e:
