@@ -19,7 +19,7 @@ from config import Settings
 from domain.agents.hephaestus import HephaestusAgent
 from domain.agents.hermes import HermesAgent
 from domain.agents.janus import JanusAgent
-from domain.agents.synarch import SynarchAgent
+from domain.agents.synarch import SynarchAgent, SynthesizerAgent
 from domain.agents.thoth import ThothAgent
 from domain.agents.zeus import ZeusAgent
 from domain.models.agent_message import MissionPhase
@@ -130,6 +130,12 @@ class MissionOrchestratorRuntime:
             **agent_common,
         )
 
+        synthesizer = SynthesizerAgent(
+            name="synarch",
+            model=self.settings.model_synarch,
+            **agent_common,
+        )
+
         return {
             "synarch": synarch,
             "zeus": zeus,
@@ -137,12 +143,14 @@ class MissionOrchestratorRuntime:
             "hermes": hermes,
             "hephaestus": hephaestus,
             "janus": janus,
-            "synthesize": synarch,
+            "synthesize": synthesizer,
             "fail": self._fail_node,
         }
 
     async def _fail_node(self, state: dict[str, Any]) -> dict[str, Any]:
         feedback = state.get("review_feedback") or "Janus returned FAIL verdict"
+        if state.get("review_verdict") == "REVISE":
+            feedback = f"revision limit exhausted without PASS; needs human review. Last feedback: {feedback}"
         return {
             "phase": MissionPhase.REVIEWING.value,
             "error": f"REVIEW_FAILED: {feedback}",
