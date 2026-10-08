@@ -11,6 +11,7 @@ sys.path.insert(0, ".")
 from config import get_settings
 from container import create_container, shutdown_container
 from api.app import create_app
+from api.security import resolve_bind
 
 logging.basicConfig(
     level=logging.INFO,
@@ -49,6 +50,7 @@ app = create_app(
     cors_origins=settings.cors_origins,
     enable_idempotency=settings.enable_idempotency_middleware,
     idempotency_ttl_seconds=settings.idempotency_ttl_seconds,
+    api_key=settings.api_key or None,
 )
 app.router.lifespan_context = lifespan
 
@@ -56,7 +58,7 @@ app.router.lifespan_context = lifespan
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
+        host=resolve_bind(settings.host, settings.api_key or None),
+        port=settings.port,
+        reload=settings.reload,
     )

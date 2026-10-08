@@ -52,6 +52,10 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
 
     # --- API ---
+    api_key: str = ""  # shared secret (env API_KEY); empty = no auth (loopback only)
+    host: str = "127.0.0.1"
+    port: int = 8000
+    reload: bool = False
     idempotency_ttl_seconds: int = 86400
     enable_idempotency_middleware: bool = True
 

@@ -68,7 +68,7 @@ fi
 # --- Backend API (FastAPI / uvicorn, :8000) -------------------------------
 if ! curl -fsS http://localhost:8000/api/v1/health >/dev/null 2>&1; then
   log "Starting Synarch backend on :8000"
-  nohup bash -c "cd '${REPO_ROOT}/backend' && source .venv/bin/activate && exec uvicorn main:app --host 0.0.0.0 --port 8000" \
+  nohup bash -c "cd '${REPO_ROOT}/backend' && source .venv/bin/activate && exec uvicorn main:app --host 127.0.0.1 --port 8000" \
     > /tmp/synarch-backend.log 2>&1 &
 else
   log "Backend already running."

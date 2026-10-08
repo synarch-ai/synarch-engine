@@ -1,9 +1,10 @@
 """FastAPI application factory."""
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from api.routes import missions, agents, health, metrics
 from api.middleware.cors import add_cors
 from api.middleware.request_id import RequestIdMiddleware
 from api.middleware.idempotency import IdempotencyMiddleware
+from api.security import make_api_key_dependency
 from api.middleware.errors import SynarchError, synarch_error_handler, generic_error_handler
 
 
@@ -12,6 +13,7 @@ def create_app(
     *,
     enable_idempotency: bool = True,
     idempotency_ttl_seconds: int = 86400,
+    api_key: str | None = None,
 ) -> FastAPI:
     """Create and configure the FastAPI application."""
     app = FastAPI(
@@ -31,9 +33,10 @@ def create_app(
     app.add_exception_handler(Exception, generic_error_handler)
 
     # Routes
-    app.include_router(missions.router, tags=["missions"], prefix="/api/v1")
-    app.include_router(agents.router, tags=["agents"], prefix="/api/v1")
+    auth = [Depends(make_api_key_dependency(api_key))]
+    app.include_router(missions.router, tags=["missions"], prefix="/api/v1", dependencies=auth)
+    app.include_router(agents.router, tags=["agents"], prefix="/api/v1", dependencies=auth)
     app.include_router(health.router, tags=["health"], prefix="/api/v1")
-    app.include_router(metrics.router, prefix="/api/v1")
+    app.include_router(metrics.router, prefix="/api/v1", dependencies=auth)
 
     return app
