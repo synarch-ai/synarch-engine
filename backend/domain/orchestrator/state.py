@@ -2,6 +2,12 @@
 from typing import TypedDict, List, Optional, Annotated
 import operator
 
+
+def last_value(_old, new):
+    """Reducer: last writer wins. Lets parallel branches both set a scalar key."""
+    return new
+
+
 class TaskAssignment(TypedDict):
     task_id: str
     agent: str
@@ -23,9 +29,9 @@ class MissionState(TypedDict):
     plan_rationale: str
 
     # Execution
-    phase: str  # MissionPhase value
+    phase: Annotated[str, last_value]  # MissionPhase value
     tasks: Annotated[List[TaskAssignment], operator.add]
-    current_agent: str
+    current_agent: Annotated[str, last_value]
 
     # Communication (append-only via reducer)
     messages: Annotated[List[dict], operator.add]
