@@ -2,6 +2,9 @@
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
@@ -31,7 +34,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:3000"]
 
     # --- Paths ---
-    souls_dir: str = "docs/agents"
+    souls_dir: str = str(REPO_ROOT / "docs" / "agents")  # absolute; independent of cwd
 
     # --- Model Routing ---
     model_synarch: str = "bedrock/anthropic.claude-opus-4-20250514-v1:0"

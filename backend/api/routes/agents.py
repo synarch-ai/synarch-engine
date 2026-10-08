@@ -2,6 +2,9 @@
 from pathlib import Path
 from fastapi import APIRouter
 
+from api.middleware.errors import SynarchError
+from config import get_settings
+
 router = APIRouter()
 
 AGENTS = ["synarch", "zeus", "thoth", "hermes", "hephaestus", "janus"]
@@ -22,10 +25,10 @@ async def list_agents():
 async def get_agent_soul(name: str):
     """Get agent's soul.md content (FR-12)."""
     if name not in AGENTS:
-        return {"error": f"Agent '{name}' not found"}, 404
-    
-    soul_path = Path("docs/agents") / name / "soul.md"
+        raise SynarchError("AGENT_NOT_FOUND", f"Agent '{name}' not found.", status_code=404)
+
+    soul_path = Path(get_settings().souls_dir) / name / "soul.md"
     if soul_path.exists():
         content = soul_path.read_text(encoding="utf-8")
         return {"agent": name, "soul": content}
-    return {"agent": name, "soul": f"Soul file not found for {name}"}
+    raise SynarchError("SOUL_NOT_FOUND", f"Soul file not found for {name}.", status_code=404)
