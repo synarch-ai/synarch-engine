@@ -24,7 +24,7 @@ from domain.agents.thoth import ThothAgent
 from domain.agents.zeus import ZeusAgent
 from domain.models.agent_message import MissionPhase
 from domain.models.mission import Mission, MissionStatus
-from domain.orchestrator.exceptions import BudgetExceededError, ResultPersistError
+from domain.orchestrator.exceptions import BudgetExceededError, CheckpointReadError, ResultPersistError
 from domain.orchestrator.graph import build_graph
 from ports.checkpointer import CheckpointerPort
 from ports.event_bus import EventBusPort
@@ -207,13 +207,26 @@ class MissionOrchestratorRuntime:
         raise RuntimeError(f"Failed to transition mission '{mission_id}' to '{status.value}' due to conflicts.")
 
     async def _load_checkpoint(self, graph_config: dict) -> Any | None:
+        """Return the saved snapshot, or None when the thread has no checkpoint.
+
+        "No checkpoint" is only an empty snapshot. A read error is never taken to
+        mean "start fresh" (that would re-run finished agent work, codex P1): it is
+        retried, then raised as CheckpointReadError.
+        """
         if not self.settings.require_durable_checkpointer:
             return None
-        try:
-            snapshot = await self._compiled_graph.aget_state(graph_config)
-        except Exception as exc:  # no checkpoint / backend hiccup -> start fresh
-            logger.warning("Could not load checkpoint: %s", exc)
-            return None
+        attempts = max(1, self.settings.persist_retry_attempts)
+        for attempt in range(1, attempts + 1):
+            try:
+                snapshot = await self._compiled_graph.aget_state(graph_config)
+                break
+            except Exception as exc:  # noqa: BLE001 - retried, then surfaced as CheckpointReadError
+                logger.warning("Checkpoint read failed (attempt %d/%d): %s", attempt, attempts, exc)
+                if attempt == attempts:
+                    raise CheckpointReadError(
+                        f"checkpoint could not be read after {attempts} attempts: {exc}"
+                    ) from exc
+                await asyncio.sleep(self.settings.persist_retry_delay_seconds * attempt)
         return snapshot if snapshot is not None and snapshot.values else None
 
     async def _persist_result(self, mission_id: UUID, result: dict[str, Any]) -> None:
@@ -483,6 +496,13 @@ class MissionOrchestratorRuntime:
         except asyncio.CancelledError:
             cancelled = True
             raise
+        except CheckpointReadError as exc:
+            logger.error("Mission %s failed: %s", mission.id, exc)
+            await self.mission_repo.patch_payload(
+                mission.id,
+                error_context={"code": "CHECKPOINT_READ_FAILED", "message": str(exc)},
+            )
+            await self._finish(mission.id, MissionStatus.FAILED)
         except ResultPersistError as exc:
             logger.error("Mission %s failed: %s", mission.id, exc)
             await self.mission_repo.patch_payload(
