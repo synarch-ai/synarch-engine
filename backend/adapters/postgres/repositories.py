@@ -458,29 +458,30 @@ class PostgresMissionRepository(MissionRepository):
         error_context: dict | None = None,
         result: dict | None = None,
     ) -> None:
-        plan_json = json.dumps(plan) if plan is not None else None
-        error_context_json = json.dumps(error_context) if error_context is not None else None
-        result_json = json.dumps(result, default=str) if result is not None else None
-        if plan_json is None and error_context_json is None and result_json is None:
+        # Only name the columns being written, so plan/error_context writes keep working
+        # on databases without migration 003's ``result`` column (review M4).
+        values: dict[str, str] = {}
+        if plan is not None:
+            values["plan"] = json.dumps(plan)
+        if error_context is not None:
+            values["error_context"] = json.dumps(error_context)
+        if result is not None:
+            values["result"] = json.dumps(result, default=str)
+        if not values:
             return
+
+        columns = list(values)  # fixed identifiers from the allow-list above
+        placeholders = ", ".join(f"${i}::jsonb" for i in range(2, len(columns) + 2))
+        updates = ", ".join(f"{c} = EXCLUDED.{c}" for c in columns)
+        sql = (
+            f"INSERT INTO mission_payloads (mission_id, {', '.join(columns)}) "
+            f"VALUES ($1::uuid, {placeholders}) "
+            f"ON CONFLICT (mission_id) DO UPDATE SET {updates}"
+        )
 
         async with self.pool.acquire() as conn:
             async with conn.transaction():
-                await conn.execute(
-                    """
-                    INSERT INTO mission_payloads (mission_id, plan, error_context, result)
-                    VALUES ($1::uuid, $2::jsonb, $3::jsonb, $4::jsonb)
-                    ON CONFLICT (mission_id) DO UPDATE
-                    SET
-                        plan = COALESCE(EXCLUDED.plan, mission_payloads.plan),
-                        error_context = COALESCE(EXCLUDED.error_context, mission_payloads.error_context),
-                        result = COALESCE(EXCLUDED.result, mission_payloads.result)
-                    """,
-                    mission_id,
-                    plan_json,
-                    error_context_json,
-                    result_json,
-                )
+                await conn.execute(sql, mission_id, *values.values())
                 await conn.execute(
                     """
                     UPDATE missions
