@@ -40,6 +40,28 @@ def _enum_value(value: object) -> str:
     return str(value)
 
 
+_RUNNABLE = {
+    MissionStatus.CREATED.value,
+    MissionStatus.PLANNING.value,
+    MissionStatus.EXECUTING.value,
+}
+
+# Compare-and-expire / compare-and-delete so a worker can never extend or delete
+# a lease that another worker now owns (review m1).
+_LEASE_RENEW_LUA = """
+if redis.call('get', KEYS[1]) == ARGV[1] then
+  return redis.call('expire', KEYS[1], ARGV[2])
+end
+return 0
+"""
+_LEASE_RELEASE_LUA = """
+if redis.call('get', KEYS[1]) == ARGV[1] then
+  return redis.call('del', KEYS[1])
+end
+return 0
+"""
+
+
 class MissionBudgetGuard:
     """Distributed budget guard using Redis for mission-scoped model calls."""
 
@@ -197,29 +219,97 @@ class MissionOrchestratorRuntime:
     def _lease_key(self, mission_id: UUID) -> str:
         return f"synarch:mission:{mission_id}:lease"
 
-    async def _renew_lease(self, key: str, token: str) -> None:
-        interval = max(self.settings.mission_lease_seconds / 3, 1)
+    async def _renew_once(self, key: str, token: str) -> bool:
+        """Extend our lease, or re-take it if it lapsed and nobody else holds it."""
+        ttl = self.settings.mission_lease_seconds
+        if await self.redis_client.eval(_LEASE_RENEW_LUA, 1, key, token, ttl):
+            return True
+        return bool(await self.redis_client.set(key, token, nx=True, ex=ttl))
+
+    async def _renew_lease(self, key: str, token: str, lease_lost: asyncio.Event) -> None:
+        """Keep the lease alive; survive transient Redis errors; flag loss (review m1)."""
+        ttl = self.settings.mission_lease_seconds
+        interval = max(ttl / 3, 0.01)
+        loop = asyncio.get_running_loop()
+        last_ok = loop.time()
         while True:
             await asyncio.sleep(interval)
-            if await self.redis_client.get(key) != token:
-                return
-            await self.redis_client.expire(key, self.settings.mission_lease_seconds)
+            try:
+                if await self._renew_once(key, token):
+                    last_ok = loop.time()
+                    continue
+                logger.error("Lease %s was taken by another worker; stopping this run.", key)
+            except Exception as exc:  # noqa: BLE001 - transient Redis failure: retry until the lease would lapse
+                if loop.time() - last_ok < ttl:
+                    logger.warning("Lease renewal for %s failed (%s); retrying.", key, exc)
+                    continue
+                logger.error("Lease %s could not be renewed for %ss; stopping this run.", key, ttl)
+            lease_lost.set()
+            return
 
-    async def run_mission(self, mission_id: UUID) -> None:
-        """Run a mission under a cross-replica Redis lease (SYN-039)."""
+    async def _release_lease(self, key: str, token: str) -> None:
+        try:
+            await self.redis_client.eval(_LEASE_RELEASE_LUA, 1, key, token)
+        except Exception as exc:  # noqa: BLE001 - the lease expires on its own
+            logger.warning("Could not release lease %s: %s", key, exc)
+
+    async def run_mission(self, mission_id: UUID) -> bool:
+        """Run a mission under a cross-replica Redis lease (SYN-039).
+
+        Returns False without running when another worker holds the lease.
+        """
         key = self._lease_key(mission_id)
         token = uuid4().hex
         acquired = await self.redis_client.set(key, token, nx=True, ex=self.settings.mission_lease_seconds)
         if not acquired:
             logger.info("Mission %s is leased by another worker; skipping.", mission_id)
-            return
-        renewer = asyncio.create_task(self._renew_lease(key, token))
+            return False
+        lease_lost = asyncio.Event()
+        renewer = asyncio.create_task(self._renew_lease(key, token, lease_lost))
+        work = asyncio.create_task(self._run_mission_locked(mission_id))
+        lost_waiter = asyncio.create_task(lease_lost.wait())
         try:
-            await self._run_mission_locked(mission_id)
+            await asyncio.wait({work, lost_waiter}, return_when=asyncio.FIRST_COMPLETED)
+            if not work.done():
+                # Lease lost: another worker may now own the mission; stop ours without
+                # touching its status (the CancelledError path writes nothing).
+                work.cancel()
+                try:
+                    await work
+                except asyncio.CancelledError:
+                    pass
+                return True
+            await work  # propagate the run's own exception, if any
+            return True
+        except asyncio.CancelledError:
+            work.cancel()
+            try:
+                await work
+            except BaseException:  # noqa: BLE001
+                pass
+            raise
         finally:
             renewer.cancel()
-            if await self.redis_client.get(key) == token:
-                await self.redis_client.delete(key)
+            lost_waiter.cancel()
+            await self._release_lease(key, token)
+
+    async def _run_when_lease_free(self, mission_id: UUID) -> None:
+        """Recovery path: if a stale lease (e.g. from a crashed process) blocks the run,
+        retry once it has had time to expire instead of giving up (review M3)."""
+        key = self._lease_key(mission_id)
+        while True:
+            if await self.run_mission(mission_id):
+                return
+            mission = await self.mission_repo.get(mission_id)
+            if mission is None or _enum_value(mission.status) not in _RUNNABLE:
+                return
+            try:
+                remaining_ms = await self.redis_client.pttl(key)
+            except Exception:  # noqa: BLE001
+                remaining_ms = -1
+            wait = (remaining_ms / 1000) if remaining_ms and remaining_ms > 0 else self.settings.mission_lease_seconds
+            logger.info("Mission %s is leased; retrying recovery in %.1fs.", mission_id, wait)
+            await asyncio.sleep(wait + 0.05)
 
     async def stop_mission(self, mission_id: UUID) -> bool:
         """Cancel the in-process task running a mission (pause/cancel support, SYN-005)."""
@@ -250,13 +340,14 @@ class MissionOrchestratorRuntime:
                 return
             raise
 
-    async def launch_mission(self, mission_id: UUID) -> None:
+    async def launch_mission(self, mission_id: UUID, *, wait_for_lease: bool = False) -> None:
         mission_key = str(mission_id)
         existing = self._running_tasks.get(mission_key)
         if existing and not existing.done():
             return
 
-        task = asyncio.create_task(self.run_mission(mission_id), name=f"mission:{mission_key}")
+        runner = self._run_when_lease_free(mission_id) if wait_for_lease else self.run_mission(mission_id)
+        task = asyncio.create_task(runner, name=f"mission:{mission_key}")
         self._running_tasks[mission_key] = task
 
         def _cleanup(completed: asyncio.Task[Any]) -> None:
@@ -280,7 +371,7 @@ class MissionOrchestratorRuntime:
         for status in resume_statuses:
             missions = await self.mission_repo.list(status=status, limit=500, offset=0)
             for mission in missions:
-                await self.launch_mission(mission.id)
+                await self.launch_mission(mission.id, wait_for_lease=True)
 
     async def _run_mission_locked(self, mission_id: UUID) -> None:
         mission = await self.mission_repo.get(mission_id)
