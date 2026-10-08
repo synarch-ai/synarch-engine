@@ -319,7 +319,11 @@ class MissionOrchestratorRuntime:
         task.cancel()
         try:
             await task
-        except BaseException:  # noqa: BLE001 - CancelledError or task's own error
+        except asyncio.CancelledError:
+            current = asyncio.current_task()
+            if current is not None and current.cancelling():
+                raise  # the caller itself is being cancelled (disconnect/shutdown): propagate
+        except Exception:  # noqa: BLE001 - the mission task's own failure is logged by its callback
             pass
         return True
 

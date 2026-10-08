@@ -1,6 +1,4 @@
 """SYN-004: soul files resolve independent of cwd and fail loudly when missing."""
-import os
-
 import pytest
 from fastapi.testclient import TestClient
 

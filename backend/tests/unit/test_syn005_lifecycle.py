@@ -78,3 +78,31 @@ async def test_completion_does_not_override_cancelled_status():
     provider.gate.set()  # task NOT stopped: it finishes on its own
     await asyncio.wait_for(runtime._running_tasks[str(m.id)], 5)
     assert (await repo.get(m.id)).status == "cancelled"
+
+
+@pytest.mark.asyncio
+async def test_stop_mission_propagates_callers_own_cancellation():
+    """Review nit 1: stop_mission must not swallow a CancelledError aimed at its caller."""
+    from uuid import uuid4
+
+    runtime = MissionOrchestratorRuntime(
+        mission_repo=InMemoryMissionRepository(), model_provider=FakeModelProvider(), event_bus=FakeEventBus(),
+        checkpointer=FakeCheckpointer(), redis_client=FakeRedis(),
+        settings=Settings(require_durable_checkpointer=False),
+    )
+
+    async def slow_to_stop():
+        try:
+            await asyncio.sleep(10)
+        except asyncio.CancelledError:
+            await asyncio.sleep(0.3)
+            raise
+
+    mid = uuid4()
+    runtime._running_tasks[str(mid)] = asyncio.create_task(slow_to_stop())
+    await asyncio.sleep(0)
+    caller = asyncio.create_task(runtime.stop_mission(mid))
+    await asyncio.sleep(0.05)
+    caller.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await caller
