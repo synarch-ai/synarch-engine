@@ -13,6 +13,14 @@ from domain.agents.janus import parse_verdict
     ("Looks great overall, ship it.", "REVISE"),
     ("", "REVISE"),
     ("Failure modes were considered; passing grade.", "REVISE"),
+    # review m2: the fallback must not match a word at the start of any later line
+    ("Review summary:\n- Pass rate of the tests is only 40%", "REVISE"),
+    ("Overall this needs work.\nFail-safe handling is missing", "REVISE"),
+    ("Pass rate is 40%", "REVISE"),
+    ("PASS", "PASS"),
+    ("**FAIL**\nbroken", "FAIL"),
+    ("REVISE - add tests", "REVISE"),
+    ("\n\nPASS.\nAll good.", "PASS"),
 ])
 def test_parse_verdict(text, expected):
     assert parse_verdict(text) == expected

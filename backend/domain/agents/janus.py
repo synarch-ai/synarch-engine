@@ -7,12 +7,19 @@ from domain.events.types import EventTypes
 
 
 _VERDICT_LINE = re.compile(r"^[\s>*#_`\-]*verdict[\s*_`]*[:=\-][\s*_`]*(PASS|REVISE|FAIL)\b", re.I | re.M)
-_LEADING_TOKEN = re.compile(r"^[\s>*#_`\-]*(PASS|REVISE|FAIL)\b", re.I | re.M)
+# Fallback: a bare verdict token, only on the first non-empty line, and only when it is
+# the whole statement ("PASS", "FAIL: ...", "REVISE - ..."), never a word such as
+# "Pass rate ..." or "Fail-safe ..." (review m2).
+_LEADING_TOKEN = re.compile(r"^[\s>*#_`\-]*(PASS|REVISE|FAIL)[*_`]*(?:\s*[:.!]|\s+[-\u2013\u2014]\s|\s*$)", re.I)
 
 
 def parse_verdict(response: str) -> str:
     """Anchored verdict extraction. Unparseable output -> REVISE (never a silent PASS)."""
-    match = _VERDICT_LINE.search(response or "") or _LEADING_TOKEN.search(response or "")
+    text = response or ""
+    match = _VERDICT_LINE.search(text)
+    if match is None:
+        first_line = next((line for line in text.splitlines() if line.strip()), "")
+        match = _LEADING_TOKEN.match(first_line)
     return match.group(1).upper() if match else "REVISE"
 
 
