@@ -37,7 +37,7 @@ def fake_container():
 def client(fake_container):
     app = create_app()
     app.state.container = fake_container
-    return TestClient(app)
+    return TestClient(app, client=("127.0.0.1", 50000))  # loopback: no API_KEY configured
 
 def test_get_daily_metrics_empty(client):
     response = client.get("/api/v1/metrics/daily")

@@ -134,7 +134,7 @@ def _build_client() -> TestClient:
         mission_repo=InMemoryMissionRepository(),
         mission_runtime=NoopMissionRuntime(),
     )
-    return TestClient(app)
+    return TestClient(app, client=("127.0.0.1", 50000))  # loopback: no API_KEY configured
 
 
 def test_start_mission_and_fetch_state() -> None:

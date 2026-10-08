@@ -41,3 +41,65 @@ def test_non_loopback_bind_requires_key():
     with pytest.raises(RuntimeError):
         resolve_bind("0.0.0.0", None)
     assert resolve_bind("0.0.0.0", "k") == "0.0.0.0"
+
+
+# --- review M2: no API_KEY means loopback-only, on every launch path ---------
+
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+from api.security import assert_safe_startup, cli_bind_host, is_loopback
+
+
+def test_no_key_rejects_non_loopback_client():
+    app = create_app(enable_idempotency=False, api_key=None)
+    remote = TestClient(app, client=("203.0.113.7", 40000))
+    r = remote.get("/api/v1/agents")
+    assert r.status_code == 403
+    assert r.json()["error"]["code"] == "API_KEY_REQUIRED"
+    assert remote.post("/api/v1/mission/start", json={"goal": "x"}).status_code == 403
+    assert remote.get("/api/v1/health").status_code == 200
+
+
+def test_no_key_allows_loopback_clients():
+    app = create_app(enable_idempotency=False, api_key=None)
+    for host in ("127.0.0.1", "::1", "::ffff:127.0.0.1"):
+        assert TestClient(app, client=(host, 40000)).get("/api/v1/agents").status_code == 200
+
+
+def test_is_loopback():
+    assert is_loopback("127.0.0.1") and is_loopback("127.0.0.2") and is_loopback("::1") and is_loopback("localhost")
+    assert not is_loopback("0.0.0.0") and not is_loopback("10.0.0.1") and not is_loopback("testclient")
+    assert not is_loopback(None) and not is_loopback("")
+
+
+def test_cli_host_detection():
+    assert cli_bind_host(["uvicorn", "main:app", "--host", "0.0.0.0"], {}) == "0.0.0.0"
+    assert cli_bind_host(["uvicorn", "main:app", "--host=::"], {}) == "::"
+    assert cli_bind_host(["uvicorn", "main:app"], {"UVICORN_HOST": "0.0.0.0"}) == "0.0.0.0"
+    assert cli_bind_host(["uvicorn", "main:app"], {}) is None
+
+
+def test_startup_refuses_public_cli_bind_without_key():
+    with pytest.raises(RuntimeError, match="Refusing to bind 0.0.0.0"):
+        assert_safe_startup(None, ["uvicorn", "main:app", "--host", "0.0.0.0"], {})
+    with pytest.raises(RuntimeError):
+        assert_safe_startup(None, ["uvicorn", "main:app"], {"UVICORN_HOST": "0.0.0.0"})
+    assert_safe_startup("k", ["uvicorn", "main:app", "--host", "0.0.0.0"], {})
+    assert_safe_startup(None, ["uvicorn", "main:app", "--host", "127.0.0.1"], {})
+    assert_safe_startup(None, ["uvicorn", "main:app"], {})
+
+
+def test_uvicorn_cli_public_bind_without_key_exits():
+    """End to end: `uvicorn main:app --host 0.0.0.0` without API_KEY fails at startup, before binding."""
+    backend = Path(__file__).resolve().parents[2]
+    env = {**os.environ, "API_KEY": "", "DATABASE_URL": "postgresql://nobody@127.0.0.1:1/none"}
+    env.pop("UVICORN_HOST", None)
+    proc = subprocess.run(
+        [sys.executable, "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "0"],
+        cwd=backend, env=env, capture_output=True, text=True, timeout=60,
+    )
+    assert proc.returncode != 0
+    assert "Refusing to bind 0.0.0.0" in proc.stderr + proc.stdout

@@ -11,7 +11,7 @@ sys.path.insert(0, ".")
 from config import get_settings
 from container import create_container, shutdown_container
 from api.app import create_app
-from api.security import resolve_bind
+from api.security import assert_safe_startup, resolve_bind
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,6 +29,10 @@ async def lifespan(app):
     global _container
     settings = get_settings()
     logger.info("Starting Synarch Engine v%s", settings.app_version)
+    # Fail before touching any adapter if `uvicorn main:app --host <public>` is used without API_KEY.
+    assert_safe_startup(settings.api_key or None)
+    if not settings.api_key:
+        logger.warning("API_KEY is not set: the API only accepts requests from loopback clients.")
 
     # Bootstrap DI container
     _container = await create_container(settings)

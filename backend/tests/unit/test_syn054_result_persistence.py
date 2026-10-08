@@ -49,7 +49,7 @@ def test_state_endpoint_returns_result():
     repo = ApiRepo()
     app = create_app(enable_idempotency=False)
     app.state.container = _TestContainer(mission_repo=repo, mission_runtime=NoopMissionRuntime())
-    with TestClient(app) as c:
+    with TestClient(app, client=("127.0.0.1", 50000)) as c:
         mid = c.post("/api/v1/mission/start", json={"goal": "x"}).json()["mission_id"]
         mission = next(iter(repo._missions.values()))
         mission.result = {"final_output": "done", "deliverables": [{"agent": "zeus"}], "messages": [{"m": 1}], "tasks": [{"t": 1}]}

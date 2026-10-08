@@ -30,7 +30,7 @@ def test_missing_soul_raises(tmp_path):
 
 def test_soul_endpoint_from_other_cwd(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    c = TestClient(create_app(enable_idempotency=False))
+    c = TestClient(create_app(enable_idempotency=False), client=("127.0.0.1", 50000))
     r = c.get("/api/v1/agents/zeus/soul")
     assert r.status_code == 200 and r.json()["soul"].strip()
     assert "not found" not in r.json()["soul"].lower()

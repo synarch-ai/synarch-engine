@@ -71,6 +71,16 @@ class ApiKeyMiddleware:
             if not key_matches(provided, self.api_key):
                 await _reject(scope, send, headers, 401, "UNAUTHORIZED", "Missing or invalid API key.")
                 return
+        else:
+            # No key configured: fail closed for anything that is not a loopback client,
+            # whatever launcher or bind address was used (review M2).
+            client = scope.get("client")
+            if not client or not is_loopback(client[0]):
+                await _reject(
+                    scope, send, headers, 403, "API_KEY_REQUIRED",
+                    "API_KEY is not configured; only loopback clients are allowed.",
+                )
+                return
         await self.app(scope, receive, send)
 
 
