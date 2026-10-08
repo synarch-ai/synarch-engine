@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     model_call_budget_cap: int = 24
     budget_counter_ttl_seconds: int = 86400
     require_durable_checkpointer: bool = True
+    mission_lease_seconds: int = 120
 
     # --- HITL ---
     approval_timeout_seconds: int = 300

@@ -110,6 +110,15 @@ class FakeRedis:
     async def expire(self, key: str, ttl: int) -> bool:
         return True
 
+    async def set(self, key, value, nx: bool = False, ex: int | None = None):
+        if nx and key in self.data:
+            return None
+        self.data[key] = value
+        return True
+
+    async def get(self, key):
+        return self.data.get(key)
+
     async def delete(self, key: str) -> int:
         return 1 if self.data.pop(key, None) is not None else 0
 

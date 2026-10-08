@@ -11,7 +11,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from redis.asyncio import Redis
 
@@ -184,6 +184,43 @@ class MissionOrchestratorRuntime:
                 raise
         raise RuntimeError(f"Failed to transition mission '{mission_id}' to '{status.value}' due to conflicts.")
 
+    async def _load_checkpoint(self, graph_config: dict) -> Any | None:
+        if not self.settings.require_durable_checkpointer:
+            return None
+        try:
+            snapshot = await self._compiled_graph.aget_state(graph_config)
+        except Exception as exc:  # no checkpoint / backend hiccup -> start fresh
+            logger.warning("Could not load checkpoint: %s", exc)
+            return None
+        return snapshot if snapshot is not None and snapshot.values else None
+
+    def _lease_key(self, mission_id: UUID) -> str:
+        return f"synarch:mission:{mission_id}:lease"
+
+    async def _renew_lease(self, key: str, token: str) -> None:
+        interval = max(self.settings.mission_lease_seconds / 3, 1)
+        while True:
+            await asyncio.sleep(interval)
+            if await self.redis_client.get(key) != token:
+                return
+            await self.redis_client.expire(key, self.settings.mission_lease_seconds)
+
+    async def run_mission(self, mission_id: UUID) -> None:
+        """Run a mission under a cross-replica Redis lease (SYN-039)."""
+        key = self._lease_key(mission_id)
+        token = uuid4().hex
+        acquired = await self.redis_client.set(key, token, nx=True, ex=self.settings.mission_lease_seconds)
+        if not acquired:
+            logger.info("Mission %s is leased by another worker; skipping.", mission_id)
+            return
+        renewer = asyncio.create_task(self._renew_lease(key, token))
+        try:
+            await self._run_mission_locked(mission_id)
+        finally:
+            renewer.cancel()
+            if await self.redis_client.get(key) == token:
+                await self.redis_client.delete(key)
+
     async def stop_mission(self, mission_id: UUID) -> bool:
         """Cancel the in-process task running a mission (pause/cancel support, SYN-005)."""
         task = self._running_tasks.get(str(mission_id))
@@ -245,7 +282,7 @@ class MissionOrchestratorRuntime:
             for mission in missions:
                 await self.launch_mission(mission.id)
 
-    async def run_mission(self, mission_id: UUID) -> None:
+    async def _run_mission_locked(self, mission_id: UUID) -> None:
         mission = await self.mission_repo.get(mission_id)
         if mission is None:
             logger.warning("Mission %s disappeared before orchestration start.", mission_id)
@@ -294,7 +331,15 @@ class MissionOrchestratorRuntime:
                 "error": None,
             }
             graph_config = {"configurable": {"thread_id": mission.thread_id or mission_id_str}}
-            final_state = await self._compiled_graph.ainvoke(initial_state, config=graph_config)
+            graph_input: Any = initial_state
+            snapshot = await self._load_checkpoint(graph_config)
+            if snapshot is not None and snapshot.next:
+                logger.info("Resuming mission %s from checkpoint at %s.", mission.id, snapshot.next)
+                graph_input = None  # continue from the saved checkpoint (SYN-039)
+            elif snapshot is not None and snapshot.values:
+                logger.info("Mission %s graph already finished; reusing final state.", mission.id)
+                graph_input = None
+            final_state = await self._compiled_graph.ainvoke(graph_input, config=graph_config)
 
             await self.mission_repo.patch_payload(
                 mission.id,
