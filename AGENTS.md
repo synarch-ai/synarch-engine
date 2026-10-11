@@ -35,8 +35,15 @@ Local env overrides live in `backend/.env.local` and `apps/web/.env.local`
 
 ```bash
 cd backend && source .venv/bin/activate
-uvicorn main:app --host 0.0.0.0 --port 8000   # or: python main.py (adds --reload)
+uvicorn main:app --host 127.0.0.1 --port 8000   # or: python main.py (same loopback default)
 ```
+
+Without `API_KEY` the API only serves loopback clients, and startup refuses a
+non-loopback `--host`. To expose it, set `API_KEY` and send it as `X-API-Key`
+or `Authorization: Bearer <key>` (`/api/v1/health` stays open).
+The web dashboard reads metrics through its own server route
+(`apps/web/app/api/metrics/daily/route.ts`), which sends `SYNARCH_API_KEY` from
+`apps/web/.env.local` server-side; the key is never exposed to the browser.
 
 Boot requires PostgreSQL, Redis, and (gracefully degrading) NATS. Side-effecting
 API endpoints require an `Idempotency-Key` header.

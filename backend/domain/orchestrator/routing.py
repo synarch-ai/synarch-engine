@@ -33,8 +33,9 @@ def route_after_review(state: MissionState) -> str:
 
     if verdict == "FAIL":
         return "fail"
-    if verdict == "REVISE" and revision_count < 3:
-        return "revise"
+    if verdict == "REVISE":
+        # Exhausted revisions must not be synthesized as success (SYN-038).
+        return "revise" if revision_count < 3 else "fail"
     return "synthesize"
 
 

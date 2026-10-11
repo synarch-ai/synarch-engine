@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 from datetime import datetime
+from pathlib import Path
 from uuid import UUID, uuid4
 
 import asyncpg
@@ -12,6 +13,9 @@ import asyncpg
 from api.middleware.errors import SynarchError
 from domain.models.mission import Mission
 from ports.persistence import MissionRepository
+
+
+MIGRATIONS_DIR = Path(__file__).parent / "migrations"
 
 
 def _enum_value(value: object) -> str:
@@ -180,7 +184,8 @@ class PostgresMissionRepository(MissionRepository):
                     m.completed_at,
                     m.thread_id,
                     mp.plan,
-                    mp.error_context
+                    mp.error_context,
+                    to_jsonb(mp) -> 'result' AS result
                 FROM missions m
                 LEFT JOIN mission_payloads mp ON mp.mission_id = m.id
                 WHERE m.id = $1::uuid
@@ -202,6 +207,7 @@ class PostgresMissionRepository(MissionRepository):
                 completed_at=row["completed_at"],
                 error_context=_json_field(row["error_context"]),
                 thread_id=row["thread_id"],
+                result=_json_field(row["result"]),
             )
 
     async def update_status(self, mission_id: UUID, status: str, **kwargs) -> None:
@@ -454,27 +460,32 @@ class PostgresMissionRepository(MissionRepository):
         *,
         plan: list[str] | None = None,
         error_context: dict | None = None,
+        result: dict | None = None,
     ) -> None:
-        plan_json = json.dumps(plan) if plan is not None else None
-        error_context_json = json.dumps(error_context) if error_context is not None else None
-        if plan_json is None and error_context_json is None:
+        # Only name the columns being written, so plan/error_context writes keep working
+        # on databases without migration 003's ``result`` column (review M4).
+        values: dict[str, str] = {}
+        if plan is not None:
+            values["plan"] = json.dumps(plan)
+        if error_context is not None:
+            values["error_context"] = json.dumps(error_context)
+        if result is not None:
+            values["result"] = json.dumps(result, default=str)
+        if not values:
             return
+
+        columns = list(values)  # fixed identifiers from the allow-list above
+        placeholders = ", ".join(f"${i}::jsonb" for i in range(2, len(columns) + 2))
+        updates = ", ".join(f"{c} = EXCLUDED.{c}" for c in columns)
+        sql = (
+            f"INSERT INTO mission_payloads (mission_id, {', '.join(columns)}) "
+            f"VALUES ($1::uuid, {placeholders}) "
+            f"ON CONFLICT (mission_id) DO UPDATE SET {updates}"
+        )
 
         async with self.pool.acquire() as conn:
             async with conn.transaction():
-                await conn.execute(
-                    """
-                    INSERT INTO mission_payloads (mission_id, plan, error_context)
-                    VALUES ($1::uuid, $2::jsonb, $3::jsonb)
-                    ON CONFLICT (mission_id) DO UPDATE
-                    SET
-                        plan = COALESCE(EXCLUDED.plan, mission_payloads.plan),
-                        error_context = COALESCE(EXCLUDED.error_context, mission_payloads.error_context)
-                    """,
-                    mission_id,
-                    plan_json,
-                    error_context_json,
-                )
+                await conn.execute(sql, mission_id, *values.values())
                 await conn.execute(
                     """
                     UPDATE missions
@@ -504,3 +515,28 @@ async def create_postgres_pool(database_url: str) -> asyncpg.Pool:
             if attempts >= max_attempts:
                 raise
             await asyncio.sleep(min(2**attempts, 10))
+
+
+async def ensure_mission_result_column(pool: asyncpg.Pool) -> bool:
+    """Apply migration 003 to databases created before it existed. Returns True if applied.
+
+    docker-compose only runs ``docker-entrypoint-initdb.d`` scripts on a fresh volume,
+    so an existing ``postgres_data`` volume never receives 003 (codex P1). 003 is
+    idempotent; it is only executed when the column is actually missing, so no
+    ALTER privilege is needed on an up-to-date schema.
+    """
+    async with pool.acquire() as conn:
+        present = await conn.fetchval(
+            """
+            SELECT EXISTS (
+                SELECT 1 FROM pg_attribute
+                WHERE attrelid = to_regclass('mission_payloads')
+                  AND attname = 'result'
+                  AND NOT attisdropped
+            )
+            """
+        )
+        if present:
+            return False
+        await conn.execute((MIGRATIONS_DIR / "003_mission_result.sql").read_text())
+        return True

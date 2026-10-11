@@ -9,13 +9,6 @@ class SynarchAgent(AgentNode):
     """Supreme orchestrator. Decomposes God's goal into a plan."""
 
     async def process(self, state: MissionState) -> dict:
-        mission_id = state["mission_id"]
-        goal = state["goal"]
-        phase = state.get("phase", MissionPhase.PLANNING)
-
-        if phase == MissionPhase.SYNTHESIZING or state.get("review_verdict") == "PASS":
-            return await self._synthesize(state)
-
         return await self._plan(state)
 
     async def _plan(self, state: MissionState) -> dict:
@@ -48,7 +41,7 @@ class SynarchAgent(AgentNode):
         return {
             "plan": plan_steps,
             "plan_rationale": response,
-            "phase": MissionPhase.EXECUTING,
+            "phase": MissionPhase.EXECUTING.value,  # plain str: checkpoint-safe
             "messages": [{"agent": "synarch", "role": "delegation", "content": response, "timestamp": "", "metadata": {}}],
         }
 
@@ -77,6 +70,13 @@ class SynarchAgent(AgentNode):
 
         return {
             "final_output": response,
-            "phase": MissionPhase.SYNTHESIZING,
+            "phase": MissionPhase.SYNTHESIZING.value,
             "messages": [{"agent": "synarch", "role": "synthesis", "content": response, "timestamp": "", "metadata": {}}],
         }
+
+
+class SynthesizerAgent(SynarchAgent):
+    """Dedicated synthesis node: always produces the final report, never re-plans (SYN-038)."""
+
+    async def process(self, state: MissionState) -> dict:
+        return await self._synthesize(state)

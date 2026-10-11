@@ -1,7 +1,25 @@
 """Janus — Reviewer Agent (Tier 3): Quality gate."""
+import re
+
 from domain.agents.base import AgentNode
 from domain.orchestrator.state import MissionState
 from domain.events.types import EventTypes
+
+
+# Janus must open its reply with its verdict, so only the first non-empty line is parsed:
+# verdict-looking text quoted from a deliverable further down is never read (codex P2).
+_VERDICT_LINE = re.compile(r"^[\s>*#_`\-]*verdict[\s*_`]*[:=\-][\s*_`]*(PASS|REVISE|FAIL)\b", re.I)
+# Or a bare verdict token on that same line, only when it is
+# the whole statement ("PASS", "FAIL: ...", "REVISE - ..."), never a word such as
+# "Pass rate ..." or "Fail-safe ..." (review m2).
+_LEADING_TOKEN = re.compile(r"^[\s>*#_`\-]*(PASS|REVISE|FAIL)[*_`]*(?:\s*[:.!]|\s+[-\u2013\u2014]\s|\s*$)", re.I)
+
+
+def parse_verdict(response: str) -> str:
+    """Verdict from the reply's first non-empty line only. Unparseable -> REVISE (never a silent PASS)."""
+    first_line = next((line for line in (response or "").splitlines() if line.strip()), "")
+    match = _VERDICT_LINE.match(first_line) or _LEADING_TOKEN.match(first_line)
+    return match.group(1).upper() if match else "REVISE"
 
 
 class JanusAgent(AgentNode):
@@ -18,7 +36,8 @@ class JanusAgent(AgentNode):
             f"REVISION COUNT: {revision_count}/3\n\n"
             f"Review each deliverable for quality, completeness, and correctness.\n"
             f"Issue a verdict: PASS (ready for synthesis), REVISE (needs improvement), or FAIL (unsalvageable).\n"
-            f"Provide specific feedback."
+            f"Begin your reply with a line of exactly the form 'VERDICT: PASS', 'VERDICT: REVISE' or 'VERDICT: FAIL', "
+            f"then provide specific feedback."
         )
 
         response = await self.invoke_llm(
@@ -26,12 +45,7 @@ class JanusAgent(AgentNode):
             mission_id=mission_id,
         )
 
-        # Extract verdict (simplified — will use structured output)
-        verdict = "PASS"
-        if "REVISE" in response.upper():
-            verdict = "REVISE"
-        elif "FAIL" in response.upper():
-            verdict = "FAIL"
+        verdict = parse_verdict(response)
 
         await self.emit_event(
             EventTypes.DELIVERABLE_REVIEWED,

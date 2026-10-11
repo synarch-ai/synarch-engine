@@ -21,7 +21,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-synarch}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # initdb scripts only run on a fresh volume; the backend applies 003 to an
+      # existing volume at startup (adapters/postgres/repositories.py).
       - ../backend/adapters/postgres/migrations/001_initial.sql:/docker-entrypoint-initdb.d/001_initial.sql:ro
+      - ../backend/adapters/postgres/migrations/002_metrics_views.sql:/docker-entrypoint-initdb.d/002_metrics_views.sql:ro
+      - ../backend/adapters/postgres/migrations/003_mission_result.sql:/docker-entrypoint-initdb.d/003_mission_result.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-synarch} -d ${POSTGRES_DB:-synarch}"]
       interval: 5s

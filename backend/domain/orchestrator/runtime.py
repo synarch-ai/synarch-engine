@@ -11,7 +11,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from redis.asyncio import Redis
 
@@ -19,12 +19,12 @@ from config import Settings
 from domain.agents.hephaestus import HephaestusAgent
 from domain.agents.hermes import HermesAgent
 from domain.agents.janus import JanusAgent
-from domain.agents.synarch import SynarchAgent
+from domain.agents.synarch import SynarchAgent, SynthesizerAgent
 from domain.agents.thoth import ThothAgent
 from domain.agents.zeus import ZeusAgent
 from domain.models.agent_message import MissionPhase
 from domain.models.mission import Mission, MissionStatus
-from domain.orchestrator.exceptions import BudgetExceededError
+from domain.orchestrator.exceptions import BudgetExceededError, CheckpointReadError, ResultPersistError
 from domain.orchestrator.graph import build_graph
 from ports.checkpointer import CheckpointerPort
 from ports.event_bus import EventBusPort
@@ -38,6 +38,28 @@ def _enum_value(value: object) -> str:
     if hasattr(value, "value"):
         return str(getattr(value, "value"))
     return str(value)
+
+
+_RUNNABLE = {
+    MissionStatus.CREATED.value,
+    MissionStatus.PLANNING.value,
+    MissionStatus.EXECUTING.value,
+}
+
+# Compare-and-expire / compare-and-delete so a worker can never extend or delete
+# a lease that another worker now owns (review m1).
+_LEASE_RENEW_LUA = """
+if redis.call('get', KEYS[1]) == ARGV[1] then
+  return redis.call('expire', KEYS[1], ARGV[2])
+end
+return 0
+"""
+_LEASE_RELEASE_LUA = """
+if redis.call('get', KEYS[1]) == ARGV[1] then
+  return redis.call('del', KEYS[1])
+end
+return 0
+"""
 
 
 class MissionBudgetGuard:
@@ -130,6 +152,12 @@ class MissionOrchestratorRuntime:
             **agent_common,
         )
 
+        synthesizer = SynthesizerAgent(
+            name="synarch",
+            model=self.settings.model_synarch,
+            **agent_common,
+        )
+
         return {
             "synarch": synarch,
             "zeus": zeus,
@@ -137,12 +165,14 @@ class MissionOrchestratorRuntime:
             "hermes": hermes,
             "hephaestus": hephaestus,
             "janus": janus,
-            "synthesize": synarch,
+            "synthesize": synthesizer,
             "fail": self._fail_node,
         }
 
     async def _fail_node(self, state: dict[str, Any]) -> dict[str, Any]:
         feedback = state.get("review_feedback") or "Janus returned FAIL verdict"
+        if state.get("review_verdict") == "REVISE":
+            feedback = f"revision limit exhausted without PASS; needs human review. Last feedback: {feedback}"
         return {
             "phase": MissionPhase.REVIEWING.value,
             "error": f"REVIEW_FAILED: {feedback}",
@@ -176,17 +206,187 @@ class MissionOrchestratorRuntime:
                 raise
         raise RuntimeError(f"Failed to transition mission '{mission_id}' to '{status.value}' due to conflicts.")
 
-    async def launch_mission(self, mission_id: UUID) -> None:
+    async def _load_checkpoint(self, graph_config: dict) -> Any | None:
+        """Return the saved snapshot, or None when the thread has no checkpoint.
+
+        "No checkpoint" is only an empty snapshot. A read error is never taken to
+        mean "start fresh" (that would re-run finished agent work, codex P1): it is
+        retried, then raised as CheckpointReadError.
+        """
+        if not self.settings.require_durable_checkpointer:
+            return None
+        attempts = max(1, self.settings.persist_retry_attempts)
+        for attempt in range(1, attempts + 1):
+            try:
+                snapshot = await self._compiled_graph.aget_state(graph_config)
+                break
+            except Exception as exc:  # noqa: BLE001 - retried, then surfaced as CheckpointReadError
+                logger.warning("Checkpoint read failed (attempt %d/%d): %s", attempt, attempts, exc)
+                if attempt == attempts:
+                    raise CheckpointReadError(
+                        f"checkpoint could not be read after {attempts} attempts: {exc}"
+                    ) from exc
+                await asyncio.sleep(self.settings.persist_retry_delay_seconds * attempt)
+        return snapshot if snapshot is not None and snapshot.values else None
+
+    async def _persist_result(self, mission_id: UUID, result: dict[str, Any]) -> None:
+        attempts = max(1, self.settings.persist_retry_attempts)
+        for attempt in range(1, attempts + 1):
+            try:
+                await self.mission_repo.patch_payload(mission_id, result=result)
+                return
+            except Exception as exc:  # noqa: BLE001 - retried, then surfaced as ResultPersistError
+                logger.warning(
+                    "Result write for mission %s failed (attempt %d/%d): %s", mission_id, attempt, attempts, exc,
+                )
+                if attempt == attempts:
+                    raise ResultPersistError(
+                        f"result could not be stored after {attempts} attempts "
+                        f"(is migration 003 applied?): {exc}"
+                    ) from exc
+                await asyncio.sleep(self.settings.persist_retry_delay_seconds * attempt)
+
+    def _lease_key(self, mission_id: UUID) -> str:
+        return f"synarch:mission:{mission_id}:lease"
+
+    async def _renew_once(self, key: str, token: str) -> bool:
+        """Extend our lease, or re-take it if it lapsed and nobody else holds it."""
+        ttl = self.settings.mission_lease_seconds
+        if await self.redis_client.eval(_LEASE_RENEW_LUA, 1, key, token, ttl):
+            return True
+        return bool(await self.redis_client.set(key, token, nx=True, ex=ttl))
+
+    async def _renew_lease(self, key: str, token: str, lease_lost: asyncio.Event) -> None:
+        """Keep the lease alive; survive transient Redis errors; flag loss (review m1)."""
+        ttl = self.settings.mission_lease_seconds
+        interval = max(ttl / 3, 0.01)
+        loop = asyncio.get_running_loop()
+        last_ok = loop.time()
+        while True:
+            await asyncio.sleep(interval)
+            try:
+                if await self._renew_once(key, token):
+                    last_ok = loop.time()
+                    continue
+                logger.error("Lease %s was taken by another worker; stopping this run.", key)
+            except Exception as exc:  # noqa: BLE001 - transient Redis failure: retry until the lease would lapse
+                if loop.time() - last_ok < ttl:
+                    logger.warning("Lease renewal for %s failed (%s); retrying.", key, exc)
+                    continue
+                logger.error("Lease %s could not be renewed for %ss; stopping this run.", key, ttl)
+            lease_lost.set()
+            return
+
+    async def _release_lease(self, key: str, token: str) -> None:
+        try:
+            await self.redis_client.eval(_LEASE_RELEASE_LUA, 1, key, token)
+        except Exception as exc:  # noqa: BLE001 - the lease expires on its own
+            logger.warning("Could not release lease %s: %s", key, exc)
+
+    async def run_mission(self, mission_id: UUID) -> bool:
+        """Run a mission under a cross-replica Redis lease (SYN-039).
+
+        Returns False without running when another worker holds the lease.
+        """
+        key = self._lease_key(mission_id)
+        token = uuid4().hex
+        acquired = await self.redis_client.set(key, token, nx=True, ex=self.settings.mission_lease_seconds)
+        if not acquired:
+            logger.info("Mission %s is leased by another worker; skipping.", mission_id)
+            return False
+        lease_lost = asyncio.Event()
+        renewer = asyncio.create_task(self._renew_lease(key, token, lease_lost))
+        work = asyncio.create_task(self._run_mission_locked(mission_id))
+        lost_waiter = asyncio.create_task(lease_lost.wait())
+        try:
+            await asyncio.wait({work, lost_waiter}, return_when=asyncio.FIRST_COMPLETED)
+            if not work.done():
+                # Lease lost: another worker may now own the mission; stop ours without
+                # touching its status (the CancelledError path writes nothing).
+                work.cancel()
+                try:
+                    await work
+                except asyncio.CancelledError:
+                    pass
+                return True
+            await work  # propagate the run's own exception, if any
+            return True
+        except asyncio.CancelledError:
+            work.cancel()
+            try:
+                await work
+            except BaseException:  # noqa: BLE001
+                pass
+            raise
+        finally:
+            renewer.cancel()
+            lost_waiter.cancel()
+            await self._release_lease(key, token)
+
+    async def _run_when_lease_free(self, mission_id: UUID) -> None:
+        """Recovery path: if a stale lease (e.g. from a crashed process) blocks the run,
+        retry once it has had time to expire instead of giving up (review M3)."""
+        key = self._lease_key(mission_id)
+        while True:
+            if await self.run_mission(mission_id):
+                return
+            mission = await self.mission_repo.get(mission_id)
+            if mission is None or _enum_value(mission.status) not in _RUNNABLE:
+                return
+            try:
+                remaining_ms = await self.redis_client.pttl(key)
+            except Exception:  # noqa: BLE001
+                remaining_ms = -1
+            wait = (remaining_ms / 1000) if remaining_ms and remaining_ms > 0 else self.settings.mission_lease_seconds
+            logger.info("Mission %s is leased; retrying recovery in %.1fs.", mission_id, wait)
+            await asyncio.sleep(wait + 0.05)
+
+    async def stop_mission(self, mission_id: UUID) -> bool:
+        """Cancel the in-process task running a mission (pause/cancel support, SYN-005)."""
+        task = self._running_tasks.get(str(mission_id))
+        if task is None or task.done():
+            return False
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            current = asyncio.current_task()
+            if current is not None and current.cancelling():
+                raise  # the caller itself is being cancelled (disconnect/shutdown): propagate
+        except Exception:  # noqa: BLE001 - the mission task's own failure is logged by its callback
+            pass
+        return True
+
+    async def _finish(self, mission_id: UUID, status: MissionStatus) -> None:
+        """Terminal transition that never overrides an externally-set status."""
+        mission = await self.mission_repo.get(mission_id)
+        if mission is None or _enum_value(mission.status) != MissionStatus.EXECUTING.value:
+            logger.info(
+                "Mission %s left executing state (%s); skipping transition to %s.",
+                mission_id, _enum_value(mission.status) if mission else None, status.value,
+            )
+            return
+        try:
+            await self._transition(mission_id, status)
+        except Exception as exc:
+            if getattr(exc, "code", None) == "MISSION_INVALID_TRANSITION":
+                logger.info("Mission %s transition to %s no longer valid: %s", mission_id, status.value, exc)
+                return
+            raise
+
+    async def launch_mission(self, mission_id: UUID, *, wait_for_lease: bool = False) -> None:
         mission_key = str(mission_id)
         existing = self._running_tasks.get(mission_key)
         if existing and not existing.done():
             return
 
-        task = asyncio.create_task(self.run_mission(mission_id), name=f"mission:{mission_key}")
+        runner = self._run_when_lease_free(mission_id) if wait_for_lease else self.run_mission(mission_id)
+        task = asyncio.create_task(runner, name=f"mission:{mission_key}")
         self._running_tasks[mission_key] = task
 
         def _cleanup(completed: asyncio.Task[Any]) -> None:
-            self._running_tasks.pop(mission_key, None)
+            if self._running_tasks.get(mission_key) is completed:
+                self._running_tasks.pop(mission_key, None)
             if completed.cancelled():
                 return
             error = completed.exception()
@@ -205,15 +405,24 @@ class MissionOrchestratorRuntime:
         for status in resume_statuses:
             missions = await self.mission_repo.list(status=status, limit=500, offset=0)
             for mission in missions:
-                await self.launch_mission(mission.id)
+                await self.launch_mission(mission.id, wait_for_lease=True)
 
-    async def run_mission(self, mission_id: UUID) -> None:
+    async def _run_mission_locked(self, mission_id: UUID) -> None:
         mission = await self.mission_repo.get(mission_id)
         if mission is None:
             logger.warning("Mission %s disappeared before orchestration start.", mission_id)
             return
 
+        if _enum_value(mission.status) not in {
+            MissionStatus.CREATED.value,
+            MissionStatus.PLANNING.value,
+            MissionStatus.EXECUTING.value,
+        }:
+            logger.info("Mission %s in status %s is not runnable; skipping.", mission_id, _enum_value(mission.status))
+            return
+
         mission_id_str = str(mission.id)
+        cancelled = False
         try:
             if _enum_value(mission.status) == MissionStatus.CREATED.value:
                 planning = await self._transition(mission.id, MissionStatus.PLANNING)
@@ -247,11 +456,29 @@ class MissionOrchestratorRuntime:
                 "error": None,
             }
             graph_config = {"configurable": {"thread_id": mission.thread_id or mission_id_str}}
-            final_state = await self._compiled_graph.ainvoke(initial_state, config=graph_config)
+            graph_input: Any = initial_state
+            snapshot = await self._load_checkpoint(graph_config)
+            if snapshot is not None and snapshot.next:
+                logger.info("Resuming mission %s from checkpoint at %s.", mission.id, snapshot.next)
+                graph_input = None  # continue from the saved checkpoint (SYN-039)
+            elif snapshot is not None and snapshot.values:
+                logger.info("Mission %s graph already finished; reusing final state.", mission.id)
+                graph_input = None
+            final_state = await self._compiled_graph.ainvoke(graph_input, config=graph_config)
 
             await self.mission_repo.patch_payload(
                 mission.id,
                 plan=final_state.get("plan") or [],
+            )
+            # Never report COMPLETED without a stored result (codex P1): retry, then fail.
+            await self._persist_result(
+                mission.id,
+                {
+                    "final_output": final_state.get("final_output"),
+                    "deliverables": final_state.get("deliverables") or [],
+                    "messages": final_state.get("messages") or [],
+                    "tasks": final_state.get("tasks") or [],
+                },
             )
 
             if final_state.get("error"):
@@ -262,10 +489,27 @@ class MissionOrchestratorRuntime:
                         "message": str(final_state["error"]),
                     },
                 )
-                await self._transition(mission.id, MissionStatus.FAILED)
+                await self._finish(mission.id, MissionStatus.FAILED)
                 return
 
-            await self._transition(mission.id, MissionStatus.COMPLETED)
+            await self._finish(mission.id, MissionStatus.COMPLETED)
+        except asyncio.CancelledError:
+            cancelled = True
+            raise
+        except CheckpointReadError as exc:
+            logger.error("Mission %s failed: %s", mission.id, exc)
+            await self.mission_repo.patch_payload(
+                mission.id,
+                error_context={"code": "CHECKPOINT_READ_FAILED", "message": str(exc)},
+            )
+            await self._finish(mission.id, MissionStatus.FAILED)
+        except ResultPersistError as exc:
+            logger.error("Mission %s failed: %s", mission.id, exc)
+            await self.mission_repo.patch_payload(
+                mission.id,
+                error_context={"code": "RESULT_PERSIST_FAILED", "message": str(exc)},
+            )
+            await self._finish(mission.id, MissionStatus.FAILED)
         except BudgetExceededError as exc:
             await self.mission_repo.patch_payload(
                 mission.id,
@@ -274,7 +518,7 @@ class MissionOrchestratorRuntime:
                     "message": str(exc),
                 },
             )
-            await self._transition(mission.id, MissionStatus.PAUSED_AWAITING_RESOURCES)
+            await self._finish(mission.id, MissionStatus.PAUSED_AWAITING_RESOURCES)
         except Exception as exc:
             logger.exception("Mission orchestration failed for %s: %s", mission.id, exc)
             await self.mission_repo.patch_payload(
@@ -284,6 +528,7 @@ class MissionOrchestratorRuntime:
                     "message": str(exc),
                 },
             )
-            await self._transition(mission.id, MissionStatus.FAILED)
+            await self._finish(mission.id, MissionStatus.FAILED)
         finally:
-            await self.budget_guard.clear(mission_id_str)
+            if not cancelled:
+                await self.budget_guard.clear(mission_id_str)

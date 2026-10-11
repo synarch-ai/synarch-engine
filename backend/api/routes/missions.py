@@ -101,14 +101,17 @@ async def get_mission_state(
     if not mission:
         raise MissionNotFoundError(mission_id)
 
+    result = mission.result or {}
     return MissionStateResponse(
         mission_id=str(mission.id),
         goal=mission.goal,
         status=_value(mission.status),
         authority_mode=_value(mission.authority_mode),
         plan=mission.plan,
-        tasks=[],
-        deliverables=[],
+        tasks=result.get("tasks") or [],
+        deliverables=result.get("deliverables") or [],
+        messages=result.get("messages") or [],
+        final_output=result.get("final_output"),
         created_at=mission.created_at,
         updated_at=mission.updated_at,
         completed_at=mission.completed_at,
@@ -142,6 +145,7 @@ async def cancel_mission(
     mission_id: str,
     request: Request,
     mission_repo: MissionRepository = Depends(get_mission_repository),
+    mission_runtime=Depends(get_mission_runtime),
 ):
     """Cancel a running mission (FR-3)."""
     mission_uuid = _parse_mission_id(mission_id)
@@ -153,6 +157,7 @@ async def cancel_mission(
         MissionStatus.CANCELLED.value,
         expected_version=mission.version,
     )
+    await mission_runtime.stop_mission(mission_uuid)
     return {
         "mission_id": mission_id,
         "status": MissionStatus.CANCELLED.value,
@@ -165,6 +170,7 @@ async def pause_mission(
     mission_id: str,
     request: Request,
     mission_repo: MissionRepository = Depends(get_mission_repository),
+    mission_runtime=Depends(get_mission_runtime),
 ):
     """Pause a running mission (FR-3)."""
     mission_uuid = _parse_mission_id(mission_id)
@@ -176,6 +182,7 @@ async def pause_mission(
         MissionStatus.PAUSED.value,
         expected_version=mission.version,
     )
+    await mission_runtime.stop_mission(mission_uuid)
     return {
         "mission_id": mission_id,
         "status": MissionStatus.PAUSED.value,
@@ -188,6 +195,7 @@ async def resume_mission(
     mission_id: str,
     request: Request,
     mission_repo: MissionRepository = Depends(get_mission_repository),
+    mission_runtime=Depends(get_mission_runtime),
 ):
     """Resume a paused mission (FR-3)."""
     mission_uuid = _parse_mission_id(mission_id)
@@ -199,6 +207,7 @@ async def resume_mission(
         MissionStatus.EXECUTING.value,
         expected_version=mission.version,
     )
+    await mission_runtime.launch_mission(mission_uuid)
     return {
         "mission_id": mission_id,
         "status": MissionStatus.EXECUTING.value,

@@ -101,10 +101,13 @@ class InMemoryMissionRepository(MissionRepository):
         *,
         plan: list[str] | None = None,
         error_context: dict | None = None,
+        result: dict | None = None,
     ) -> None:
         mission = self._missions.get(mission_id)
         if mission is None:
             return
+        if result is not None:
+            mission.result = result
         if plan is not None:
             mission.plan = plan
         if error_context is not None:
@@ -112,8 +115,18 @@ class InMemoryMissionRepository(MissionRepository):
 
 
 class NoopMissionRuntime:
+    """Records the runtime calls the routes make (review m3)."""
+
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, UUID]] = []
+
     async def launch_mission(self, mission_id: UUID) -> None:
+        self.calls.append(("launch", mission_id))
         return None
+
+    async def stop_mission(self, mission_id: UUID) -> bool:
+        self.calls.append(("stop", mission_id))
+        return False
 
 
 @dataclass
@@ -128,7 +141,7 @@ def _build_client() -> TestClient:
         mission_repo=InMemoryMissionRepository(),
         mission_runtime=NoopMissionRuntime(),
     )
-    return TestClient(app)
+    return TestClient(app, client=("127.0.0.1", 50000))  # loopback: no API_KEY configured
 
 
 def test_start_mission_and_fetch_state() -> None:
@@ -174,6 +187,12 @@ def test_mission_lifecycle_pause_resume_cancel() -> None:
         cancel_resp = client.post(f"/api/v1/mission/{mission_id}/cancel")
         assert cancel_resp.status_code == 200
         assert cancel_resp.json()["status"] == "cancelled"
+
+        # start launches, pause stops, resume relaunches, cancel stops the running task
+        mid = UUID(mission_id)
+        assert client.app.state.container.mission_runtime.calls == [
+            ("launch", mid), ("stop", mid), ("launch", mid), ("stop", mid),
+        ]
 
 
 def test_mission_not_found_returns_404() -> None:

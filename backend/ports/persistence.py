@@ -36,6 +36,7 @@ class MissionRepository(ABC):
         *,
         plan: List[str] | None = None,
         error_context: Dict | None = None,
+        result: Dict | None = None,
     ) -> None: ...
 
 

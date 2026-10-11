@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from datetime import datetime
 from uuid import UUID
 
@@ -64,10 +65,13 @@ class InMemoryMissionRepository(MissionRepository):
         *,
         plan: list[str] | None = None,
         error_context: dict | None = None,
+        result: dict | None = None,
     ) -> None:
         mission = self._missions.get(mission_id)
         if mission is None:
             return
+        if result is not None:
+            mission.result = result
         if plan is not None:
             mission.plan = plan
         if error_context is not None:
@@ -100,18 +104,65 @@ class FakeCheckpointer:
 
 
 class FakeRedis:
+    """In-memory Redis subset with TTLs and the runtime's lease Lua scripts."""
+
     def __init__(self) -> None:
-        self.data: dict[str, int] = {}
+        self.data: dict[str, object] = {}
+        self.expiry: dict[str, float] = {}
+
+    def _purge(self, key: str) -> None:
+        exp = self.expiry.get(key)
+        if exp is not None and time.monotonic() >= exp:
+            self.data.pop(key, None)
+            self.expiry.pop(key, None)
 
     async def incr(self, key: str) -> int:
-        self.data[key] = self.data.get(key, 0) + 1
+        self._purge(key)
+        self.data[key] = int(self.data.get(key, 0)) + 1
         return self.data[key]
 
     async def expire(self, key: str, ttl: int) -> bool:
+        self._purge(key)
+        if key not in self.data:
+            return False
+        self.expiry[key] = time.monotonic() + ttl
         return True
 
+    async def set(self, key, value, nx: bool = False, ex: int | None = None):
+        self._purge(key)
+        if nx and key in self.data:
+            return None
+        self.data[key] = value
+        self.expiry.pop(key, None)
+        if ex is not None:
+            self.expiry[key] = time.monotonic() + ex
+        return True
+
+    async def get(self, key):
+        self._purge(key)
+        return self.data.get(key)
+
     async def delete(self, key: str) -> int:
+        self.expiry.pop(key, None)
         return 1 if self.data.pop(key, None) is not None else 0
+
+    async def pttl(self, key: str) -> int:
+        self._purge(key)
+        if key not in self.data:
+            return -2
+        exp = self.expiry.get(key)
+        return -1 if exp is None else max(int((exp - time.monotonic()) * 1000), 0)
+
+    async def eval(self, script: str, numkeys: int, key: str, token: str, *args):
+        """Compare-and-expire / compare-and-delete, matching the runtime's Lua scripts."""
+        self._purge(key)
+        if self.data.get(key) != token:
+            return 0
+        if "'del'" in script:
+            return await self.delete(key)
+        if "'expire'" in script:
+            return int(await self.expire(key, int(args[0])))
+        raise NotImplementedError(script)
 
 
 class FakeModelProvider:

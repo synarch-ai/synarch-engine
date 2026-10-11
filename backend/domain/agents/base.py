@@ -45,14 +45,14 @@ class AgentNode(ABC):
         return self._soul
 
     def load_soul(self) -> str:
-        """Read the agent's soul.md file (FR-12)."""
+        """Read the agent's soul.md file (FR-12). Fails loudly if it is missing (SYN-004)."""
         path = Path(self.soul_path) / self.name / "soul.md"
-        if not path.exists():
-            # Try relative to project root
-            path = Path("docs/agents") / self.name / "soul.md"
-        if path.exists():
-            return path.read_text(encoding="utf-8")
-        return f"You are {self.name}, an AI agent in the Synarch hierarchy."
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"Soul file for agent '{self.name}' not found at '{path}'. "
+                "Set souls_dir to the docs/agents directory."
+            )
+        return path.read_text(encoding="utf-8")
 
     async def invoke_llm(self, messages: list[dict], **kwargs) -> str:
         """Call LLM via ModelProviderPort with soul as system prompt (FR-11)."""

@@ -2,6 +2,9 @@
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
@@ -31,7 +34,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:3000"]
 
     # --- Paths ---
-    souls_dir: str = "docs/agents"
+    souls_dir: str = str(REPO_ROOT / "docs" / "agents")  # absolute; independent of cwd
 
     # --- Model Routing ---
     model_synarch: str = "bedrock/anthropic.claude-opus-4-20250514-v1:0"
@@ -43,6 +46,11 @@ class Settings(BaseSettings):
     model_call_budget_cap: int = 24
     budget_counter_ttl_seconds: int = 86400
     require_durable_checkpointer: bool = True
+    mission_lease_seconds: int = 120
+    # Bounded retries for the durable reads/writes a mission's outcome depends on
+    # (result write, checkpoint read) before the run fails instead of guessing.
+    persist_retry_attempts: int = 3
+    persist_retry_delay_seconds: float = 0.5
 
     # --- HITL ---
     approval_timeout_seconds: int = 300
@@ -52,6 +60,10 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
 
     # --- API ---
+    api_key: str = ""  # shared secret (env API_KEY); empty = no auth (loopback only)
+    host: str = "127.0.0.1"
+    port: int = 8000
+    reload: bool = False
     idempotency_ttl_seconds: int = 86400
     enable_idempotency_middleware: bool = True
 

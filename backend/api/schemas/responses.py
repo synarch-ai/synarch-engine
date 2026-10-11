@@ -18,6 +18,8 @@ class MissionStateResponse(BaseModel):
     plan: list[str] | None = None
     tasks: list[dict] = Field(default_factory=list)
     deliverables: list[dict] = Field(default_factory=list)
+    messages: list[dict] = Field(default_factory=list)
+    final_output: str | None = None
     created_at: datetime
     updated_at: datetime
     completed_at: datetime | None = None

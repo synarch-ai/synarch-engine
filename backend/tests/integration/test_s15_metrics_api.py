@@ -15,7 +15,7 @@ class FakeMissionRepository(MissionRepository):
     async def list(self, status: str | None = None, limit: int = 50, offset: int = 0) -> List[Mission]: return []
     async def get_daily_metrics(self) -> List[Dict]: return []
     async def refresh_daily_metrics(self) -> None: pass
-    async def patch_payload(self, mission_id: UUID, *, plan: List[str] | None = None, error_context: Dict | None = None) -> None: pass
+    async def patch_payload(self, mission_id: UUID, *, plan: List[str] | None = None, error_context: Dict | None = None, result: Dict | None = None) -> None: pass
     async def update_status(self, mission_id: UUID, status: str, **kwargs) -> None: pass
 
 @pytest.fixture
@@ -37,7 +37,7 @@ def fake_container():
 def client(fake_container):
     app = create_app()
     app.state.container = fake_container
-    return TestClient(app)
+    return TestClient(app, client=("127.0.0.1", 50000))  # loopback: no API_KEY configured
 
 def test_get_daily_metrics_empty(client):
     response = client.get("/api/v1/metrics/daily")
